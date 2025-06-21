@@ -1,0 +1,12 @@
+# Load rules_haskell rules.
+load(
+    "@rules_haskell//haskell:defs.bzl",
+    "haskell_binary",
+)
+
+# Calculator application that performs basic arithmetic operations.
+haskell_binary(
+    name = "calculator",
+    srcs = [":Main.hs"],
+    deps = ["//:base"],
+) 

@@ -1,0 +1,14 @@
+# Load rules_haskell rules.
+load(
+    "@rules_haskell//haskell:defs.bzl",
+    "haskell_binary",
+)
+
+# Calculator MCP Server that provides tools for basic arithmetic operations.
+haskell_binary(
+    name = "calculator-mcp",
+    srcs = [":Main.hs"],
+    deps = [
+        "//:base"
+    ],
+) 

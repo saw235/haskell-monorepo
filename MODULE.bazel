@@ -1,0 +1,131 @@
+module(name = "your_project_name_here", version = "0.1")
+
+bazel_dep(name = "rules_haskell", version = "1.0")
+bazel_dep(name = "rules_cc", version = "0.0.9")
+
+haskell_toolchains = use_extension(
+    "@rules_haskell//extensions:haskell_toolchains.bzl",
+    "haskell_toolchains",
+)
+
+haskell_toolchains.bindists(version = "9.8.1")
+
+non_module_deps = use_extension(
+    "//:non_module_deps.bzl",
+    "non_module_deps",
+)
+
+use_repo(
+    non_module_deps,
+    "zlib.hs",
+    "Cabal",
+)
+
+stack = use_extension(
+    "@rules_haskell//extensions:stack_snapshot.bzl",
+    "stack_snapshot",
+)
+
+use_repo(
+    stack,
+    "stackage",
+    "stackage-exe",
+    "stackage-unpinned",
+)
+
+stack.package(
+    name = "zlib",
+    extra_deps = ["@zlib.hs"],
+    flags =
+        # Sets the default explicitly to demonstrate the flags attribute.
+        [
+            "-non-blocking-ffi",
+            "-pkg-config",
+    ],
+)
+
+# LTS snapshot published for ghc-9.4.6 (default version used by rules_haskell)
+stack.snapshot(name = "lts-23.22")
+
+# stack.package(
+#     name = "wai-websockets-3.0.1.1",
+#     setup_deps = ["@Cabal//:Cabal"],
+# )
+
+stack.package(
+    name = "aeson",
+)
+
+
+stack.package(
+    name = "bytestring",
+)
+
+stack.package(
+    name = "containers",
+    setup_deps = ["@Cabal//:Cabal"],
+)
+
+# stack.package(
+#     name = "mtl",
+#     setup_deps = ["@Cabal//:Cabal"],
+
+# )
+
+stack.package(
+    name = "stm",
+    setup_deps = ["@Cabal//:Cabal"],
+)
+
+stack.package(
+    name = "template-haskell",
+)
+
+stack.package(
+    name = "text",
+)
+
+stack.package(
+    name = "network-uri",
+)
+
+stack.package(
+    name = "wai",
+)
+
+stack.package(
+    name = "streaming-commons",
+    extra_deps = ["@zlib.hs"],
+)
+
+
+stack.package(
+    name = "warp",
+)
+
+stack.package(
+    name = "http-types",
+)
+
+stack.package(
+    name = "attoparsec",
+    components =
+        [
+            # attoparsec contains an internal library which is not exposed publicly,
+            # but required to build the public library, hence the declaration of
+            # those 2 components, as well as the explicit declaration of the
+            # dependency between them.
+            "lib",
+            "lib:attoparsec-internal",
+        ],
+    components_dependencies = {
+        "lib:attoparsec": ["lib:attoparsec-internal"],
+    },
+)
+
+
+# This uses an unpinned version of stack_snapshot, meaning that stack is invoked on every build.
+# To switch to pinned stackage dependencies, run `bazel run @stackage-unpinned//:pin` and
+# uncomment the following line.
+#stack.stack_snapshot_json(label = "//:stackage_snapshot.json")
+

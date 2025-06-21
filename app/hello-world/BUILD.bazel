@@ -1,0 +1,13 @@
+# Load rules_haskell rules.
+load(
+    "@rules_haskell//haskell:defs.bzl",
+    "haskell_binary",
+)
+
+# Hello world application using the Prelude module from the
+# GHC base package, and zlib from stackage, to print the hello world.
+haskell_binary(
+    name = "hello-world",
+    srcs = [":Main.hs"],
+    deps = ["//:base", "@stackage//:zlib"],
+) 

@@ -1,0 +1,60 @@
+# Applications
+
+This directory contains individual Haskell applications, each in their own subdirectory.
+
+## Structure
+
+```
+app/
+├── hello-world/          # Simple hello world application
+│   ├── BUILD.bazel
+│   └── Main.hs
+├── calculator/           # Basic calculator application
+│   ├── BUILD.bazel
+│   └── Main.hs
+└── README.md            # This file
+```
+
+## Building Applications
+
+To build a specific application:
+
+```bash
+# Build hello-world
+bazel build //app/hello-world:hello-world
+
+# Build calculator
+bazel build //app/calculator:calculator
+```
+
+## Running Applications
+
+To run a specific application:
+
+```bash
+# Run hello-world
+bazel run //app/hello-world:hello-world
+
+# Run calculator
+bazel run //app/calculator:calculator
+```
+
+## Adding New Applications
+
+To add a new application:
+
+1. Create a new directory: `mkdir app/your-app-name`
+2. Create `Main.hs` with your application code
+3. Create `BUILD.bazel` with the haskell_binary target:
+
+```bzl
+load("@rules_haskell//haskell:defs.bzl", "haskell_binary")
+
+haskell_binary(
+    name = "your-app-name",
+    srcs = [":Main.hs"],
+    deps = ["//:base"],  # Add other dependencies as needed
+)
+```
+
+4. Build and run: `bazel run //app/your-app-name:your-app-name` 

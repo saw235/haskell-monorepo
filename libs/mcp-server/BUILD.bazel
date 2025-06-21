@@ -1,0 +1,27 @@
+# Load rules_haskell rules.
+load(
+    "@rules_haskell//haskell:defs.bzl",
+    "haskell_library",
+)
+
+# MCP server library.
+haskell_library(
+    name = "mcp-server",
+    srcs = glob(["**/*.hs"]),
+    deps = [
+        "@stackage//:aeson",
+        "//:base",
+        "@stackage//:bytestring",
+        "@stackage//:containers",
+        # "@stackage//:mtl",
+        "@stackage//:stm",
+        "@stackage//:template-haskell",
+        "@stackage//:text",
+        "@stackage//:network-uri",
+        "@stackage//:wai",
+        # "@stackage//:wai-websockets",
+        "@stackage//:warp",
+        "@stackage//:http-types",
+    ],
+    visibility = ["//visibility:public"],
+) 
