@@ -14,7 +14,7 @@ haskell_binary(
     ],
     deps = [
         "//:base",
-        "//libs/mcp-server",
+        "//haskell/libs/mcp-server",
         "@stackage//:text",
         "@stackage//:network-uri",
     ],

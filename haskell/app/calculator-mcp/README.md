@@ -23,13 +23,13 @@ A Model Context Protocol (MCP) server that provides calculator functionality thr
 ## Building
 
 ```bash
-bazel build //app/calculator-mcp:calculator-mcp
+bazel build //haskell/app/calculator-mcp:calculator-mcp
 ```
 
 ## Running
 
 ```bash
-bazel run //app/calculator-mcp:calculator-mcp
+bazel run //haskell/app/calculator-mcp:calculator-mcp
 ```
 
 ## Usage with MCP Clients
@@ -47,24 +47,9 @@ For Claude Desktop, add to your `claude_desktop_config.json`:
             "command": "bazel",
             "args": [
                 "run",
-                "//app/calculator-mcp:calculator-mcp"
+                "//haskell/app/calculator-mcp:calculator-mcp"
             ]
         }
     }
 }
 ```
-
-## Implementation Details
-
-This server uses the [haskell-mcp-server](https://github.com/drshade/haskell-mcp-server) library and demonstrates:
-
-- Template Haskell derivation for automatic MCP schema generation
-- Type-safe tool, prompt, and resource definitions
-- Custom descriptions for better MCP integration
-- Error handling for edge cases (division by zero, negative square roots)
-
-## Dependencies
-
-- `mcp-server`: The MCP server framework
-- `text`: Text handling utilities
-- `base`: Standard Haskell libraries 

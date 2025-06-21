@@ -5,7 +5,7 @@ This directory contains individual Haskell applications, each in their own subdi
 ## Structure
 
 ```
-app/
+haskell/app/
 ├── hello-world/          # Simple hello world application
 │   ├── BUILD.bazel
 │   └── Main.hs
@@ -21,10 +21,10 @@ To build a specific application:
 
 ```bash
 # Build hello-world
-bazel build //app/hello-world:hello-world
+bazel build //haskell/app/hello-world:hello-world
 
 # Build calculator
-bazel build //app/calculator:calculator
+bazel build //haskell/app/calculator:calculator
 ```
 
 ## Running Applications
@@ -33,17 +33,17 @@ To run a specific application:
 
 ```bash
 # Run hello-world
-bazel run //app/hello-world:hello-world
+bazel run //haskell/app/hello-world:hello-world
 
 # Run calculator
-bazel run //app/calculator:calculator
+bazel run //haskell/app/calculator:calculator
 ```
 
 ## Adding New Applications
 
 To add a new application:
 
-1. Create a new directory: `mkdir app/your-app-name`
+1. Create a new directory: `mkdir haskell/app/your-app-name`
 2. Create `Main.hs` with your application code
 3. Create `BUILD.bazel` with the haskell_binary target:
 
@@ -57,4 +57,4 @@ haskell_binary(
 )
 ```
 
-4. Build and run: `bazel run //app/your-app-name:your-app-name` 
+4. Build and run: `bazel run //haskell/app/your-app-name:your-app-name` 
