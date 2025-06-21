@@ -7,28 +7,9 @@ import MCP.Server
 import MCP.Server.Derive
 import Data.Text (Text)
 import qualified Data.Text as T
-
--- Define calculator tools
-data CalculatorTool
-    = Add { a :: Double, b :: Double }
-    | Subtract { a :: Double, b :: Double }
-    | Multiply { a :: Double, b :: Double }
-    | Divide { a :: Double, b :: Double }
-    | Power { base :: Double, exponent :: Double }
-    | Sqrt { value :: Double }
-    deriving (Show, Eq)
-
--- Define calculator prompts
-data CalculatorPrompt
-    = CalculateExpression { expression :: Text }
-    | GetHelp
-    deriving (Show, Eq)
-
--- Define calculator resources
-data CalculatorResource
-    = Operations
-    | Constants
-    deriving (Show, Eq)
+import Descriptions (descriptions)
+import Types
+import Network.URI (URI)
 
 -- Implement tool handlers
 handleCalculatorTool :: CalculatorTool -> IO Content
@@ -75,59 +56,43 @@ handleCalculatorPrompt GetHelp =
         ]
 
 -- Implement resource handlers
-handleCalculatorResource :: CalculatorResource -> IO Content
-handleCalculatorResource Operations = 
-    pure $ ContentText $ T.unlines
-        [ "Supported Operations:"
-        , ""
-        , "1. Addition (+) - add two numbers"
-        , "2. Subtraction (-) - subtract two numbers"
-        , "3. Multiplication (*) - multiply two numbers"
-        , "4. Division (/) - divide two numbers"
-        , "5. Exponentiation (^) - raise to power"
-        , "6. Square Root (√) - calculate square root"
-        , ""
-        , "All operations work with real numbers (Double precision)."
-        ]
-handleCalculatorResource Constants = 
-    pure $ ContentText $ T.unlines
-        [ "Mathematical Constants:"
-        , ""
-        , "π (pi) ≈ 3.141592653589793"
-        , "e ≈ 2.718281828459045"
-        , "φ (golden ratio) ≈ 1.618033988749895"
-        , "√2 ≈ 1.4142135623730951"
-        , "√3 ≈ 1.7320508075688772"
-        , ""
-        , "Note: These are approximate values. For precise calculations, use the calculator tools."
-        ]
-
--- Custom descriptions for better MCP integration
-descriptions :: [(String, String)]
-descriptions = 
-    [ -- Tool descriptions
-      ("Add", "Add two numbers together")
-    , ("Subtract", "Subtract the second number from the first")
-    , ("Multiply", "Multiply two numbers")
-    , ("Divide", "Divide the first number by the second")
-    , ("Power", "Raise the base number to the given exponent")
-    , ("Sqrt", "Calculate the square root of a number")
-    , ("a", "First number for the operation")
-    , ("b", "Second number for the operation")
-    , ("base", "The base number to raise to a power")
-    , ("exponent", "The exponent to raise the base to")
-    , ("value", "The number to calculate the square root of")
-    , -- Prompt descriptions
-      ("CalculateExpression", "Get help with calculating mathematical expressions")
-    , ("GetHelp", "Show help information for the calculator")
-    , ("expression", "The mathematical expression you want help with")
-    , -- Resource descriptions
-      ("Operations", "List of supported mathematical operations")
-    , ("Constants", "Common mathematical constants")
-    ]
+handleCalculatorResource :: URI -> CalculatorResource -> IO ResourceContent
+handleCalculatorResource uri Operations = 
+    pure $ ResourceText
+        uri
+        "text/plain"
+        (T.unlines
+            [ "Supported Operations:"
+            , ""
+            , "1. Addition (+) - add two numbers"
+            , "2. Subtraction (-) - subtract two numbers"
+            , "3. Multiplication (*) - multiply two numbers"
+            , "4. Division (/) - divide two numbers"
+            , "5. Exponentiation (^) - raise to power"
+            , "6. Square Root (√) - calculate square root"
+            , ""
+            , "All operations work with real numbers (Double precision)."
+            ])
+handleCalculatorResource uri Constants = 
+    pure $ ResourceText
+        uri
+        "text/plain"
+        (T.unlines
+            [ "Mathematical Constants:"
+            , ""
+            , "π (pi) ≈ 3.141592653589793"
+            , "e ≈ 2.718281828459045"
+            , "φ (golden ratio) ≈ 1.618033988749895"
+            , "√2 ≈ 1.4142135623730951"
+            , "√3 ≈ 1.7320508075688772"
+            , ""
+            , "Note: These are approximate values. For precise calculations, use the calculator tools."
+            ])
 
 main :: IO ()
-main = runMcpServerStdio serverInfo handlers
+main = do
+    putStrLn "Starting Calculator MCP Server..."
+    runMcpServerStdio serverInfo handlers
   where
     serverInfo = McpServerInfo
       { serverName = "Calculator MCP Server"

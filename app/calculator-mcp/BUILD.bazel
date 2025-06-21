@@ -7,8 +7,15 @@ load(
 # Calculator MCP Server that provides tools for basic arithmetic operations.
 haskell_binary(
     name = "calculator-mcp",
-    srcs = [":Main.hs"],
+    srcs = [
+        ":Main.hs",
+        ":Descriptions.hs",
+        ":Types.hs",
+    ],
     deps = [
-        "//:base"
+        "//:base",
+        "//libs/mcp-server",
+        "@stackage//:text",
+        "@stackage//:network-uri",
     ],
 ) 
