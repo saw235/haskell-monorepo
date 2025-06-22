@@ -4,6 +4,7 @@ load("@bazel_skylib//rules:select_file.bzl", "select_file")
 load("@aspect_rules_ts//ts:defs.bzl", "ts_project")
 load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_run_binary")
 load("@npm//:defs.bzl", "npm_link_all_packages")
+load("@npm//tools/mcp-shrimp-task-manager:tsconfig-to-swcconfig/package_json.bzl", tsconfig_to_swcconfig = "bin")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -13,11 +14,12 @@ ts_project(
     name = "mcp-shrimp-task-manager-ts",
     srcs = glob(["src/**/*.ts"]),
     declaration = True,
-    out_dir = "./dist",
+    out_dir = "dist",
     resolve_json_module = True,
     source_map = True,
-    transpiler = swc,
+    transpiler = partial.make(swc, swcrc = ".swcrc"),
     tsconfig = ":tsconfig.json",
+    deps = [":node_modules"],
 )
 
 js_binary(
@@ -49,3 +51,4 @@ select_file(
 #     name = "mcp-shrimp-task-manager-run",
 #     tool = ":mcp-shrimp-task-manager",
 # )
+

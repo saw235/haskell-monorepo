@@ -26,6 +26,8 @@ common:windows --repo_env=BAZEL_DO_NOT_DETECT_CPP_TOOLCHAIN=1
 # Honor the skipLibCheck setting from tsconfig.json files
 # This allows individual TypeScript projects to control whether to skip type checking of declaration files
 common --@aspect_rules_ts//ts:skipLibCheck=honor_tsconfig
+common --@aspect_rules_ts//ts:default_to_tsc_transpiler
+
 
 # test environment does not propagate locales by default
 # some tests reads files written in UTF8, we need to propagate the correct

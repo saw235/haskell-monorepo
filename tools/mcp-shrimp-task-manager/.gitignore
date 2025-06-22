@@ -56,3 +56,8 @@ data/*
 
 # Cursor AI 生成的暫存檔案
 .cursor/tmp/ 
+
+bazel-out/
+bazel-bin/
+bazel-testlogs/
+bazel-haskell-monorepo/
