@@ -1,0 +1,51 @@
+load("@aspect_rules_swc//swc:defs.bzl", "swc")
+load("@bazel_skylib//lib:partial.bzl", "partial")
+load("@bazel_skylib//rules:select_file.bzl", "select_file")
+load("@aspect_rules_ts//ts:defs.bzl", "ts_project")
+load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_run_binary")
+load("@npm//:defs.bzl", "npm_link_all_packages")
+
+package(default_visibility = ["//visibility:public"])
+
+npm_link_all_packages(name = "node_modules")
+
+ts_project(
+    name = "mcp-shrimp-task-manager-ts",
+    srcs = glob(["src/**/*.ts"]),
+    declaration = True,
+    out_dir = "./dist",
+    resolve_json_module = True,
+    source_map = True,
+    transpiler = swc,
+    tsconfig = ":tsconfig.json",
+)
+
+js_binary(
+    name = "mcp-shrimp-task-manager",
+    data = [
+        ":node_modules",
+        ":mcp-shrimp-task-manager-ts",
+        ":package.json"
+    ] + glob([
+        "src/prompts/templates_en/**/*.md",
+        "src/prompts/templates_zh/**/*.md",
+    ]),
+    entry_point = ":entry-point",
+)
+
+# filegroup(
+#     name = "entry-point",
+#     srcs = [":mcp-shrimp-task-manager-ts"],
+# )
+
+
+select_file(
+    name = "entry-point",
+    srcs = ":mcp-shrimp-task-manager-ts",
+    subpath = "src/index.js",
+)
+
+# js_run_binary(
+#     name = "mcp-shrimp-task-manager-run",
+#     tool = ":mcp-shrimp-task-manager",
+# )

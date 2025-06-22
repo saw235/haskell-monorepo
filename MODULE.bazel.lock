@@ -1,0 +1,1179 @@
+{
+  "lockFileVersion": 11,
+  "registryFileHashes": {
+    "https://bcr.bazel.build/bazel_registry.json": "8a28e4aff06ee60aed2a8c281907fb8bcbf3b753c91fb5a5c57da3215d5b3497",
+    "https://bcr.bazel.build/modules/abseil-cpp/20210324.2/MODULE.bazel": "7cd0312e064fde87c8d1cd79ba06c876bd23630c83466e9500321be55c96ace2",
+    "https://bcr.bazel.build/modules/abseil-cpp/20211102.0/MODULE.bazel": "70390338f7a5106231d20620712f7cccb659cd0e9d073d1991c038eb9fc57589",
+    "https://bcr.bazel.build/modules/abseil-cpp/20230125.1/MODULE.bazel": "89047429cb0207707b2dface14ba7f8df85273d484c2572755be4bab7ce9c3a0",
+    "https://bcr.bazel.build/modules/abseil-cpp/20230802.0.bcr.1/MODULE.bazel": "1c8cec495288dccd14fdae6e3f95f772c1c91857047a098fad772034264cc8cb",
+    "https://bcr.bazel.build/modules/abseil-cpp/20230802.0.bcr.1/source.json": "14892cc698e02ffedf4967546e6bedb7245015906888d3465fcf27c90a26da10",
+    "https://bcr.bazel.build/modules/apple_support/1.5.0/MODULE.bazel": "50341a62efbc483e8a2a6aec30994a58749bd7b885e18dd96aa8c33031e558ef",
+    "https://bcr.bazel.build/modules/apple_support/1.5.0/source.json": "eb98a7627c0bc486b57f598ad8da50f6625d974c8f723e9ea71bd39f709c9862",
+    "https://bcr.bazel.build/modules/aspect_bazel_lib/1.38.1/MODULE.bazel": "17ae5bb970187e51c39a5ac21190279a58d7eeba83bc43e4165547cc0cf8de4a",
+    "https://bcr.bazel.build/modules/aspect_bazel_lib/2.11.0/MODULE.bazel": "cb1ba9f9999ed0bc08600c221f532c1ddd8d217686b32ba7d45b0713b5131452",
+    "https://bcr.bazel.build/modules/aspect_bazel_lib/2.14.0/MODULE.bazel": "2b31ffcc9bdc8295b2167e07a757dbbc9ac8906e7028e5170a3708cecaac119f",
+    "https://bcr.bazel.build/modules/aspect_bazel_lib/2.14.0/source.json": "0cf1826853b0bef8b5cd19c0610d717500f5521aa2b38b72b2ec302ac5e7526c",
+    "https://bcr.bazel.build/modules/aspect_bazel_lib/2.7.7/MODULE.bazel": "491f8681205e31bb57892d67442ce448cda4f472a8e6b3dc062865e29a64f89c",
+    "https://bcr.bazel.build/modules/aspect_bazel_lib/2.9.3/MODULE.bazel": "66baf724dbae7aff4787bf2245cc188d50cb08e07789769730151c0943587c14",
+    "https://bcr.bazel.build/modules/aspect_rules_js/1.34.0/MODULE.bazel": "cbe059f9c11db239121a858c5586cbfbed56777eb089860553675b25085ab11a",
+    "https://bcr.bazel.build/modules/aspect_rules_js/2.0.0/MODULE.bazel": "b45b507574aa60a92796e3e13c195cd5744b3b8aff516a9c0cb5ae6a048161c5",
+    "https://bcr.bazel.build/modules/aspect_rules_js/2.3.8/MODULE.bazel": "74bf20a7a6bd5f2be09607fdb4196cfd6f203422ea271752ec2b1afe95426101",
+    "https://bcr.bazel.build/modules/aspect_rules_js/2.3.8/source.json": "411ec9d79d6f5fe8a083359588c21d01a5b48d88a2cbd334a4c90365015b7836",
+    "https://bcr.bazel.build/modules/aspect_rules_swc/2.4.3/MODULE.bazel": "2477db7e0d53468c1e3df43bafc26e49a0c214e4ceda762344d560ce107ce7ce",
+    "https://bcr.bazel.build/modules/aspect_rules_swc/2.4.3/source.json": "f3cf36b85296ea687b333f5f050a6c331571713b5c7dc539e35e91f9aaf974d6",
+    "https://bcr.bazel.build/modules/aspect_rules_ts/3.6.0/MODULE.bazel": "d0045b5eabb012be550a609589b3e5e47eba682344b19cfd9365d4d896ed07df",
+    "https://bcr.bazel.build/modules/aspect_rules_ts/3.6.0/source.json": "5593e3f1cd0dd5147f7748e163307fd5c2e1077913d6945b58739ad8d770a290",
+    "https://bcr.bazel.build/modules/bazel_features/0.1.0/MODULE.bazel": "47011d645b0f949f42ee67f2e8775188a9cf4a0a1528aa2fa4952f2fd00906fd",
+    "https://bcr.bazel.build/modules/bazel_features/1.11.0/MODULE.bazel": "f9382337dd5a474c3b7d334c2f83e50b6eaedc284253334cf823044a26de03e8",
+    "https://bcr.bazel.build/modules/bazel_features/1.19.0/MODULE.bazel": "59adcdf28230d220f0067b1f435b8537dd033bfff8db21335ef9217919c7fb58",
+    "https://bcr.bazel.build/modules/bazel_features/1.19.0/source.json": "d7bf14517c1b25b9d9c580b0f8795fceeae08a7590f507b76aace528e941375d",
+    "https://bcr.bazel.build/modules/bazel_features/1.4.1/MODULE.bazel": "e45b6bb2350aff3e442ae1111c555e27eac1d915e77775f6fdc4b351b758b5d7",
+    "https://bcr.bazel.build/modules/bazel_features/1.9.0/MODULE.bazel": "885151d58d90d8d9c811eb75e3288c11f850e1d6b481a8c9f766adee4712358b",
+    "https://bcr.bazel.build/modules/bazel_skylib/1.0.3/MODULE.bazel": "bcb0fd896384802d1ad283b4e4eb4d718eebd8cb820b0a2c3a347fb971afd9d8",
+    "https://bcr.bazel.build/modules/bazel_skylib/1.1.1/MODULE.bazel": "1add3e7d93ff2e6998f9e118022c84d163917d912f5afafb3058e3d2f1545b5e",
+    "https://bcr.bazel.build/modules/bazel_skylib/1.2.0/MODULE.bazel": "44fe84260e454ed94ad326352a698422dbe372b21a1ac9f3eab76eb531223686",
+    "https://bcr.bazel.build/modules/bazel_skylib/1.2.1/MODULE.bazel": "f35baf9da0efe45fa3da1696ae906eea3d615ad41e2e3def4aeb4e8bc0ef9a7a",
+    "https://bcr.bazel.build/modules/bazel_skylib/1.3.0/MODULE.bazel": "20228b92868bf5cfc41bda7afc8a8ba2a543201851de39d990ec957b513579c5",
+    "https://bcr.bazel.build/modules/bazel_skylib/1.4.1/MODULE.bazel": "a0dcb779424be33100dcae821e9e27e4f2901d9dfd5333efe5ac6a8d7ab75e1d",
+    "https://bcr.bazel.build/modules/bazel_skylib/1.4.2/MODULE.bazel": "3bd40978e7a1fac911d5989e6b09d8f64921865a45822d8b09e815eaa726a651",
+    "https://bcr.bazel.build/modules/bazel_skylib/1.5.0/MODULE.bazel": "32880f5e2945ce6a03d1fbd588e9198c0a959bb42297b2cfaf1685b7bc32e138",
+    "https://bcr.bazel.build/modules/bazel_skylib/1.6.1/MODULE.bazel": "8fdee2dbaace6c252131c00e1de4b165dc65af02ea278476187765e1a617b917",
+    "https://bcr.bazel.build/modules/bazel_skylib/1.7.1/MODULE.bazel": "3120d80c5861aa616222ec015332e5f8d3171e062e3e804a2a0253e1be26e59b",
+    "https://bcr.bazel.build/modules/bazel_skylib/1.7.1/source.json": "f121b43eeefc7c29efbd51b83d08631e2347297c95aac9764a701f2a6a2bb953",
+    "https://bcr.bazel.build/modules/buildozer/7.1.2/MODULE.bazel": "2e8dd40ede9c454042645fd8d8d0cd1527966aa5c919de86661e62953cd73d84",
+    "https://bcr.bazel.build/modules/buildozer/7.1.2/source.json": "c9028a501d2db85793a6996205c8de120944f50a0d570438fcae0457a5f9d1f8",
+    "https://bcr.bazel.build/modules/googletest/1.11.0/MODULE.bazel": "3a83f095183f66345ca86aa13c58b59f9f94a2f81999c093d4eeaa2d262d12f4",
+    "https://bcr.bazel.build/modules/googletest/1.14.0/MODULE.bazel": "cfbcbf3e6eac06ef9d85900f64424708cc08687d1b527f0ef65aa7517af8118f",
+    "https://bcr.bazel.build/modules/googletest/1.14.0/source.json": "2478949479000fdd7de9a3d0107ba2c85bb5f961c3ecb1aa448f52549ce310b5",
+    "https://bcr.bazel.build/modules/jsoncpp/1.9.5/MODULE.bazel": "31271aedc59e815656f5736f282bb7509a97c7ecb43e927ac1a37966e0578075",
+    "https://bcr.bazel.build/modules/jsoncpp/1.9.5/source.json": "4108ee5085dd2885a341c7fab149429db457b3169b86eb081fa245eadf69169d",
+    "https://bcr.bazel.build/modules/platforms/0.0.10/MODULE.bazel": "8cb8efaf200bdeb2150d93e162c40f388529a25852b332cec879373771e48ed5",
+    "https://bcr.bazel.build/modules/platforms/0.0.10/source.json": "f22828ff4cf021a6b577f1bf6341cb9dcd7965092a439f64fc1bb3b7a5ae4bd5",
+    "https://bcr.bazel.build/modules/platforms/0.0.4/MODULE.bazel": "9b328e31ee156f53f3c416a64f8491f7eb731742655a47c9eec4703a71644aee",
+    "https://bcr.bazel.build/modules/platforms/0.0.5/MODULE.bazel": "5733b54ea419d5eaf7997054bb55f6a1d0b5ff8aedf0176fef9eea44f3acda37",
+    "https://bcr.bazel.build/modules/platforms/0.0.6/MODULE.bazel": "ad6eeef431dc52aefd2d77ed20a4b353f8ebf0f4ecdd26a807d2da5aa8cd0615",
+    "https://bcr.bazel.build/modules/platforms/0.0.7/MODULE.bazel": "72fd4a0ede9ee5c021f6a8dd92b503e089f46c227ba2813ff183b71616034814",
+    "https://bcr.bazel.build/modules/platforms/0.0.8/MODULE.bazel": "9f142c03e348f6d263719f5074b21ef3adf0b139ee4c5133e2aa35664da9eb2d",
+    "https://bcr.bazel.build/modules/platforms/0.0.9/MODULE.bazel": "4a87a60c927b56ddd67db50c89acaa62f4ce2a1d2149ccb63ffd871d5ce29ebc",
+    "https://bcr.bazel.build/modules/protobuf/21.7/MODULE.bazel": "a5a29bb89544f9b97edce05642fac225a808b5b7be74038ea3640fae2f8e66a7",
+    "https://bcr.bazel.build/modules/protobuf/27.0/MODULE.bazel": "7873b60be88844a0a1d8f80b9d5d20cfbd8495a689b8763e76c6372998d3f64c",
+    "https://bcr.bazel.build/modules/protobuf/27.0/source.json": "1acf3d080c728d42f423fde5422fd0a1a24f44c15908124ce12363a253384193",
+    "https://bcr.bazel.build/modules/protobuf/3.19.0/MODULE.bazel": "6b5fbb433f760a99a22b18b6850ed5784ef0e9928a72668b66e4d7ccd47db9b0",
+    "https://bcr.bazel.build/modules/protobuf/3.19.6/MODULE.bazel": "9233edc5e1f2ee276a60de3eaa47ac4132302ef9643238f23128fea53ea12858",
+    "https://bcr.bazel.build/modules/rules_cc/0.0.1/MODULE.bazel": "cb2aa0747f84c6c3a78dad4e2049c154f08ab9d166b1273835a8174940365647",
+    "https://bcr.bazel.build/modules/rules_cc/0.0.17/MODULE.bazel": "2ae1d8f4238ec67d7185d8861cb0a2cdf4bc608697c331b95bf990e69b62e64a",
+    "https://bcr.bazel.build/modules/rules_cc/0.0.17/source.json": "4db99b3f55c90ab28d14552aa0632533e3e8e5e9aea0f5c24ac0014282c2a7c5",
+    "https://bcr.bazel.build/modules/rules_cc/0.0.2/MODULE.bazel": "6915987c90970493ab97393024c156ea8fb9f3bea953b2f3ec05c34f19b5695c",
+    "https://bcr.bazel.build/modules/rules_cc/0.0.6/MODULE.bazel": "abf360251023dfe3efcef65ab9d56beefa8394d4176dd29529750e1c57eaa33f",
+    "https://bcr.bazel.build/modules/rules_cc/0.0.8/MODULE.bazel": "964c85c82cfeb6f3855e6a07054fdb159aced38e99a5eecf7bce9d53990afa3e",
+    "https://bcr.bazel.build/modules/rules_cc/0.0.9/MODULE.bazel": "836e76439f354b89afe6a911a7adf59a6b2518fafb174483ad78a2a2fde7b1c5",
+    "https://bcr.bazel.build/modules/rules_haskell/1.0/MODULE.bazel": "49b531ff82404fe5dd7be526a652ba799e732a83abbdf265ecce89fcbb45804c",
+    "https://bcr.bazel.build/modules/rules_haskell/1.0/source.json": "ab1c0d0b5e7c399333f6804771b0b663cdaee9e55980894f86d9395c87cc296f",
+    "https://bcr.bazel.build/modules/rules_java/4.0.0/MODULE.bazel": "5a78a7ae82cd1a33cef56dc578c7d2a46ed0dca12643ee45edbb8417899e6f74",
+    "https://bcr.bazel.build/modules/rules_java/5.3.5/MODULE.bazel": "a4ec4f2db570171e3e5eb753276ee4b389bae16b96207e9d3230895c99644b86",
+    "https://bcr.bazel.build/modules/rules_java/6.1.0/MODULE.bazel": "5a718e43a934f342754609021d256396d8c92fd07da42b39a7174e2e16a1c23e",
+    "https://bcr.bazel.build/modules/rules_java/6.3.0/MODULE.bazel": "a97c7678c19f236a956ad260d59c86e10a463badb7eb2eda787490f4c969b963",
+    "https://bcr.bazel.build/modules/rules_java/7.6.5/MODULE.bazel": "481164be5e02e4cab6e77a36927683263be56b7e36fef918b458d7a8a1ebadb1",
+    "https://bcr.bazel.build/modules/rules_java/7.6.5/source.json": "a805b889531d1690e3c72a7a7e47a870d00323186a9904b36af83aa3d053ee8d",
+    "https://bcr.bazel.build/modules/rules_jvm_external/4.4.2/MODULE.bazel": "a56b85e418c83eb1839819f0b515c431010160383306d13ec21959ac412d2fe7",
+    "https://bcr.bazel.build/modules/rules_jvm_external/5.1/MODULE.bazel": "33f6f999e03183f7d088c9be518a63467dfd0be94a11d0055fe2d210f89aa909",
+    "https://bcr.bazel.build/modules/rules_jvm_external/5.2/MODULE.bazel": "d9351ba35217ad0de03816ef3ed63f89d411349353077348a45348b096615036",
+    "https://bcr.bazel.build/modules/rules_jvm_external/5.2/source.json": "10572111995bc349ce31c78f74b3c147f6b3233975c7fa5eff9211f6db0d34d9",
+    "https://bcr.bazel.build/modules/rules_license/0.0.3/MODULE.bazel": "627e9ab0247f7d1e05736b59dbb1b6871373de5ad31c3011880b4133cafd4bd0",
+    "https://bcr.bazel.build/modules/rules_license/0.0.7/MODULE.bazel": "088fbeb0b6a419005b89cf93fe62d9517c0a2b8bb56af3244af65ecfe37e7d5d",
+    "https://bcr.bazel.build/modules/rules_license/0.0.7/source.json": "355cc5737a0f294e560d52b1b7a6492d4fff2caf0bef1a315df5a298fca2d34a",
+    "https://bcr.bazel.build/modules/rules_nodejs/5.8.2/MODULE.bazel": "6bc03c8f37f69401b888023bf511cb6ee4781433b0cb56236b2e55a21e3a026a",
+    "https://bcr.bazel.build/modules/rules_nodejs/5.8.3/MODULE.bazel": "9fac1897d2067a37693e47f48e11cdb386a455902313c85e9e46fe0aaaa2e4e1",
+    "https://bcr.bazel.build/modules/rules_nodejs/6.2.0/MODULE.bazel": "ec27907f55eb34705adb4e8257952162a2d4c3ed0f0b3b4c3c1aad1fac7be35e",
+    "https://bcr.bazel.build/modules/rules_nodejs/6.3.0/MODULE.bazel": "45345e4aba35dd6e4701c1eebf5a4e67af4ed708def9ebcdc6027585b34ee52d",
+    "https://bcr.bazel.build/modules/rules_nodejs/6.3.0/source.json": "1254ffd8d0d908a19c67add7fb5e2a1f604df133bc5d206425264293e2e537fc",
+    "https://bcr.bazel.build/modules/rules_pkg/0.7.0/MODULE.bazel": "df99f03fc7934a4737122518bb87e667e62d780b610910f0447665a7e2be62dc",
+    "https://bcr.bazel.build/modules/rules_pkg/0.7.0/source.json": "c2557066e0c0342223ba592510ad3d812d4963b9024831f7f66fd0584dd8c66c",
+    "https://bcr.bazel.build/modules/rules_proto/4.0.0/MODULE.bazel": "a7a7b6ce9bee418c1a760b3d84f83a299ad6952f9903c67f19e4edd964894e06",
+    "https://bcr.bazel.build/modules/rules_proto/5.3.0-21.7/MODULE.bazel": "e8dff86b0971688790ae75528fe1813f71809b5afd57facb44dad9e8eca631b7",
+    "https://bcr.bazel.build/modules/rules_proto/6.0.0/MODULE.bazel": "b531d7f09f58dce456cd61b4579ce8c86b38544da75184eadaf0a7cb7966453f",
+    "https://bcr.bazel.build/modules/rules_proto/6.0.0/source.json": "de77e10ff0ab16acbf54e6b46eecd37a99c5b290468ea1aee6e95eb1affdaed7",
+    "https://bcr.bazel.build/modules/rules_python/0.10.2/MODULE.bazel": "cc82bc96f2997baa545ab3ce73f196d040ffb8756fd2d66125a530031cd90e5f",
+    "https://bcr.bazel.build/modules/rules_python/0.21.0/MODULE.bazel": "af3962f20b4d7e2194b8ec8458b8daf92034c81c0ba646e1089baddbad447785",
+    "https://bcr.bazel.build/modules/rules_python/0.22.1/MODULE.bazel": "26114f0c0b5e93018c0c066d6673f1a2c3737c7e90af95eff30cfee38d0bbac7",
+    "https://bcr.bazel.build/modules/rules_python/0.22.1/source.json": "57226905e783bae7c37c2dd662be078728e48fa28ee4324a7eabcafb5a43d014",
+    "https://bcr.bazel.build/modules/rules_python/0.4.0/MODULE.bazel": "9208ee05fd48bf09ac60ed269791cf17fb343db56c8226a720fbb1cdf467166c",
+    "https://bcr.bazel.build/modules/rules_sh/0.4.0/MODULE.bazel": "1e1f124fafde047e65d614930e1f344dbbc47204865c8c7aae484ee0de2d60ac",
+    "https://bcr.bazel.build/modules/rules_sh/0.4.0/source.json": "2d2bb2ff9bfc8becd036bbe5c5f7ecddeac92be95dc02170bfb7173759e3ff1f",
+    "https://bcr.bazel.build/modules/stardoc/0.5.1/MODULE.bazel": "1a05d92974d0c122f5ccf09291442580317cdd859f07a8655f1db9a60374f9f8",
+    "https://bcr.bazel.build/modules/stardoc/0.5.3/MODULE.bazel": "c7f6948dae6999bf0db32c1858ae345f112cacf98f174c7a8bb707e41b974f1c",
+    "https://bcr.bazel.build/modules/stardoc/0.5.4/MODULE.bazel": "6569966df04610b8520957cb8e97cf2e9faac2c0309657c537ab51c16c18a2a4",
+    "https://bcr.bazel.build/modules/stardoc/0.6.2/MODULE.bazel": "7060193196395f5dd668eda046ccbeacebfd98efc77fed418dbe2b82ffaa39fd",
+    "https://bcr.bazel.build/modules/stardoc/0.6.2/source.json": "d2ff8063b63b4a85e65fe595c4290f99717434fa9f95b4748a79a7d04dfed349",
+    "https://bcr.bazel.build/modules/upb/0.0.0-20220923-a547704/MODULE.bazel": "7298990c00040a0e2f121f6c32544bab27d4452f80d9ce51349b1a28f3005c43",
+    "https://bcr.bazel.build/modules/zlib/1.2.11/MODULE.bazel": "07b389abc85fdbca459b69e2ec656ae5622873af3f845e1c9d80fe179f3effa0",
+    "https://bcr.bazel.build/modules/zlib/1.2.12/MODULE.bazel": "3b1a8834ada2a883674be8cbd36ede1b6ec481477ada359cd2d3ddc562340b27",
+    "https://bcr.bazel.build/modules/zlib/1.3.1.bcr.3/MODULE.bazel": "af322bc08976524477c79d1e45e241b6efbeb918c497e8840b8ab116802dda79",
+    "https://bcr.bazel.build/modules/zlib/1.3.1.bcr.3/source.json": "2be409ac3c7601245958cd4fcdff4288be79ed23bd690b4b951f500d54ee6e7d"
+  },
+  "selectedYankedVersions": {},
+  "moduleExtensions": {
+    "//:non_module_deps.bzl%non_module_deps": {
+      "general": {
+        "bzlTransitiveDigest": "0N0rzQ1rNaEnlArWzPeaUDJJvTh/z5gUrMvzsJRgm/E=",
+        "usagesDigest": "qkfuclecbMVEZ8FJLJeQ/YRuyYL6WgXuGYEf0ALAuXo=",
+        "recordedFileInputs": {},
+        "recordedDirentsInputs": {},
+        "envVariables": {},
+        "generatedRepoSpecs": {
+          "os_info": {
+            "bzlFile": "@@rules_haskell~//tools:os_info.bzl",
+            "ruleClassName": "os_info",
+            "attributes": {}
+          },
+          "zlib.hs": {
+            "bzlFile": "@@bazel_tools//tools/build_defs/repo:http.bzl",
+            "ruleClassName": "http_archive",
+            "attributes": {
+              "build_file_content": "\nload(\"@rules_cc//cc:defs.bzl\", \"cc_library\")\ncc_library(\n    name = \"zlib.hs\",\n    # Import `:z` as `srcs` to enforce the library name `libz.so`. Otherwise,\n    # Bazel would mangle the library name and e.g. Cabal wouldn't recognize it.\n    srcs = [\":z\"],\n    hdrs = glob([\"*.h\"]),\n    includes = [\".\"],\n    visibility = [\"//visibility:public\"],\n)\ncc_library(\n    name = \"z\",\n    srcs = glob([\"*.c\"]),\n    hdrs = glob([\"*.h\"]),\n    copts = select({\n        \"@bazel_tools//src/conditions:windows\": [],\n        # Needed to avoid \"call to undeclared function\" errors [-Wimplicit-function-declaration]\n        \"//conditions:default\": [\"-DZ_HAVE_UNISTD_H\"],\n    }),\n)\n",
+              "sha256": "9a93b2b7dfdac77ceba5a558a580e74667dd6fede4585b91eefb60f03b72df23",
+              "strip_prefix": "zlib-1.3.1",
+              "urls": [
+                "https://github.com/madler/zlib/releases/download/v1.3.1/zlib-1.3.1.tar.gz"
+              ]
+            }
+          },
+          "Cabal": {
+            "bzlFile": "@@bazel_tools//tools/build_defs/repo:http.bzl",
+            "ruleClassName": "http_archive",
+            "attributes": {
+              "build_file_content": "\nload(\"@rules_haskell//haskell:cabal.bzl\", \"haskell_cabal_library\")\nhaskell_cabal_library(\n    name = \"Cabal\",\n    srcs = glob([\"Cabal/**\"]),\n    verbose = False,\n    version = \"3.8.1.0\",\n    visibility = [\"//visibility:public\"],\n)\n",
+              "sha256": "b697b558558f351d2704e520e7dcb1f300cd77fea5677d4b2ee71d0b965a4fe9",
+              "strip_prefix": "cabal-ghc-9.4-paths-module-relocatable",
+              "urls": [
+                "https://github.com/tweag/cabal/archive/refs/heads/ghc-9.4-paths-module-relocatable.zip"
+              ]
+            }
+          }
+        },
+        "recordedRepoMappingEntries": [
+          [
+            "",
+            "bazel_tools",
+            "bazel_tools"
+          ],
+          [
+            "",
+            "rules_haskell",
+            "rules_haskell~"
+          ],
+          [
+            "rules_haskell~",
+            "bazel_tools",
+            "bazel_tools"
+          ]
+        ]
+      }
+    },
+    "@@apple_support~//crosstool:setup.bzl%apple_cc_configure_extension": {
+      "general": {
+        "bzlTransitiveDigest": "PjIds3feoYE8SGbbIq2SFTZy3zmxeO2tQevJZNDo7iY=",
+        "usagesDigest": "+hz7IHWN6A1oVJJWNDB6yZRG+RYhF76wAYItpAeIUIg=",
+        "recordedFileInputs": {},
+        "recordedDirentsInputs": {},
+        "envVariables": {},
+        "generatedRepoSpecs": {
+          "local_config_apple_cc_toolchains": {
+            "bzlFile": "@@apple_support~//crosstool:setup.bzl",
+            "ruleClassName": "_apple_cc_autoconf_toolchains",
+            "attributes": {}
+          },
+          "local_config_apple_cc": {
+            "bzlFile": "@@apple_support~//crosstool:setup.bzl",
+            "ruleClassName": "_apple_cc_autoconf",
+            "attributes": {}
+          }
+        },
+        "recordedRepoMappingEntries": [
+          [
+            "apple_support~",
+            "bazel_tools",
+            "bazel_tools"
+          ]
+        ]
+      }
+    },
+    "@@aspect_rules_js~//npm:extensions.bzl%pnpm": {
+      "general": {
+        "bzlTransitiveDigest": "z9QO3p1z04onN2QkIuVfqwAVIySwIBMS3RrKoeNoaoc=",
+        "usagesDigest": "vqD1oPUy9dL8D1Z8wMFcH7NeUgqoSMhQW6IdHjy//Rg=",
+        "recordedFileInputs": {},
+        "recordedDirentsInputs": {},
+        "envVariables": {},
+        "generatedRepoSpecs": {
+          "pnpm": {
+            "bzlFile": "@@aspect_rules_js~//npm/private:npm_import.bzl",
+            "ruleClassName": "npm_import_rule",
+            "attributes": {
+              "package": "pnpm",
+              "version": "8.6.7",
+              "root_package": "",
+              "link_workspace": "",
+              "link_packages": {},
+              "integrity": "sha512-vRIWpD/L4phf9Bk2o/O2TDR8fFoJnpYrp2TKqTIZF/qZ2/rgL3qKXzHofHgbXsinwMoSEigz28sqk3pQ+yMEQQ==",
+              "url": "",
+              "commit": "",
+              "patch_args": [
+                "-p0"
+              ],
+              "patches": [],
+              "custom_postinstall": "",
+              "npm_auth": "",
+              "npm_auth_basic": "",
+              "npm_auth_username": "",
+              "npm_auth_password": "",
+              "lifecycle_hooks": [],
+              "extra_build_content": "load(\"@aspect_rules_js//js:defs.bzl\", \"js_binary\")\njs_binary(name = \"pnpm\", data = glob([\"package/**\"]), entry_point = \"package/dist/pnpm.cjs\", visibility = [\"//visibility:public\"])",
+              "generate_bzl_library_targets": false,
+              "extract_full_archive": true,
+              "exclude_package_contents": [],
+              "system_tar": "auto"
+            }
+          },
+          "pnpm__links": {
+            "bzlFile": "@@aspect_rules_js~//npm/private:npm_import.bzl",
+            "ruleClassName": "npm_import_links",
+            "attributes": {
+              "package": "pnpm",
+              "version": "8.6.7",
+              "dev": false,
+              "root_package": "",
+              "link_packages": {},
+              "deps": {},
+              "transitive_closure": {},
+              "lifecycle_build_target": false,
+              "lifecycle_hooks_env": [],
+              "lifecycle_hooks_execution_requirements": [
+                "no-sandbox"
+              ],
+              "lifecycle_hooks_use_default_shell_env": false,
+              "bins": {},
+              "package_visibility": [
+                "//visibility:public"
+              ],
+              "replace_package": "",
+              "exclude_package_contents": []
+            }
+          }
+        },
+        "recordedRepoMappingEntries": [
+          [
+            "aspect_bazel_lib~",
+            "aspect_bazel_lib",
+            "aspect_bazel_lib~"
+          ],
+          [
+            "aspect_bazel_lib~",
+            "bazel_skylib",
+            "bazel_skylib~"
+          ],
+          [
+            "aspect_bazel_lib~",
+            "bazel_tools",
+            "bazel_tools"
+          ],
+          [
+            "aspect_rules_js~",
+            "aspect_bazel_lib",
+            "aspect_bazel_lib~"
+          ],
+          [
+            "aspect_rules_js~",
+            "aspect_rules_js",
+            "aspect_rules_js~"
+          ],
+          [
+            "aspect_rules_js~",
+            "bazel_features",
+            "bazel_features~"
+          ],
+          [
+            "aspect_rules_js~",
+            "bazel_skylib",
+            "bazel_skylib~"
+          ],
+          [
+            "aspect_rules_js~",
+            "bazel_tools",
+            "bazel_tools"
+          ],
+          [
+            "bazel_features~",
+            "bazel_features_globals",
+            "bazel_features~~version_extension~bazel_features_globals"
+          ],
+          [
+            "bazel_features~",
+            "bazel_features_version",
+            "bazel_features~~version_extension~bazel_features_version"
+          ]
+        ]
+      }
+    },
+    "@@aspect_rules_swc~//swc:extensions.bzl%swc": {
+      "general": {
+        "bzlTransitiveDigest": "KoZhReav7DkhzbYPtYo7uh2Le1w/LPhIwNP+5r8RLX4=",
+        "usagesDigest": "F7/r8C5OEUQY98yOZXGlydUXOEYMTcaEr8AqSqlmysk=",
+        "recordedFileInputs": {},
+        "recordedDirentsInputs": {},
+        "envVariables": {},
+        "generatedRepoSpecs": {
+          "swc_darwin-arm64": {
+            "bzlFile": "@@aspect_rules_swc~//swc:repositories.bzl",
+            "ruleClassName": "swc_repositories",
+            "attributes": {
+              "platform": "darwin-arm64",
+              "swc_version": "v1.7.40"
+            }
+          },
+          "swc_darwin-x64": {
+            "bzlFile": "@@aspect_rules_swc~//swc:repositories.bzl",
+            "ruleClassName": "swc_repositories",
+            "attributes": {
+              "platform": "darwin-x64",
+              "swc_version": "v1.7.40"
+            }
+          },
+          "swc_linux-arm64-gnu": {
+            "bzlFile": "@@aspect_rules_swc~//swc:repositories.bzl",
+            "ruleClassName": "swc_repositories",
+            "attributes": {
+              "platform": "linux-arm64-gnu",
+              "swc_version": "v1.7.40"
+            }
+          },
+          "swc_linux-x64-gnu": {
+            "bzlFile": "@@aspect_rules_swc~//swc:repositories.bzl",
+            "ruleClassName": "swc_repositories",
+            "attributes": {
+              "platform": "linux-x64-gnu",
+              "swc_version": "v1.7.40"
+            }
+          },
+          "swc_win32-arm64-msvc": {
+            "bzlFile": "@@aspect_rules_swc~//swc:repositories.bzl",
+            "ruleClassName": "swc_repositories",
+            "attributes": {
+              "platform": "win32-arm64-msvc",
+              "swc_version": "v1.7.40"
+            }
+          },
+          "swc_win32-ia32-msvc": {
+            "bzlFile": "@@aspect_rules_swc~//swc:repositories.bzl",
+            "ruleClassName": "swc_repositories",
+            "attributes": {
+              "platform": "win32-ia32-msvc",
+              "swc_version": "v1.7.40"
+            }
+          },
+          "swc_win32-x64-msvc": {
+            "bzlFile": "@@aspect_rules_swc~//swc:repositories.bzl",
+            "ruleClassName": "swc_repositories",
+            "attributes": {
+              "platform": "win32-x64-msvc",
+              "swc_version": "v1.7.40"
+            }
+          },
+          "swc_toolchains": {
+            "bzlFile": "@@aspect_rules_swc~//swc/private:toolchains_repo.bzl",
+            "ruleClassName": "toolchains_repo",
+            "attributes": {
+              "user_repository_name": "swc"
+            }
+          }
+        },
+        "recordedRepoMappingEntries": [
+          [
+            "aspect_rules_swc~",
+            "bazel_skylib",
+            "bazel_skylib~"
+          ]
+        ]
+      }
+    },
+    "@@aspect_rules_ts~//ts:extensions.bzl%ext": {
+      "general": {
+        "bzlTransitiveDigest": "h1hftyFCdJgiHD9blfFcMAiEk5ltEoUdNkuHPIkg/hM=",
+        "usagesDigest": "JR5evflfXH+907svVhif/EJrnxzMLJa+SLoCx7lXi/Y=",
+        "recordedFileInputs": {},
+        "recordedDirentsInputs": {},
+        "envVariables": {},
+        "generatedRepoSpecs": {
+          "npm_typescript": {
+            "bzlFile": "@@aspect_rules_ts~//ts/private:npm_repositories.bzl",
+            "ruleClassName": "http_archive_version",
+            "attributes": {
+              "bzlmod": true,
+              "version": "5.8.3",
+              "integrity": "",
+              "build_file": "@@aspect_rules_ts~//ts:BUILD.typescript",
+              "build_file_substitutions": {
+                "bazel_worker_version": "5.4.2",
+                "google_protobuf_version": "3.20.1"
+              },
+              "urls": [
+                "https://registry.npmjs.org/typescript/-/typescript-{}.tgz"
+              ]
+            }
+          }
+        },
+        "recordedRepoMappingEntries": [
+          [
+            "aspect_rules_ts~",
+            "bazel_tools",
+            "bazel_tools"
+          ]
+        ]
+      }
+    },
+    "@@platforms//host:extension.bzl%host_platform": {
+      "general": {
+        "bzlTransitiveDigest": "xelQcPZH8+tmuOHVjL9vDxMnnQNMlwj0SlvgoqBkm4U=",
+        "usagesDigest": "XzdJB+yoYQTA23Jn6P1B9SSXmlXoFnMxt4fnVhrhjwI=",
+        "recordedFileInputs": {},
+        "recordedDirentsInputs": {},
+        "envVariables": {},
+        "generatedRepoSpecs": {
+          "host_platform": {
+            "bzlFile": "@@platforms//host:extension.bzl",
+            "ruleClassName": "host_platform_repo",
+            "attributes": {}
+          }
+        },
+        "recordedRepoMappingEntries": []
+      }
+    },
+    "@@rules_haskell~//extensions:ghc_version.bzl%ghc_default_version": {
+      "general": {
+        "bzlTransitiveDigest": "1T6mg5oKStVxecF1dN7Hi3uVP//MQOPlL0uQBcpO3bw=",
+        "usagesDigest": "I8HWac/HOxoJJQjRlVyrrlt0E5uAb9atD/c2sINVwus=",
+        "recordedFileInputs": {},
+        "recordedDirentsInputs": {},
+        "envVariables": {},
+        "generatedRepoSpecs": {
+          "rules_haskell_ghc_version": {
+            "bzlFile": "@@rules_haskell~//haskell:private/ghc_ci.bzl",
+            "ruleClassName": "ghc_default_version",
+            "attributes": {}
+          }
+        },
+        "recordedRepoMappingEntries": [
+          [
+            "rules_haskell~",
+            "rules_haskell",
+            "rules_haskell~"
+          ]
+        ]
+      }
+    },
+    "@@rules_haskell~//extensions:haskell_toolchains.bzl%haskell_toolchains": {
+      "general": {
+        "bzlTransitiveDigest": "4Gb81roel66/j16a43ysWkgCex2beMKvwR0GoEXre1g=",
+        "usagesDigest": "+Ydsrs9ZutHCH/s/Kx0wk0BbQ10Q5celOMEtuuO4dRo=",
+        "recordedFileInputs": {
+          "@@rules_haskell~//haskell/private/ghc_bindist_generated.json": "0be7e35cb98d664beef98aef76b3278597ea9bc14d7e2e0c212be82379ecb5aa"
+        },
+        "recordedDirentsInputs": {},
+        "envVariables": {},
+        "generatedRepoSpecs": {
+          "rules_haskell_ghc_linux_amd64": {
+            "bzlFile": "@@rules_haskell~//haskell:ghc_bindist.bzl",
+            "ruleClassName": "_ghc_bindist",
+            "attributes": {
+              "version": "9.8.1",
+              "ghcopts": [],
+              "haddock_flags": [],
+              "repl_ghci_args": [],
+              "cabalopts": [],
+              "target": "linux_amd64",
+              "locale": ""
+            }
+          },
+          "rules_haskell_ghc_linux_amd64-toolchain": {
+            "bzlFile": "@@rules_haskell~//haskell:ghc_bindist.bzl",
+            "ruleClassName": "_ghc_bindist_toolchain",
+            "attributes": {
+              "bindist_name": "rules_haskell_ghc_linux_amd64",
+              "target": "linux_amd64"
+            }
+          },
+          "rules_haskell_ghc_linux_arm64": {
+            "bzlFile": "@@rules_haskell~//haskell:ghc_bindist.bzl",
+            "ruleClassName": "_ghc_bindist",
+            "attributes": {
+              "version": "9.8.1",
+              "ghcopts": [],
+              "haddock_flags": [],
+              "repl_ghci_args": [],
+              "cabalopts": [],
+              "target": "linux_arm64",
+              "locale": ""
+            }
+          },
+          "rules_haskell_ghc_linux_arm64-toolchain": {
+            "bzlFile": "@@rules_haskell~//haskell:ghc_bindist.bzl",
+            "ruleClassName": "_ghc_bindist_toolchain",
+            "attributes": {
+              "bindist_name": "rules_haskell_ghc_linux_arm64",
+              "target": "linux_arm64"
+            }
+          },
+          "rules_haskell_ghc_darwin_amd64": {
+            "bzlFile": "@@rules_haskell~//haskell:ghc_bindist.bzl",
+            "ruleClassName": "_ghc_bindist",
+            "attributes": {
+              "version": "9.8.1",
+              "ghcopts": [],
+              "haddock_flags": [],
+              "repl_ghci_args": [],
+              "cabalopts": [],
+              "target": "darwin_amd64",
+              "locale": ""
+            }
+          },
+          "rules_haskell_ghc_darwin_amd64-toolchain": {
+            "bzlFile": "@@rules_haskell~//haskell:ghc_bindist.bzl",
+            "ruleClassName": "_ghc_bindist_toolchain",
+            "attributes": {
+              "bindist_name": "rules_haskell_ghc_darwin_amd64",
+              "target": "darwin_amd64"
+            }
+          },
+          "rules_haskell_ghc_darwin_arm64": {
+            "bzlFile": "@@rules_haskell~//haskell:ghc_bindist.bzl",
+            "ruleClassName": "_ghc_bindist",
+            "attributes": {
+              "version": "9.8.1",
+              "ghcopts": [],
+              "haddock_flags": [],
+              "repl_ghci_args": [],
+              "cabalopts": [],
+              "target": "darwin_arm64",
+              "locale": ""
+            }
+          },
+          "rules_haskell_ghc_darwin_arm64-toolchain": {
+            "bzlFile": "@@rules_haskell~//haskell:ghc_bindist.bzl",
+            "ruleClassName": "_ghc_bindist_toolchain",
+            "attributes": {
+              "bindist_name": "rules_haskell_ghc_darwin_arm64",
+              "target": "darwin_arm64"
+            }
+          },
+          "rules_haskell_ghc_windows_amd64": {
+            "bzlFile": "@@rules_haskell~//haskell:ghc_bindist.bzl",
+            "ruleClassName": "_ghc_bindist",
+            "attributes": {
+              "version": "9.8.1",
+              "ghcopts": [],
+              "haddock_flags": [],
+              "repl_ghci_args": [],
+              "cabalopts": [],
+              "target": "windows_amd64",
+              "locale": ""
+            }
+          },
+          "rules_haskell_ghc_windows_amd64-toolchain": {
+            "bzlFile": "@@rules_haskell~//haskell:ghc_bindist.bzl",
+            "ruleClassName": "_ghc_bindist_toolchain",
+            "attributes": {
+              "bindist_name": "rules_haskell_ghc_windows_amd64",
+              "target": "windows_amd64"
+            }
+          },
+          "rules_haskell_ghc_windows_amd64_cc_toolchain": {
+            "bzlFile": "@@rules_haskell~//haskell:ghc_bindist.bzl",
+            "ruleClassName": "_windows_cc_toolchain",
+            "attributes": {
+              "bindist_name": "rules_haskell_ghc_windows_amd64"
+            }
+          },
+          "rules_haskell_sh_posix_local": {
+            "bzlFile": "@@rules_sh~//sh:posix.bzl",
+            "ruleClassName": "_sh_posix_config",
+            "attributes": {}
+          },
+          "rules_haskell_python_local": {
+            "bzlFile": "@@rules_haskell~//haskell:ghc_bindist.bzl",
+            "ruleClassName": "_config_python3_toolchain",
+            "attributes": {}
+          },
+          "all_bindist_toolchains": {
+            "bzlFile": "@@rules_haskell~//extensions:haskell_toolchains.bzl",
+            "ruleClassName": "all_toolchains",
+            "attributes": {
+              "toolchains": [
+                "\ntoolchain(\n    name = \"{}\",\n    toolchain_type = \"@rules_haskell//haskell:toolchain\",\n    toolchain = \"@rules_haskell_ghc_linux_amd64//:toolchain-impl\",\n    exec_compatible_with = [\"@platforms//os:linux\", \"@platforms//cpu:x86_64\"],\n    target_compatible_with = [\"@platforms//os:linux\", \"@platforms//cpu:x86_64\"],\n)\n",
+                "\ntoolchain(\n    name = \"{}\",\n    toolchain_type = \"@rules_haskell//haskell:toolchain\",\n    toolchain = \"@rules_haskell_ghc_linux_arm64//:toolchain-impl\",\n    exec_compatible_with = [\"@platforms//os:linux\", \"@platforms//cpu:arm64\"],\n    target_compatible_with = [\"@platforms//os:linux\", \"@platforms//cpu:arm64\"],\n)\n",
+                "\ntoolchain(\n    name = \"{}\",\n    toolchain_type = \"@rules_haskell//haskell:toolchain\",\n    toolchain = \"@rules_haskell_ghc_darwin_amd64//:toolchain-impl\",\n    exec_compatible_with = [\"@platforms//os:osx\", \"@platforms//cpu:x86_64\"],\n    target_compatible_with = [\"@platforms//os:osx\", \"@platforms//cpu:x86_64\"],\n)\n",
+                "\ntoolchain(\n    name = \"{}\",\n    toolchain_type = \"@rules_haskell//haskell:toolchain\",\n    toolchain = \"@rules_haskell_ghc_darwin_arm64//:toolchain-impl\",\n    exec_compatible_with = [\"@platforms//os:osx\", \"@platforms//cpu:arm64\"],\n    target_compatible_with = [\"@platforms//os:osx\", \"@platforms//cpu:arm64\"],\n)\n",
+                "\ntoolchain(\n    name = \"{}\",\n    toolchain_type = \"@rules_haskell//haskell:toolchain\",\n    toolchain = \"@rules_haskell_ghc_windows_amd64//:toolchain-impl\",\n    exec_compatible_with = [\"@platforms//os:windows\", \"@platforms//cpu:x86_64\"],\n    target_compatible_with = [\"@platforms//os:windows\", \"@platforms//cpu:x86_64\"],\n)\n"
+              ]
+            }
+          }
+        },
+        "recordedRepoMappingEntries": [
+          [
+            "rules_cc~",
+            "bazel_tools",
+            "bazel_tools"
+          ],
+          [
+            "rules_haskell~",
+            "bazel_skylib",
+            "bazel_skylib~"
+          ],
+          [
+            "rules_haskell~",
+            "bazel_tools",
+            "bazel_tools"
+          ],
+          [
+            "rules_haskell~",
+            "rules_cc",
+            "rules_cc~"
+          ],
+          [
+            "rules_haskell~",
+            "rules_haskell",
+            "rules_haskell~"
+          ],
+          [
+            "rules_haskell~",
+            "rules_sh",
+            "rules_sh~"
+          ],
+          [
+            "rules_sh~",
+            "bazel_skylib",
+            "bazel_skylib~"
+          ],
+          [
+            "rules_sh~",
+            "bazel_tools",
+            "bazel_tools"
+          ]
+        ]
+      }
+    },
+    "@@rules_haskell~//extensions:rules_haskell_dependencies.bzl%rules_haskell_dependencies": {
+      "general": {
+        "bzlTransitiveDigest": "3F+O7+OiTGbbXgeGu+3sxAsYHJ+Fd1CjROlCLUcD2wA=",
+        "usagesDigest": "+YkgTrqm3VGr41/QlmunHpNs530+M/EVfn+AlUb8LiI=",
+        "recordedFileInputs": {},
+        "recordedDirentsInputs": {},
+        "envVariables": {},
+        "generatedRepoSpecs": {
+          "rules_haskell_ghc_version": {
+            "bzlFile": "@@rules_haskell~//haskell:private/ghc_ci.bzl",
+            "ruleClassName": "ghc_default_version",
+            "attributes": {}
+          },
+          "os_info": {
+            "bzlFile": "@@rules_haskell~//tools:os_info.bzl",
+            "ruleClassName": "os_info",
+            "attributes": {}
+          },
+          "rules_haskell_stack": {
+            "bzlFile": "@@rules_haskell~//haskell:cabal.bzl",
+            "ruleClassName": "_fetch_stack",
+            "attributes": {}
+          },
+          "rules_haskell_stack_update": {
+            "bzlFile": "@@rules_haskell~//haskell:cabal.bzl",
+            "ruleClassName": "_stack_update",
+            "attributes": {
+              "stack": "@@rules_haskell~~rules_haskell_dependencies~rules_haskell_stack//:stack"
+            }
+          },
+          "rules_haskell_worker_dependencies-unpinned": {
+            "bzlFile": "@@rules_haskell~//haskell:cabal.bzl",
+            "ruleClassName": "_stack_snapshot_unpinned",
+            "attributes": {
+              "unmangled_repo_name": "rules_haskell_worker_dependencies",
+              "stack": "@@rules_haskell~~rules_haskell_dependencies~rules_haskell_stack//:stack",
+              "stack_update": "@@rules_haskell~~rules_haskell_dependencies~rules_haskell_stack_update//:stack_update",
+              "vendored_packages": {},
+              "snapshot": "",
+              "local_snapshot": "@@rules_haskell~//:stackage_snapshot_9.4.6.yaml",
+              "packages": [
+                "base",
+                "bytestring",
+                "filepath",
+                "ghc",
+                "ghc-paths",
+                "microlens",
+                "process",
+                "profunctors",
+                "proto-lens",
+                "proto-lens-runtime",
+                "text",
+                "vector"
+              ],
+              "flags": {},
+              "netrc": "",
+              "custom_toolchain_libraries": [],
+              "enable_custom_toolchain_libraries": false
+            }
+          },
+          "rules_haskell_worker_dependencies": {
+            "bzlFile": "@@rules_haskell~//haskell:cabal.bzl",
+            "ruleClassName": "_stack_snapshot",
+            "attributes": {
+              "unmangled_repo_name": "rules_haskell_worker_dependencies",
+              "stack": "@@rules_haskell~~rules_haskell_dependencies~rules_haskell_stack//:stack",
+              "stack_update": "'@@rules_haskell~~rules_haskell_dependencies~rules_haskell_stack_update//:stack_update'",
+              "extra_deps": {},
+              "vendored_packages": {},
+              "snapshot": "",
+              "local_snapshot": "@@rules_haskell~//:stackage_snapshot_9.4.6.yaml",
+              "packages": [
+                "base",
+                "bytestring",
+                "filepath",
+                "ghc",
+                "ghc-paths",
+                "microlens",
+                "process",
+                "profunctors",
+                "proto-lens",
+                "proto-lens-runtime",
+                "text",
+                "vector"
+              ],
+              "flags": {},
+              "haddock": true,
+              "setup_deps": {
+                "bifunctors": [
+                  "'@@rules_haskell~~rules_haskell_dependencies~Cabal//:Cabal'"
+                ],
+                "proto-lens-runtime": [
+                  "'@@rules_haskell~~rules_haskell_dependencies~Cabal//:Cabal'"
+                ],
+                "transformers-compat": [
+                  "'@@rules_haskell~~rules_haskell_dependencies~Cabal//:Cabal'"
+                ]
+              },
+              "tools": [],
+              "components": {},
+              "components_dependencies": {},
+              "verbose": false,
+              "custom_toolchain_libraries": [],
+              "enable_custom_toolchain_libraries": false
+            }
+          },
+          "rules_haskell_worker_dependencies-exe": {
+            "bzlFile": "@@rules_haskell~//haskell:cabal.bzl",
+            "ruleClassName": "_stack_executables",
+            "attributes": {
+              "unmangled_repo_name": "rules_haskell_worker_dependencies",
+              "components_json": "@@rules_haskell~~rules_haskell_dependencies~rules_haskell_worker_dependencies//:components.json"
+            }
+          },
+          "Cabal": {
+            "bzlFile": "@@bazel_tools//tools/build_defs/repo:http.bzl",
+            "ruleClassName": "http_archive",
+            "attributes": {
+              "build_file_content": "\nload(\"@rules_haskell//haskell:cabal.bzl\", \"haskell_cabal_library\")\nhaskell_cabal_library(\n    name = \"Cabal\",\n    srcs = glob([\"Cabal/**\"]),\n    verbose = False,\n    version = \"3.8.1.0\",\n    visibility = [\"//visibility:public\"],\n)\n",
+              "sha256": "b697b558558f351d2704e520e7dcb1f300cd77fea5677d4b2ee71d0b965a4fe9",
+              "strip_prefix": "cabal-ghc-9.4-paths-module-relocatable",
+              "urls": [
+                "https://github.com/tweag/cabal/archive/refs/heads/ghc-9.4-paths-module-relocatable.zip"
+              ]
+            }
+          }
+        },
+        "recordedRepoMappingEntries": [
+          [
+            "rules_cc~",
+            "bazel_tools",
+            "bazel_tools"
+          ],
+          [
+            "rules_haskell~",
+            "Cabal",
+            "rules_haskell~~rules_haskell_dependencies~Cabal"
+          ],
+          [
+            "rules_haskell~",
+            "bazel_skylib",
+            "bazel_skylib~"
+          ],
+          [
+            "rules_haskell~",
+            "bazel_tools",
+            "bazel_tools"
+          ],
+          [
+            "rules_haskell~",
+            "rules_cc",
+            "rules_cc~"
+          ],
+          [
+            "rules_haskell~",
+            "rules_haskell",
+            "rules_haskell~"
+          ],
+          [
+            "rules_haskell~",
+            "rules_haskell_ghc_version",
+            "rules_haskell~~ghc_default_version~rules_haskell_ghc_version"
+          ],
+          [
+            "rules_haskell~",
+            "rules_haskell_stack",
+            "rules_haskell~~rules_haskell_dependencies~rules_haskell_stack"
+          ],
+          [
+            "rules_haskell~",
+            "rules_haskell_stack_update",
+            "rules_haskell~~rules_haskell_dependencies~rules_haskell_stack_update"
+          ]
+        ]
+      }
+    },
+    "@@rules_haskell~//extensions:stack_snapshot.bzl%stack_snapshot": {
+      "general": {
+        "bzlTransitiveDigest": "I9dE/IPkeO/mkCmDvxjs6J9WP1Tf8kV6hE6XhXWYcuw=",
+        "usagesDigest": "/WAJtjw5Q5YwqY/342VvBakuJt5Fq3p/YPv80OHyuKY=",
+        "recordedFileInputs": {},
+        "recordedDirentsInputs": {},
+        "envVariables": {},
+        "generatedRepoSpecs": {
+          "rules_haskell_stack": {
+            "bzlFile": "@@rules_haskell~//haskell:cabal.bzl",
+            "ruleClassName": "_fetch_stack",
+            "attributes": {}
+          },
+          "rules_haskell_stack_update": {
+            "bzlFile": "@@rules_haskell~//haskell:cabal.bzl",
+            "ruleClassName": "_stack_update",
+            "attributes": {
+              "stack": "@@rules_haskell~~rules_haskell_dependencies~rules_haskell_stack//:stack"
+            }
+          },
+          "stackage-unpinned": {
+            "bzlFile": "@@rules_haskell~//haskell:cabal.bzl",
+            "ruleClassName": "_stack_snapshot_unpinned",
+            "attributes": {
+              "unmangled_repo_name": "stackage",
+              "stack": "@@rules_haskell~~rules_haskell_dependencies~rules_haskell_stack//:stack",
+              "stack_update": "@@rules_haskell~~stack_snapshot~rules_haskell_stack_update//:stack_update",
+              "vendored_packages": {},
+              "snapshot": "lts-23.22",
+              "stack_snapshot_json": "@@//:stackage_snapshot.json",
+              "packages": [
+                "zlib",
+                "aeson",
+                "bytestring",
+                "containers",
+                "stm",
+                "template-haskell",
+                "text",
+                "network-uri",
+                "wai",
+                "streaming-commons",
+                "warp",
+                "http-types",
+                "attoparsec"
+              ],
+              "flags": {
+                "zlib": [
+                  "-non-blocking-ffi",
+                  "-pkg-config"
+                ]
+              },
+              "netrc": "",
+              "custom_toolchain_libraries": [],
+              "enable_custom_toolchain_libraries": false
+            }
+          },
+          "stackage": {
+            "bzlFile": "@@rules_haskell~//haskell:cabal.bzl",
+            "ruleClassName": "_stack_snapshot",
+            "attributes": {
+              "unmangled_repo_name": "stackage",
+              "stack": "@@rules_haskell~~rules_haskell_dependencies~rules_haskell_stack//:stack",
+              "stack_update": "'@@rules_haskell~~rules_haskell_dependencies~rules_haskell_stack_update//:stack_update'",
+              "extra_deps": {
+                "@@_main~non_module_deps~zlib.hs//:zlib.hs": "zlib streaming-commons"
+              },
+              "vendored_packages": {},
+              "snapshot": "lts-23.22",
+              "stack_snapshot_json": "@@//:stackage_snapshot.json",
+              "packages": [
+                "zlib",
+                "aeson",
+                "bytestring",
+                "containers",
+                "stm",
+                "template-haskell",
+                "text",
+                "network-uri",
+                "wai",
+                "streaming-commons",
+                "warp",
+                "http-types",
+                "attoparsec"
+              ],
+              "flags": {
+                "zlib": [
+                  "-non-blocking-ffi",
+                  "-pkg-config"
+                ]
+              },
+              "haddock": true,
+              "setup_deps": {
+                "containers": [
+                  "'@@_main~non_module_deps~Cabal//:Cabal'"
+                ],
+                "stm": [
+                  "'@@_main~non_module_deps~Cabal//:Cabal'"
+                ]
+              },
+              "tools": [],
+              "components": {
+                "attoparsec": [
+                  "lib",
+                  "lib:attoparsec-internal"
+                ]
+              },
+              "components_dependencies": {
+                "attoparsec": "{\"lib:attoparsec\":[\"lib:attoparsec-internal\"]}"
+              },
+              "verbose": false,
+              "custom_toolchain_libraries": [],
+              "enable_custom_toolchain_libraries": false
+            }
+          },
+          "stackage-exe": {
+            "bzlFile": "@@rules_haskell~//haskell:cabal.bzl",
+            "ruleClassName": "_stack_executables",
+            "attributes": {
+              "unmangled_repo_name": "stackage",
+              "components_json": "@@rules_haskell~~stack_snapshot~stackage//:components.json"
+            }
+          }
+        },
+        "recordedRepoMappingEntries": [
+          [
+            "rules_cc~",
+            "bazel_tools",
+            "bazel_tools"
+          ],
+          [
+            "rules_haskell~",
+            "bazel_skylib",
+            "bazel_skylib~"
+          ],
+          [
+            "rules_haskell~",
+            "bazel_tools",
+            "bazel_tools"
+          ],
+          [
+            "rules_haskell~",
+            "os_info",
+            "rules_haskell~~rules_haskell_dependencies~os_info"
+          ],
+          [
+            "rules_haskell~",
+            "rules_cc",
+            "rules_cc~"
+          ],
+          [
+            "rules_haskell~",
+            "rules_haskell",
+            "rules_haskell~"
+          ],
+          [
+            "rules_haskell~",
+            "rules_haskell_stack",
+            "rules_haskell~~rules_haskell_dependencies~rules_haskell_stack"
+          ],
+          [
+            "rules_haskell~",
+            "rules_haskell_stack_update",
+            "rules_haskell~~rules_haskell_dependencies~rules_haskell_stack_update"
+          ]
+        ]
+      }
+    },
+    "@@rules_nodejs~//nodejs:extensions.bzl%node": {
+      "general": {
+        "bzlTransitiveDigest": "SqbzUarOVzAfK28Ca5+NIU3LUwnW/b3h0xXBUS97oyI=",
+        "usagesDigest": "BkGR2PKeEzALFwx986R2I4GqvAB11H9oH0q5ZvFRGa0=",
+        "recordedFileInputs": {},
+        "recordedDirentsInputs": {},
+        "envVariables": {},
+        "generatedRepoSpecs": {
+          "nodejs_linux_amd64": {
+            "bzlFile": "@@rules_nodejs~//nodejs:repositories.bzl",
+            "ruleClassName": "_nodejs_repositories",
+            "attributes": {
+              "node_download_auth": {},
+              "node_repositories": {},
+              "node_urls": [
+                "https://nodejs.org/dist/v{version}/{filename}"
+              ],
+              "node_version": "16.14.2",
+              "include_headers": false,
+              "platform": "linux_amd64"
+            }
+          },
+          "nodejs_linux_arm64": {
+            "bzlFile": "@@rules_nodejs~//nodejs:repositories.bzl",
+            "ruleClassName": "_nodejs_repositories",
+            "attributes": {
+              "node_download_auth": {},
+              "node_repositories": {},
+              "node_urls": [
+                "https://nodejs.org/dist/v{version}/{filename}"
+              ],
+              "node_version": "16.14.2",
+              "include_headers": false,
+              "platform": "linux_arm64"
+            }
+          },
+          "nodejs_linux_s390x": {
+            "bzlFile": "@@rules_nodejs~//nodejs:repositories.bzl",
+            "ruleClassName": "_nodejs_repositories",
+            "attributes": {
+              "node_download_auth": {},
+              "node_repositories": {},
+              "node_urls": [
+                "https://nodejs.org/dist/v{version}/{filename}"
+              ],
+              "node_version": "16.14.2",
+              "include_headers": false,
+              "platform": "linux_s390x"
+            }
+          },
+          "nodejs_linux_ppc64le": {
+            "bzlFile": "@@rules_nodejs~//nodejs:repositories.bzl",
+            "ruleClassName": "_nodejs_repositories",
+            "attributes": {
+              "node_download_auth": {},
+              "node_repositories": {},
+              "node_urls": [
+                "https://nodejs.org/dist/v{version}/{filename}"
+              ],
+              "node_version": "16.14.2",
+              "include_headers": false,
+              "platform": "linux_ppc64le"
+            }
+          },
+          "nodejs_darwin_amd64": {
+            "bzlFile": "@@rules_nodejs~//nodejs:repositories.bzl",
+            "ruleClassName": "_nodejs_repositories",
+            "attributes": {
+              "node_download_auth": {},
+              "node_repositories": {},
+              "node_urls": [
+                "https://nodejs.org/dist/v{version}/{filename}"
+              ],
+              "node_version": "16.14.2",
+              "include_headers": false,
+              "platform": "darwin_amd64"
+            }
+          },
+          "nodejs_darwin_arm64": {
+            "bzlFile": "@@rules_nodejs~//nodejs:repositories.bzl",
+            "ruleClassName": "_nodejs_repositories",
+            "attributes": {
+              "node_download_auth": {},
+              "node_repositories": {},
+              "node_urls": [
+                "https://nodejs.org/dist/v{version}/{filename}"
+              ],
+              "node_version": "16.14.2",
+              "include_headers": false,
+              "platform": "darwin_arm64"
+            }
+          },
+          "nodejs_windows_amd64": {
+            "bzlFile": "@@rules_nodejs~//nodejs:repositories.bzl",
+            "ruleClassName": "_nodejs_repositories",
+            "attributes": {
+              "node_download_auth": {},
+              "node_repositories": {},
+              "node_urls": [
+                "https://nodejs.org/dist/v{version}/{filename}"
+              ],
+              "node_version": "16.14.2",
+              "include_headers": false,
+              "platform": "windows_amd64"
+            }
+          },
+          "nodejs": {
+            "bzlFile": "@@rules_nodejs~//nodejs/private:nodejs_repo_host_os_alias.bzl",
+            "ruleClassName": "nodejs_repo_host_os_alias",
+            "attributes": {
+              "user_node_repository_name": "nodejs"
+            }
+          },
+          "nodejs_host": {
+            "bzlFile": "@@rules_nodejs~//nodejs/private:nodejs_repo_host_os_alias.bzl",
+            "ruleClassName": "nodejs_repo_host_os_alias",
+            "attributes": {
+              "user_node_repository_name": "nodejs"
+            }
+          },
+          "nodejs_toolchains": {
+            "bzlFile": "@@rules_nodejs~//nodejs/private:nodejs_toolchains_repo.bzl",
+            "ruleClassName": "nodejs_toolchains_repo",
+            "attributes": {
+              "user_node_repository_name": "nodejs"
+            }
+          }
+        },
+        "recordedRepoMappingEntries": []
+      }
+    },
+    "@@rules_sh~//bzlmod:extensions.bzl%sh_configure": {
+      "general": {
+        "bzlTransitiveDigest": "XWrAILT08LeNThiG0V8wx43EaZzjiLaDYlRVt0NDYmU=",
+        "usagesDigest": "OORSTiAwcQci3rr6NMjDqZv5YBTwVDqVL4s0OH8jZsc=",
+        "recordedFileInputs": {},
+        "recordedDirentsInputs": {},
+        "envVariables": {},
+        "generatedRepoSpecs": {
+          "local_posix_config": {
+            "bzlFile": "@@rules_sh~//sh:posix.bzl",
+            "ruleClassName": "_sh_posix_config",
+            "attributes": {}
+          },
+          "rules_sh_shim_exe": {
+            "bzlFile": "@@bazel_tools//tools/build_defs/repo:http.bzl",
+            "ruleClassName": "http_file",
+            "attributes": {
+              "sha256": "cb440b8a08a2095a59666a859b35aa5a1524b140b909ecc760f38f3baccf80e6",
+              "urls": [
+                "https://github.com/ScoopInstaller/Shim/releases/download/v1.0.1/shim.exe"
+              ],
+              "downloaded_file_path": "shim.exe",
+              "executable": true
+            }
+          }
+        },
+        "recordedRepoMappingEntries": [
+          [
+            "rules_sh~",
+            "bazel_skylib",
+            "bazel_skylib~"
+          ],
+          [
+            "rules_sh~",
+            "bazel_tools",
+            "bazel_tools"
+          ]
+        ]
+      }
+    }
+  }
+}

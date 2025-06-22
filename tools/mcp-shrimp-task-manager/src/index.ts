@@ -53,6 +53,11 @@ import {
 
 async function main() {
   try {
+    // Add debugging
+    console.error("=== Shrimp Task Manager starting ===");
+    console.error(`Node version: ${process.version}`);
+    console.error(`Current directory: ${process.cwd()}`);
+    
     const ENABLE_GUI = process.env.ENABLE_GUI === "true";
 
     if (ENABLE_GUI) {
@@ -192,6 +197,9 @@ async function main() {
         },
       }
     );
+
+    // Add debug logging
+    console.error("Shrimp Task Manager MCP server starting...");
 
     server.setRequestHandler(ListToolsRequestSchema, async () => {
       return {
@@ -474,8 +482,10 @@ async function main() {
     );
 
     // 建立連接
+    console.error("=== About to connect to stdio transport ===");
     const transport = new StdioServerTransport();
     await server.connect(transport);
+    console.error("=== Successfully connected to stdio transport ===");
   } catch (error) {
     process.exit(1);
   }

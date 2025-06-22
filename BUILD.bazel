@@ -1,13 +1,11 @@
-# Set all target's visibility in this package to "public".
-package(default_visibility = ["//visibility:public"])
-
 # Load rules_haskell rules.
 load(
     "@rules_haskell//haskell:defs.bzl",
     "haskell_toolchain_library",
-    "haskell_library",
-    "haskell_binary",
 )
+
+# Set all target's visibility in this package to "public".
+package(default_visibility = ["//visibility:public"])
 
 # haskell_toolchain_library can access builtin GHC packages
 # and assign them a bazel target name, so that they

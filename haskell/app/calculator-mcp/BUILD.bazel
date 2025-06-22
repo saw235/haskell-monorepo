@@ -8,14 +8,14 @@ load(
 haskell_binary(
     name = "calculator-mcp",
     srcs = [
-        ":Main.hs",
         ":Descriptions.hs",
+        ":Main.hs",
         ":Types.hs",
     ],
     deps = [
         "//:base",
         "//haskell/libs/mcp-server",
-        "@stackage//:text",
         "@stackage//:network-uri",
+        "@stackage//:text",
     ],
-) 
+)

@@ -1,0 +1,13 @@
+tools/mcp-shrimp-task-manager/node_modules
+node_modules
+dist
+.bzlignore
+.env
+.DS_Store
+.idea
+.vscode
+.project
+*.iml
+*.iws
+.classpath
+.settings 

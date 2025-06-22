@@ -35,26 +35,6 @@ cc_library(
         urls = ["https://github.com/madler/zlib/releases/download/v1.3.1/zlib-1.3.1.tar.gz"],
     )
 
-    # Demonstrates a vendored Stackage package to bump a version bound.
-    http_archive(
-        name = "split",
-        build_file_content = """
-load("@rules_haskell//haskell:cabal.bzl", "haskell_cabal_library")
-load("@stackage//:packages.bzl", "packages")
-haskell_cabal_library(
-    name = "split",
-    version = packages["split"].version,
-    srcs = glob(["**"]),
-    deps = packages["split"].deps,
-    visibility = ["//visibility:public"],
-)
-    """,
-        patch_args = ["-p1"],
-        patches = ["@rules_haskell_examples//:split.patch"],
-        sha256 = "1dcd674f7c5f276f33300f5fd59e49d1ac6fc92ae949fd06a0f6d3e9d9ac1413",
-        strip_prefix = "split-0.2.3.3",
-        urls = ["http://hackage.haskell.org/package/split-0.2.3.3/split-0.2.3.3.tar.gz"],
-    )
 
     # TODO: Remove when tests are run with a ghc version containing Cabal >= 3.10
     # See https://github.com/tweag/rules_haskell/issues/1871

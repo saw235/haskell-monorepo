@@ -9,4 +9,4 @@ haskell_binary(
     name = "calculator",
     srcs = [":Main.hs"],
     deps = ["//:base"],
-) 
+)

@@ -8,6 +8,7 @@ load(
 haskell_library(
     name = "mcp-server",
     srcs = glob(["**/*.hs"]),
+    visibility = ["//visibility:public"],
     deps = [
         "@stackage//:aeson",
         "//:base",
@@ -23,5 +24,4 @@ haskell_library(
         "@stackage//:warp",
         "@stackage//:http-types",
     ],
-    visibility = ["//visibility:public"],
-) 
+)

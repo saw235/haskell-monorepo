@@ -4,4 +4,4 @@ haskell_binary(
     name = "ghc-version-check",
     srcs = ["Main.hs"],
     deps = ["//:base"],
-) 
+)
