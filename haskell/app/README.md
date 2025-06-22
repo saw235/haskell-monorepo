@@ -12,6 +12,9 @@ haskell/app/
 ├── calculator/           # Basic calculator application
 │   ├── BUILD.bazel
 │   └── Main.hs
+├── calculator-mcp/       # Basic calculator MCP application
+│   ├── BUILD.bazel
+│   └── Main.hs
 └── README.md            # This file
 ```
 
@@ -25,6 +28,9 @@ bazel build //haskell/app/hello-world:hello-world
 
 # Build calculator
 bazel build //haskell/app/calculator:calculator
+
+# Build calculator-mcp
+bazel build //haskell/app/calculator-mcp:calculator-mcp
 ```
 
 ## Running Applications
@@ -37,6 +43,9 @@ bazel run //haskell/app/hello-world:hello-world
 
 # Run calculator
 bazel run //haskell/app/calculator:calculator
+
+# Run calculator-mcp (this is an MCP server)
+bazel run //haskell/app/calculator-mcp:calculator-mcp
 ```
 
 ## Adding New Applications
