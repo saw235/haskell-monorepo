@@ -45,8 +45,9 @@ RUN wget http://security.ubuntu.com/ubuntu/pool/universe/n/ncurses/libtinfo5_6.3
     && apt install -y ./libtinfo5_6.3-2ubuntu0.1_amd64.deb \
     && rm libtinfo5_6.3-2ubuntu0.1_amd64.deb
 
-# Download Selenium Server
-RUN wget https://github.com/SeleniumHQ/selenium/releases/download/selenium-3.9.1/selenium-server-standalone-3.9.1.jar -O /opt/selenium-server-standalone.jar
+# # Download Selenium Server
+# RUN wget https://github.com/SeleniumHQ/selenium/releases/download/selenium-3.9.1/selenium-server-standalone-3.9.1.jar \
+#     && mv selenium-server-standalone-3.9.1.jar /opt/selenium-server-standalone.jar
 
 # # Create a non-root user and set home directory
 # RUN useradd -ms /bin/bash ubuntu
