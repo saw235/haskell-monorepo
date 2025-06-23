@@ -17,15 +17,30 @@ sudo apt-get install -y \
     gnupg \
     jq \
     default-jre \
-    python3 \
-    python3-pip \
     pkg-config \
     libgmp-dev \
     libffi-dev \
     zlib1g-dev \
     libncurses5-dev \
     libtinfo-dev \
+    build-essential \
+    libssl-dev \
+    libbz2-dev \
+    libreadline-dev \
+    libsqlite3-dev \
+    libncursesw5-dev \
+    xz-utils \
+    tk-dev \
+    liblzma-dev \
+    python3-openssl \
+    git \
     && sudo rm -rf /var/lib/apt/lists/*
+
+# --- 1a. Fix libtinfo5 for Bazel ---
+echo "Installing libtinfo5 for Bazel..."
+wget http://security.ubuntu.com/ubuntu/pool/universe/n/ncurses/libtinfo5_6.3-2ubuntu0.1_amd64.deb
+sudo dpkg -i libtinfo5_6.3-2ubuntu0.1_amd64.deb || sudo apt-get -f install -y
+rm libtinfo5_6.3-2ubuntu0.1_amd64.deb
 
 # --- 2. Install Node.js using nvm ---
 # The Dockerfile used the node:22-slim base image. This section replicates that.
@@ -40,6 +55,17 @@ fi
 nvm install 22
 nvm use 22
 nvm alias default 22
+
+# --- 2a. Install Python using pyenv ---
+echo "Installing pyenv and Python 3.12.3..."
+if [ ! -d "$HOME/.pyenv" ]; then
+  curl https://pyenv.run | bash
+fi
+export PYENV_ROOT="$HOME/.pyenv"
+[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
+eval "$(pyenv init -)"
+pyenv install --skip-existing 3.12.3
+pyenv global 3.12.3
 
 # --- 3. Install Bazelisk ---
 echo "Installing Bazelisk globally via npm..."
