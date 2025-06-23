@@ -4,7 +4,7 @@
     "dockerfile": "Dockerfile",
     "context": "."
   },
-  "start": "echo 'Environment ready'",
+  "install": "./setup.sh",
   "terminals": [
     {
       "name": "Run Selenium Server",
