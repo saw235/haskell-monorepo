@@ -47,5 +47,3 @@ RUN wget https://github.com/SeleniumHQ/selenium/releases/download/selenium-3.9.1
 EXPOSE 4444
 EXPOSE 3000
 
-# A simple default command to show the environment is ready
-CMD ["echo", "Environment ready. Run selenium with 'java -jar /opt/selenium-server-standalone.jar'"]

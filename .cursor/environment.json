@@ -1,5 +1,4 @@
 {
-  "snapshot": "POPULATED_FROM_SETTINGS",
   "build": {
     "dockerfile": "Dockerfile",
     "context": "."
