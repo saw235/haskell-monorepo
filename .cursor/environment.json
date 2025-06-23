@@ -3,5 +3,6 @@
     "dockerfile": "Dockerfile",
     "context": "."
   },
-  "install": "bazel build //..."
+  "install": "bazel build //...",
+  "start": "sudo service docker start && java -jar /opt/selenium-server-standalone.jar"
 }
