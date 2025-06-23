@@ -99,3 +99,6 @@ wget -q https://github.com/SeleniumHQ/selenium/releases/download/selenium-3.9.1/
 # move selenium-server-standalone-3.9.1.jar to /usr/bin/selenium-server-standalone.jar
 sudo mv selenium-server-standalone-3.9.1.jar /usr/bin/selenium-server-standalone.jar
 
+# --- Install libtinfo5 for Bazel ---
+wget -q http://security.ubuntu.com/ubuntu/pool/universe/n/ncurses/libtinfo5_6.3-2ubuntu0.1_amd64.deb
+sudo apt install -y ./libtinfo5_6.3-2ubuntu0.1_amd64.deb
