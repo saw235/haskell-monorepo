@@ -1,0 +1,15 @@
+{
+  "name": "Haskell Monorepo Environment",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": "."
+  },
+  "start": "echo 'Environment ready'",
+  "terminals": [
+    {
+      "name": "Run Selenium Server",
+      "command": "java -jar /opt/selenium-server-standalone.jar",
+      "description": "Starts the Selenium WebDriver server for browser automation testing"
+    }
+  ]
+}
