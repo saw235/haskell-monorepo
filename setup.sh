@@ -71,6 +71,11 @@ pyenv global 3.12.3
 echo "Installing Bazelisk globally via npm..."
 npm install -g @bazel/bazelisk
 
+# --- 3.5. Install Chrome dependencies ---
+echo "Installing Chrome dependencies..."
+sudo apt-get update
+sudo apt-get install -y fonts-liberation xdg-utils
+
 # --- 4. Install Google Chrome ---
 echo "Installing Google Chrome..."
 wget -q https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
@@ -91,6 +96,6 @@ sudo chmod +x /usr/bin/chromedriver
 echo "Downloading Selenium Server Standalone JAR..."
 wget -q https://github.com/SeleniumHQ/selenium/releases/download/selenium-3.9.1/selenium-server-standalone-3.9.1.jar -O ./selenium-server-standalone-3.9.1.jar
 
-# move selenium-server-standalone-3.9.1.jar to /opt/selenium-server-standalone.jar
-sudo mv selenium-server-standalone-3.9.1.jar /opt/selenium-server-standalone.jar
+# move selenium-server-standalone-3.9.1.jar to /usr/bin/selenium-server-standalone.jar
+sudo mv selenium-server-standalone-3.9.1.jar /usr/bin/selenium-server-standalone.jar
 
