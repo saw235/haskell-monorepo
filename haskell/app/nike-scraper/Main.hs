@@ -2,7 +2,7 @@
 
 module Main where
 
-import Nike.Scraper (scrapeProducts, countProducts)
+import Nike.Scraper (scrapeProducts, countProducts, getTotalItemCount)
 import Text.HTML.Scalpel.Core (scrapeStringLike)
 import Test.WebDriver
 import Test.WebDriver.JSON
@@ -27,10 +27,51 @@ getCurrentProductCount = do
     html <- getSource
     return $ countProducts (T.unpack html)
 
--- Keep scrolling until no new products load or max attempts reached
-scrollUntilComplete :: Int -> WD ()
-scrollUntilComplete maxAttempts = scrollUntilCompleteHelper maxAttempts 0
+-- Get the expected total item count from the header
+getExpectedTotal :: WD (Maybe Int)
+getExpectedTotal = do
+    html <- getSource
+    return $ getTotalItemCount (T.unpack html)
 
+-- Keep scrolling until we have all expected products or max attempts reached
+scrollUntilComplete :: Int -> WD ()
+scrollUntilComplete maxAttempts = do
+    expectedTotal <- getExpectedTotal
+    case expectedTotal of
+        Just total -> do
+            liftIO $ putStrLn $ "Found expected total: " ++ show total ++ " products"
+            scrollUntilCompleteWithTotal maxAttempts 0 total
+        Nothing -> do
+            liftIO $ putStrLn "Could not determine total count, using fallback method"
+            scrollUntilCompleteHelper maxAttempts 0
+
+scrollUntilCompleteWithTotal :: Int -> Int -> Int -> WD ()
+scrollUntilCompleteWithTotal maxAttempts attempts expectedTotal = do
+    when (attempts < maxAttempts) $ do
+        currentCount <- getCurrentProductCount
+        liftIO $ putStrLn $ "Progress: " ++ show currentCount ++ "/" ++ show expectedTotal ++ " products (attempt " ++ show (attempts + 1) ++ "/" ++ show maxAttempts ++ ")"
+        
+        if currentCount >= expectedTotal
+            then liftIO $ putStrLn "All products loaded successfully!"
+            else do
+                scrollToBottom
+                newCount <- getCurrentProductCount
+                
+                if newCount > currentCount
+                    then do
+                        liftIO $ putStrLn $ "New products loaded! Count increased from " ++ show currentCount ++ " to " ++ show newCount
+                        liftIO $ putStrLn "Waiting a bit more to ensure all content is loaded..."
+                        liftIO $ threadDelay 2000000  -- Additional 2 seconds after new content detected
+                        scrollUntilCompleteWithTotal maxAttempts (attempts + 1) expectedTotal
+                    else do
+                        liftIO $ putStrLn $ "No new products loaded. Current: " ++ show newCount ++ ", Expected: " ++ show expectedTotal
+                        if newCount < expectedTotal
+                            then do
+                                liftIO $ putStrLn "Still missing products, trying one more scroll..."
+                                scrollUntilCompleteWithTotal maxAttempts (attempts + 1) expectedTotal
+                            else liftIO $ putStrLn "Infinite scroll complete."
+
+-- Fallback method for when we can't get total count
 scrollUntilCompleteHelper :: Int -> Int -> WD ()
 scrollUntilCompleteHelper maxAttempts attempts = do
     when (attempts < maxAttempts) $ do

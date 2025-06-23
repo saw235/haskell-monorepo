@@ -11,17 +11,25 @@ A Haskell-based web scraper that extracts product information from Nike's websit
 
 ## How Infinite Scrolling Works
 
-The scraper handles infinite scrolling by:
+The scraper intelligently handles infinite scrolling by:
 
 1. Loading the initial Nike products page
-2. Counting the current number of products visible
-3. Scrolling to the bottom of the page using JavaScript: `window.scrollTo(0, document.body.scrollHeight);`
-4. Waiting 5 seconds for new content to load
-5. Counting products again to detect if new items were loaded
-6. Repeating steps 3-5 until no new products are detected or maximum attempts (10) reached
-7. Scraping all loaded products from the final HTML
+2. **Extracting the total expected product count** from the header element `<span class="wall-header__item_count">(639)</span>`
+3. Counting the current number of products visible
+4. Scrolling to the bottom of the page using JavaScript: `window.scrollTo(0, document.body.scrollHeight);`
+5. Waiting 5 seconds for new content to load
+6. Comparing current product count against the expected total
+7. Repeating steps 4-6 until all expected products are loaded or maximum attempts (10) reached
+8. Scraping all loaded products from the final HTML
 
-This approach ensures all products are captured while preventing infinite loops.
+### Smart Detection Strategy
+
+- **Primary Method**: Uses the total count from Nike's header to know exactly how many products to expect
+- **Progress Tracking**: Shows real-time progress like "Progress: 120/639 products"
+- **Fallback Method**: If total count can't be determined, falls back to detecting when no new products load
+- **Safety Limits**: Maximum attempts prevent infinite loops
+
+This approach ensures all products are captured efficiently and provides clear progress feedback.
 
 ### Timing Strategy
 
@@ -50,5 +58,5 @@ bazel run //haskell/app/nike-scraper
 - **Language**: Haskell
 - **Web Driver**: Chrome WebDriver via `webdriver` library
 - **HTML Parsing**: Scalpel library for CSS selector-based scraping
-- **Infinite Scroll**: JavaScript execution with product count monitoring
+- **Infinite Scroll**: JavaScript execution with intelligent total count extraction and progress monitoring
 - **Target**: Nike men's shoes category
