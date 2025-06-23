@@ -840,7 +840,7 @@
     "@@rules_haskell~//extensions:stack_snapshot.bzl%stack_snapshot": {
       "general": {
         "bzlTransitiveDigest": "I9dE/IPkeO/mkCmDvxjs6J9WP1Tf8kV6hE6XhXWYcuw=",
-        "usagesDigest": "/WAJtjw5Q5YwqY/342VvBakuJt5Fq3p/YPv80OHyuKY=",
+        "usagesDigest": "Xt/Izdj6pzt7Y6hiCsHuAJKH5jfAvNSYITg+HSZB26k=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},
         "envVariables": {},
@@ -880,7 +880,10 @@
                 "streaming-commons",
                 "warp",
                 "http-types",
-                "attoparsec"
+                "attoparsec",
+                "data-default-0.8.0.0",
+                "tls-2.1.2",
+                "scalpel"
               ],
               "flags": {
                 "zlib": [
@@ -919,7 +922,10 @@
                 "streaming-commons",
                 "warp",
                 "http-types",
-                "attoparsec"
+                "attoparsec",
+                "data-default-0.8.0.0",
+                "tls-2.1.2",
+                "scalpel"
               ],
               "flags": {
                 "zlib": [

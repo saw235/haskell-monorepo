@@ -1,0 +1,12 @@
+load("@rules_haskell//haskell:defs.bzl", "haskell_binary")
+
+haskell_binary(
+    name = "nike-scraper",
+    srcs = ["Main.hs"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//:base",
+        "@stackage//:scalpel",
+        "@stackage//:tls",
+    ],
+) 
