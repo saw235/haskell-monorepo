@@ -3,6 +3,6 @@
     "dockerfile": "Dockerfile",
     "context": "."
   },
-  "install": "bazel build //...",
+  "install": "",
   "start": "sudo service docker start"
 }
