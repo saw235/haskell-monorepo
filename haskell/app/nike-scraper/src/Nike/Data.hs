@@ -13,9 +13,12 @@ import GHC.Generics
 import Data.Aeson
 
 data Product = Product {
-    productName  :: String,
-    productPrice :: String,
-    productImage :: String
+    productName     :: String,
+    productSubtitle :: String,
+    productPrice    :: String,
+    productVariant  :: String,
+    productUrl      :: String,
+    productImage    :: String
 } deriving (Show, Eq)
 
 data ApiResponse = ApiResponse {
