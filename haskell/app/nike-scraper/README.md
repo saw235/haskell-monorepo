@@ -17,7 +17,7 @@ The scraper intelligently handles infinite scrolling by:
 2. **Extracting the total expected product count** from the header element `<span class="wall-header__item_count">(639)</span>`
 3. Counting the current number of products visible
 4. Scrolling to the bottom of the page using JavaScript: `window.scrollTo(0, document.body.scrollHeight);`
-5. Waiting 5 seconds for new content to load
+5. Waiting 7 seconds for new content to load
 6. Comparing current product count against the expected total
 7. Repeating steps 4-6 until all expected products are loaded or maximum attempts (10) reached
 8. Scraping all loaded products from the final HTML
@@ -25,7 +25,9 @@ The scraper intelligently handles infinite scrolling by:
 ### Smart Detection Strategy
 
 - **Primary Method**: Uses the total count from Nike's header to know exactly how many products to expect
+- **Multiple Selectors**: Tries span, h1, and header selectors to find the product count
 - **Progress Tracking**: Shows real-time progress like "Progress: 120/639 products"
+- **Dynamic Content Handling**: Waits for JavaScript-loaded content and retries total count extraction
 - **Fallback Method**: If total count can't be determined, falls back to detecting when no new products load
 - **Safety Limits**: Maximum attempts prevent infinite loops
 
@@ -34,9 +36,10 @@ This approach ensures all products are captured efficiently and provides clear p
 ### Timing Strategy
 
 The scraper uses conservative timing to handle Nike's loading behavior:
-- **Initial load**: 5 seconds to ensure the page is fully loaded
-- **Post-scroll wait**: 5 seconds after each scroll to allow new content to load
-- **Additional buffer**: 2 seconds extra wait when new products are detected
+- **Initial load**: 8 seconds to ensure the page is fully loaded (increased for dynamic content)
+- **Post-scroll wait**: 7 seconds after each scroll to allow new content to load
+- **Additional buffer**: 4 seconds extra wait when new products are detected
+- **Retry logic**: Only gives up after 2 consecutive failed scroll attempts
 
 ## Prerequisites
 
