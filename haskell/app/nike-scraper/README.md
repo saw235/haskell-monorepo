@@ -26,20 +26,24 @@ The scraper intelligently handles infinite scrolling by:
 
 - **Primary Method**: Uses the total count from Nike's header to know exactly how many products to expect
 - **Multiple Selectors**: Tries span, h1, and header selectors to find the product count
-- **Progress Tracking**: Shows real-time progress like "Progress: 120/639 products"
-- **Dynamic Content Handling**: Waits for JavaScript-loaded content and retries total count extraction
-- **Fallback Method**: If total count can't be determined, falls back to detecting when no new products load
+- **Text Search Fallback**: Searches all span elements and any text with parentheses for count numbers
+- **Retry Logic**: Attempts total count detection up to 5 times with 3-second delays for dynamic content
+- **Progress Tracking**: Shows real-time progress like "Progress: 120/639 products" when total is known
+- **Enhanced Debugging**: Comprehensive logging to understand page structure and selector results
+- **Robust Fallback**: If total count can't be determined, uses persistent scroll detection (2 failed attempts before giving up)
 - **Safety Limits**: Maximum attempts prevent infinite loops
 
 This approach ensures all products are captured efficiently and provides clear progress feedback.
 
 ### Timing Strategy
 
-The scraper uses conservative timing to handle Nike's loading behavior:
-- **Initial load**: 8 seconds to ensure the page is fully loaded (increased for dynamic content)
+The scraper uses conservative timing to handle Nike's dynamic loading:
+- **Initial load**: 8 seconds to ensure the page is fully loaded
+- **Total count detection**: Up to 5 retry attempts with 3-second delays for dynamic content
 - **Post-scroll wait**: 7 seconds after each scroll to allow new content to load
 - **Additional buffer**: 4 seconds extra wait when new products are detected
-- **Retry logic**: Only gives up after 2 consecutive failed scroll attempts
+- **Fallback persistence**: Only gives up after 2 consecutive failed scroll attempts
+- **Maximum attempts**: 10 scroll attempts to prevent infinite loops
 
 ## Prerequisites
 

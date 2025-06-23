@@ -31,13 +31,40 @@ getCurrentProductCount = do
 getExpectedTotal :: WD (Maybe Int)
 getExpectedTotal = do
     html <- getSource
+    return $ getTotalItemCount (T.unpack html)
+
+-- Debug version that shows detailed output
+getExpectedTotalWithDebug :: WD (Maybe Int)
+getExpectedTotalWithDebug = do
+    html <- getSource
     liftIO $ debugTotalCount (T.unpack html)  -- Debug what we're extracting
     return $ getTotalItemCount (T.unpack html)
+
+-- Retry getting total count with delays for dynamic content
+getExpectedTotalWithRetry :: Int -> WD (Maybe Int)
+getExpectedTotalWithRetry maxRetries = getExpectedTotalWithRetryHelper maxRetries maxRetries
+
+getExpectedTotalWithRetryHelper :: Int -> Int -> WD (Maybe Int)
+getExpectedTotalWithRetryHelper 0 _ = do
+    liftIO $ putStrLn "Max retries reached for total count detection"
+    return Nothing
+getExpectedTotalWithRetryHelper retries maxRetries = do
+    result <- if retries == maxRetries 
+                then getExpectedTotalWithDebug  -- Debug on first attempt
+                else getExpectedTotal           -- No debug on retries
+    case result of
+        Just count -> do
+            liftIO $ putStrLn $ "Successfully found total count: " ++ show count
+            return (Just count)
+        Nothing -> do
+            liftIO $ putStrLn $ "Total count not found, retrying in 3 seconds... (" ++ show retries ++ " attempts left)"
+            liftIO $ threadDelay 3000000  -- Wait 3 seconds
+            getExpectedTotalWithRetryHelper (retries - 1) maxRetries
 
 -- Keep scrolling until we have all expected products or max attempts reached
 scrollUntilComplete :: Int -> WD ()
 scrollUntilComplete maxAttempts = do
-    expectedTotal <- getExpectedTotal
+    expectedTotal <- getExpectedTotalWithRetry 2  -- Try 2 more times during scrolling
     case expectedTotal of
         Just total -> do
             liftIO $ putStrLn $ "Found expected total: " ++ show total ++ " products"
@@ -110,12 +137,7 @@ main = do
         liftIO $ threadDelay 8000000  -- Wait 8 seconds for initial load (increased for dynamic content)
         
         liftIO $ putStrLn "Checking for total count after initial load..."
-        expectedTotal1 <- getExpectedTotal
-        case expectedTotal1 of
-            Just total -> liftIO $ putStrLn $ "Found total count on first try: " ++ show total
-            Nothing -> do
-                liftIO $ putStrLn "Total count not found yet, waiting more..."
-                liftIO $ threadDelay 3000000  -- Wait another 3 seconds
+        expectedTotal1 <- getExpectedTotalWithRetry 3  -- Try up to 3 times with delays
         
         liftIO $ putStrLn "Starting infinite scroll process..."
         scrollUntilComplete 10  -- Maximum 10 scroll attempts

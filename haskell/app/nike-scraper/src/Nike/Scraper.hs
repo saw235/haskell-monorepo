@@ -29,8 +29,7 @@ countProducts html =
 -- Extract total item count from the header using multiple approaches
 getTotalItemCount :: String -> Maybe Int
 getTotalItemCount html = 
-    -- Try the primary selector first
-    trySpanSelector `orElse` tryH1Selector `orElse` tryAnyNumberInHeader
+    trySpanSelector `orElse` tryH1Selector `orElse` tryAnySpanSelector `orElse` tryParenthesesInText
   where
     trySpanSelector = do
         countText <- scrapeStringLike html $ text ("span" @: [hasClass "wall-header__item_count"])
@@ -40,9 +39,23 @@ getTotalItemCount html =
         h1Text <- scrapeStringLike html $ text ("h1" @: [hasClass "wall-header__title"])
         extractNumber h1Text
     
-    tryAnyNumberInHeader = do
-        headerText <- scrapeStringLike html $ text ("header" @: [hasClass "wall-header"])
-        extractNumber headerText
+    tryAnySpanSelector = 
+        case scrapeStringLike html $ texts "span" of
+            Just texts -> 
+                let textsWithParens = filter (elem '(') texts
+                in case textsWithParens of
+                    [] -> Nothing
+                    (firstMatch:_) -> extractNumber firstMatch
+            Nothing -> Nothing
+    
+    tryParenthesesInText = 
+        case scrapeStringLike html $ texts anySelector of
+            Just allTexts -> 
+                let textsWithParens = filter (elem '(') allTexts
+                in case textsWithParens of
+                    [] -> Nothing
+                    (firstMatch:_) -> extractNumber firstMatch
+            Nothing -> Nothing
     
     extractNumber text =
         let cleanedText = filter (`elem` ("0123456789" :: String)) text
@@ -69,13 +82,19 @@ debugTotalCount html = do
     let headerResult = scrapeStringLike html $ text ("header" @: [hasClass "wall-header"])
     putStrLn $ "Header selector result: " ++ show headerResult
     
-    -- Original logic
-    let countText = scrapeStringLike html $ text ("span" @: [hasClass "wall-header__item_count"])
-    putStrLn $ "Debug - countText extracted: " ++ show countText
-    case countText of
-        Just text -> do
-            let cleanedText = filter (`elem` ("0123456789" :: String)) text
-            putStrLn $ "Debug - cleanedText: " ++ show cleanedText
-            putStrLn $ "Debug - readMaybe result: " ++ show (readMaybe cleanedText :: Maybe Int)
-        Nothing -> putStrLn "Debug - No text found with the selector"
+    -- Try to find any span with text containing parentheses
+    let allSpans = scrapeStringLike html $ texts "span"
+    putStrLn $ "All span texts: " ++ show allSpans
+    
+    -- Try to find any text with parentheses and numbers
+    let allText = scrapeStringLike html $ texts anySelector
+    putStrLn $ "All text elements: " ++ show (take 10 <$> allText)
+    
+    -- Look for anything with parentheses
+    case allText of
+        Just texts -> do
+            let textsWithParens = filter (elem '(') texts
+            putStrLn $ "Texts with parentheses: " ++ show textsWithParens
+        Nothing -> putStrLn "No text elements found"
+    
     putStrLn "=======================================" 
