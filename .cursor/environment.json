@@ -1,5 +1,4 @@
 {
-  "snapshot": "POPULATED_FROM_SETTINGS",
   "name": "Haskell Monorepo Environment",
   "build": {
     "dockerfile": "Dockerfile",
