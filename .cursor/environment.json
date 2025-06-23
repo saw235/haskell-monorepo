@@ -1,5 +1,9 @@
 {
   "name": "Haskell Monorepo Environment",
-  "install": "chmod u+x ./setup.sh && ./setup.sh && bazel build //...",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": "."
+  },
+  "install": "bazel build //...",
   "start": "java -jar /opt/selenium-server-standalone.jar"
 }
