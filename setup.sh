@@ -91,3 +91,6 @@ sudo chmod +x /usr/bin/chromedriver
 echo "Downloading Selenium Server Standalone JAR..."
 wget https://github.com/SeleniumHQ/selenium/releases/download/selenium-3.9.1/selenium-server-standalone-3.9.1.jar -O ./selenium-server-standalone-3.9.1.jar
 
+# move selenium-server-standalone-3.9.1.jar to /opt/selenium-server-standalone.jar
+sudo mv selenium-server-standalone-3.9.1.jar /opt/selenium-server-standalone.jar
+

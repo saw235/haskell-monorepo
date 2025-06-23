@@ -1,15 +1,5 @@
 {
   "name": "Haskell Monorepo Environment",
-  "build": {
-    "dockerfile": "Dockerfile",
-    "context": "."
-  },
-  "install": "bazel build //...",
-  "terminals": [
-    {
-      "name": "Run Selenium Server",
-      "command": "java -jar /opt/selenium-server-standalone.jar",
-      "description": "Starts the Selenium WebDriver server for browser automation testing"
-    }
-  ]
+  "install": "chmod u+x ./setup.sh && ./setup.sh && bazel build //...",
+  "start": "java -jar /opt/selenium-server-standalone.jar"
 }
