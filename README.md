@@ -7,3 +7,8 @@ To install the dependencies for the task manager, run the following command from
 ```bash
 bazel run -- @pnpm//:pnpm --dir $PWD/tools/mcp-shrimp-task-manager/ install
 ``` 
+
+## Run this to pin stackage dependencies
+```bash
+bazel run @stackage-unpinned//:pin
+```

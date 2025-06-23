@@ -1,0 +1,22 @@
+load("@rules_haskell//haskell:defs.bzl", "haskell_binary")
+
+haskell_binary(
+    name = "nike-scraper",
+    srcs = [
+        "Main.hs",
+        "src/Nike/Data.hs",
+        "src/Nike/Scraper.hs",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        # Per user instruction, //:base is the correct dependency.
+        "//:base",
+        "@stackage//:scalpel",
+        "@stackage//:scalpel-core",
+        "@stackage//:attoparsec",
+        "@stackage//:webdriver",
+        "@stackage//:text",
+        "@stackage//:aeson",
+        "@stackage//:bytestring",
+    ],
+)
