@@ -2,4 +2,5 @@
 bazel-bin
 bazel-out
 bazel-testlogs
-bazel-haskell-monorepo 
+bazel-haskell-monorepo /bazel-workspace
+/libtinfo5_6.3-2ubuntu0.1_amd64.deb
