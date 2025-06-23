@@ -1,4 +1,4 @@
-FROM node:22-slim
+FROM ubuntu:22.04
 
 # Set non-interactive for package installations to avoid prompts
 ENV DEBIAN_FRONTEND=noninteractive
@@ -17,6 +17,11 @@ RUN apt-get update && apt-get install -y \
     libgmp-dev \
     libffi-dev \
     zlib1g-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Node.js
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+    && apt-get install -y nodejs \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Bazelisk globally using npm
@@ -41,7 +46,7 @@ RUN wget http://security.ubuntu.com/ubuntu/pool/universe/n/ncurses/libtinfo5_6.3
     && rm libtinfo5_6.3-2ubuntu0.1_amd64.deb
 
 # Download Selenium Server
-# RUN wget https://github.com/SeleniumHQ/selenium/releases/download/selenium-3.9.1/selenium-server-standalone-3.9.1.jar -O /opt/selenium-server-standalone.jar
+RUN wget https://github.com/SeleniumHQ/selenium/releases/download/selenium-3.9.1/selenium-server-standalone-3.9.1.jar -O /opt/selenium-server-standalone.jar
 
 # # Create a non-root user and set home directory
 # RUN useradd -ms /bin/bash ubuntu
