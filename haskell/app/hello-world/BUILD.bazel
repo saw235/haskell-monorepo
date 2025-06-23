@@ -11,6 +11,5 @@ haskell_binary(
     srcs = [":Main.hs"],
     deps = [
         "//:base",
-        "@stackage//:zlib",
     ],
 )
