@@ -8,12 +8,15 @@ import Test.WebDriver
 import qualified Data.Text as T
 import Control.Monad (when)
 
+chromeConfig = useBrowser chromeHeadless defaultConfig
+  where chromeHeadless = chrome { chromeOptions = ["--headless", "--no-sandbox", "--disable-dev-shm-usage"] }
+
 main :: IO ()
 main = do
     putStrLn "Starting Nike scraper..."
     let nikeUrl = "https://www.nike.com/w/mens-shoes-nik1-z5e1x6znik1"
     putStrLn $ "Fetching URL: " ++ nikeUrl
-    html <- runSession defaultConfig $ do
+    html <- runSession chromeConfig $ do
         openPage nikeUrl
         getSource
     putStrLn "Successfully fetched HTML source."

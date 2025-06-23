@@ -60,6 +60,11 @@ stack.package(
 )
 
 stack.package(
+    name = "vector",
+)
+
+
+stack.package(
     name = "containers",
     setup_deps = ["@Cabal//:Cabal"],
 )

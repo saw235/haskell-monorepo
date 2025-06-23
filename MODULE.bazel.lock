@@ -840,7 +840,7 @@
     "@@rules_haskell~//extensions:stack_snapshot.bzl%stack_snapshot": {
       "general": {
         "bzlTransitiveDigest": "I9dE/IPkeO/mkCmDvxjs6J9WP1Tf8kV6hE6XhXWYcuw=",
-        "usagesDigest": "dU3pb4rMWFyaSGbweFMMysQrxfNtNO93LswMRbqyAGQ=",
+        "usagesDigest": "n62DyPrHrYLH0OMZUHBaGiHG1Ut6qWlBhZ0jTXLUwHA=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},
         "envVariables": {},
@@ -871,6 +871,7 @@
                 "zlib",
                 "aeson",
                 "bytestring",
+                "vector",
                 "containers",
                 "stm",
                 "template-haskell",
@@ -920,6 +921,7 @@
                 "zlib",
                 "aeson",
                 "bytestring",
+                "vector",
                 "containers",
                 "stm",
                 "template-haskell",
