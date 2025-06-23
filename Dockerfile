@@ -43,14 +43,6 @@ RUN wget http://security.ubuntu.com/ubuntu/pool/universe/n/ncurses/libtinfo5_6.3
 # Download Selenium Server
 RUN wget https://github.com/SeleniumHQ/selenium/releases/download/selenium-3.9.1/selenium-server-standalone-3.9.1.jar -O /opt/selenium-server-standalone.jar
 
-# Set up the application directory
-WORKDIR /app
-
-# Copy project files and install dependencies
-COPY . .
-
-RUN bazelisk build //haskell/app/nike-scraper:nike-scraper
-
 # Expose ports for Selenium and a potential web application
 EXPOSE 4444
 EXPOSE 3000
