@@ -16,12 +16,19 @@ The scraper handles infinite scrolling by:
 1. Loading the initial Nike products page
 2. Counting the current number of products visible
 3. Scrolling to the bottom of the page using JavaScript: `window.scrollTo(0, document.body.scrollHeight);`
-4. Waiting 2 seconds for new content to load
+4. Waiting 5 seconds for new content to load
 5. Counting products again to detect if new items were loaded
 6. Repeating steps 3-5 until no new products are detected or maximum attempts (10) reached
 7. Scraping all loaded products from the final HTML
 
 This approach ensures all products are captured while preventing infinite loops.
+
+### Timing Strategy
+
+The scraper uses conservative timing to handle Nike's loading behavior:
+- **Initial load**: 5 seconds to ensure the page is fully loaded
+- **Post-scroll wait**: 5 seconds after each scroll to allow new content to load
+- **Additional buffer**: 2 seconds extra wait when new products are detected
 
 ## Prerequisites
 

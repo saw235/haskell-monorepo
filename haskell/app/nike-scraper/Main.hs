@@ -18,8 +18,8 @@ chromeConfig = useBrowser chromeHeadless defaultConfig
 scrollToBottom :: WD ()
 scrollToBottom = do
     _ <- executeJS [] "window.scrollTo(0, document.body.scrollHeight);" :: WD (Maybe ())
-    -- Wait 2 seconds for content to load
-    liftIO $ threadDelay 2000000  -- 2 seconds in microseconds
+    -- Wait 5 seconds for content to load (increased for Nike's slower loading)
+    liftIO $ threadDelay 5000000  -- 5 seconds in microseconds
 
 -- Get current product count from the page
 getCurrentProductCount :: WD Int
@@ -42,6 +42,8 @@ scrollUntilCompleteHelper maxAttempts attempts = do
         if newCount > initialCount
             then do
                 liftIO $ putStrLn $ "New products loaded! Count increased from " ++ show initialCount ++ " to " ++ show newCount
+                liftIO $ putStrLn "Waiting a bit more to ensure all content is loaded..."
+                liftIO $ threadDelay 2000000  -- Additional 2 seconds after new content detected
                 scrollUntilCompleteHelper maxAttempts (attempts + 1)
             else do
                 liftIO $ putStrLn "No new products loaded, infinite scroll complete."
@@ -55,7 +57,7 @@ main = do
     html <- runSession chromeConfig $ do
         openPage nikeUrl
         liftIO $ putStrLn "Waiting for initial page load..."
-        liftIO $ threadDelay 3000000  -- Wait 3 seconds for initial load
+        liftIO $ threadDelay 5000000  -- Wait 5 seconds for initial load
         
         liftIO $ putStrLn "Starting infinite scroll process..."
         scrollUntilComplete 10  -- Maximum 10 scroll attempts
