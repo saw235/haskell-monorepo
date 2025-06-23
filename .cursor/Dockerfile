@@ -30,12 +30,12 @@ RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
 RUN npm install -g @bazel/bazelisk
 
 # Install Google Chrome Stable
-RUN wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb \
+RUN wget -q https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb \
     && dpkg -i google-chrome-stable_current_amd64.deb || apt-get -f install -y \
     && rm google-chrome-stable_current_amd64.deb
 
 # Install Chromedriver with fixed version
-RUN wget https://storage.googleapis.com/chrome-for-testing-public/126.0.6478.126/linux64/chromedriver-linux64.zip \
+RUN wget -q https://storage.googleapis.com/chrome-for-testing-public/126.0.6478.126/linux64/chromedriver-linux64.zip \
     && unzip chromedriver-linux64.zip \
     && mv chromedriver-linux64/chromedriver /usr/bin/ \
     && rm chromedriver-linux64.zip \
@@ -43,7 +43,7 @@ RUN wget https://storage.googleapis.com/chrome-for-testing-public/126.0.6478.126
     && chmod +x /usr/bin/chromedriver
 
 # Fix libtinfo5 for Bazel
-RUN wget http://security.ubuntu.com/ubuntu/pool/universe/n/ncurses/libtinfo5_6.3-2ubuntu0.1_amd64.deb \
+RUN wget -q http://security.ubuntu.com/ubuntu/pool/universe/n/ncurses/libtinfo5_6.3-2ubuntu0.1_amd64.deb \
     && apt install -y ./libtinfo5_6.3-2ubuntu0.1_amd64.deb \
     && rm libtinfo5_6.3-2ubuntu0.1_amd64.deb
 

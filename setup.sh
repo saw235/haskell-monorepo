@@ -38,7 +38,7 @@ sudo apt-get install -y \
 
 # --- 1a. Fix libtinfo5 for Bazel ---
 echo "Installing libtinfo5 for Bazel..."
-wget http://security.ubuntu.com/ubuntu/pool/universe/n/ncurses/libtinfo5_6.3-2ubuntu0.1_amd64.deb
+wget -q http://security.ubuntu.com/ubuntu/pool/universe/n/ncurses/libtinfo5_6.3-2ubuntu0.1_amd64.deb
 sudo dpkg -i libtinfo5_6.3-2ubuntu0.1_amd64.deb || sudo apt-get -f install -y
 rm libtinfo5_6.3-2ubuntu0.1_amd64.deb
 
@@ -73,14 +73,14 @@ npm install -g @bazel/bazelisk
 
 # --- 4. Install Google Chrome ---
 echo "Installing Google Chrome..."
-wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+wget -q https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
 # Use dpkg to install and apt-get -f install to fix any missing dependencies
 sudo dpkg -i google-chrome-stable_current_amd64.deb || sudo apt-get -f install -y
 rm google-chrome-stable_current_amd64.deb
 
 # --- 5. Install Chromedriver ---
 echo "Installing a fixed version of Chromedriver..."
-wget https://storage.googleapis.com/chrome-for-testing-public/126.0.6478.126/linux64/chromedriver-linux64.zip
+wget -q https://storage.googleapis.com/chrome-for-testing-public/126.0.6478.126/linux64/chromedriver-linux64.zip
 unzip chromedriver-linux64.zip
 sudo mv chromedriver-linux64/chromedriver /usr/bin/
 rm chromedriver-linux64.zip
@@ -89,7 +89,7 @@ sudo chmod +x /usr/bin/chromedriver
 
 # --- 6. Download Selenium Server ---
 echo "Downloading Selenium Server Standalone JAR..."
-wget https://github.com/SeleniumHQ/selenium/releases/download/selenium-3.9.1/selenium-server-standalone-3.9.1.jar -O ./selenium-server-standalone-3.9.1.jar
+wget -q https://github.com/SeleniumHQ/selenium/releases/download/selenium-3.9.1/selenium-server-standalone-3.9.1.jar -O ./selenium-server-standalone-3.9.1.jar
 
 # move selenium-server-standalone-3.9.1.jar to /opt/selenium-server-standalone.jar
 sudo mv selenium-server-standalone-3.9.1.jar /opt/selenium-server-standalone.jar
