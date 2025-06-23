@@ -14,7 +14,8 @@ import Data.Aeson
 
 data Product = Product {
     productName  :: String,
-    productPrice :: String
+    productPrice :: String,
+    productImage :: String
 } deriving (Show, Eq)
 
 data ApiResponse = ApiResponse {

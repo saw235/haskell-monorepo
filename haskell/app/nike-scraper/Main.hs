@@ -14,7 +14,7 @@ chromeConfig = useBrowser chromeHeadless defaultConfig
 main :: IO ()
 main = do
     putStrLn "Starting Nike scraper..."
-    let nikeUrl = "https://www.nike.com/w/mens-shoes-nik1-z5e1x6znik1"
+    let nikeUrl = "https://www.nike.com/w/mens-shoes-nik1zy7ok"
     putStrLn $ "Fetching URL: " ++ nikeUrl
     html <- runSession chromeConfig $ do
         openPage nikeUrl
