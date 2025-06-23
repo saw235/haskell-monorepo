@@ -1,5 +1,7 @@
 FROM ubuntu:22.04
 
+SHELL ["/bin/bash", "-c"]
+
 # Set non-interactive for package installations to avoid prompts
 ENV DEBIAN_FRONTEND=noninteractive
 
