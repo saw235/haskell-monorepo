@@ -1,4 +1,30 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 module Main where
 
+import Nike.Scraper (scrapeProducts)
+import Text.HTML.Scalpel.Core (scrapeStringLike)
+import Test.WebDriver
+import qualified Data.Text as T
+import Control.Monad (when)
+
 main :: IO ()
-main = putStrLn "Hello from nike-scraper!" 
+main = do
+    putStrLn "Starting Nike scraper..."
+    let nikeUrl = "https://www.nike.com/w/mens-shoes-nik1-z5e1x6znik1"
+    putStrLn $ "Fetching URL: " ++ nikeUrl
+    html <- runSession defaultConfig $ do
+        openPage nikeUrl
+        getSource
+    putStrLn "Successfully fetched HTML source."
+
+    if T.null html
+      then putStrLn "HTML content is empty, skipping scraping."
+      else do
+        putStrLn "Scraping products from HTML..."
+        let products = scrapeStringLike (T.unpack html) scrapeProducts
+        case products of
+            Just prods -> do
+                putStrLn $ "Successfully scraped " ++ show (length prods) ++ " products."
+                mapM_ print prods
+            Nothing    -> putStrLn "Failed to scrape products." 

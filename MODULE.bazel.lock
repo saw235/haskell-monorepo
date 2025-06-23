@@ -840,7 +840,7 @@
     "@@rules_haskell~//extensions:stack_snapshot.bzl%stack_snapshot": {
       "general": {
         "bzlTransitiveDigest": "I9dE/IPkeO/mkCmDvxjs6J9WP1Tf8kV6hE6XhXWYcuw=",
-        "usagesDigest": "Xt/Izdj6pzt7Y6hiCsHuAJKH5jfAvNSYITg+HSZB26k=",
+        "usagesDigest": "dU3pb4rMWFyaSGbweFMMysQrxfNtNO93LswMRbqyAGQ=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},
         "envVariables": {},
@@ -883,11 +883,17 @@
                 "attoparsec",
                 "data-default-0.8.0.0",
                 "tls-2.1.2",
-                "scalpel"
+                "scalpel",
+                "scalpel-core",
+                "webdriver",
+                "digest"
               ],
               "flags": {
                 "zlib": [
                   "-non-blocking-ffi",
+                  "-pkg-config"
+                ],
+                "digest": [
                   "-pkg-config"
                 ]
               },
@@ -904,7 +910,8 @@
               "stack": "@@rules_haskell~~rules_haskell_dependencies~rules_haskell_stack//:stack",
               "stack_update": "'@@rules_haskell~~rules_haskell_dependencies~rules_haskell_stack_update//:stack_update'",
               "extra_deps": {
-                "@@_main~non_module_deps~zlib.hs//:zlib.hs": "zlib streaming-commons"
+                "@@_main~non_module_deps~zlib.hs//:zlib.hs": "zlib streaming-commons digest",
+                "@@rules_haskell~~stack_snapshot~stackage//:zlib": "digest"
               },
               "vendored_packages": {},
               "snapshot": "lts-23.22",
@@ -925,11 +932,17 @@
                 "attoparsec",
                 "data-default-0.8.0.0",
                 "tls-2.1.2",
-                "scalpel"
+                "scalpel",
+                "scalpel-core",
+                "webdriver",
+                "digest"
               ],
               "flags": {
                 "zlib": [
                   "-non-blocking-ffi",
+                  "-pkg-config"
+                ],
+                "digest": [
                   "-pkg-config"
                 ]
               },

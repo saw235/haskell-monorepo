@@ -126,7 +126,24 @@ stack.package(
 stack.package(
     name = "scalpel",
 )
-# stack.package(name = "scalpel-core")
+stack.package(
+    name = "scalpel-core",
+)
+
+stack.package(
+    name = "webdriver",
+)
+
+stack.package(
+    name = "digest",
+    extra_deps = ["@stackage//:zlib", "@zlib.hs"],
+    flags =
+        [
+            "-pkg-config",
+    ],
+)
+
+
 # stack.package(name = "http-client")
 # stack.package(name = "http-client-tls")
 # stack.package(name = "tagsoup")
