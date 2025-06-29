@@ -1,0 +1,9 @@
+{
+  "agentCanUpdateSnapshot": true,
+  // "build": {
+  //   "dockerfile": "Dockerfile",
+  //   "context": "."
+  // },
+  "install": "",
+  "start": "sudo service docker start"
+}

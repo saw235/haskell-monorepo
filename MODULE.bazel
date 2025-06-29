@@ -50,11 +50,6 @@ stack.package(
 # LTS snapshot published for ghc-9.4.6 (default version used by rules_haskell)
 stack.snapshot(name = "lts-23.22")
 
-# stack.package(
-#     name = "wai-websockets-3.0.1.1",
-#     setup_deps = ["@Cabal//:Cabal"],
-# )
-
 stack.package(
     name = "aeson",
 )
@@ -65,15 +60,14 @@ stack.package(
 )
 
 stack.package(
+    name = "vector",
+)
+
+
+stack.package(
     name = "containers",
     setup_deps = ["@Cabal//:Cabal"],
 )
-
-# stack.package(
-#     name = "mtl",
-#     setup_deps = ["@Cabal//:Cabal"],
-
-# )
 
 stack.package(
     name = "stm",
@@ -126,6 +120,40 @@ stack.package(
     },
 )
 
+stack.package(
+    name = "data-default-0.8.0.0",
+)
+
+stack.package(
+    name = "tls-2.1.2",
+)
+
+stack.package(
+    name = "scalpel",
+)
+stack.package(
+    name = "scalpel-core",
+)
+
+stack.package(
+    name = "webdriver",
+)
+
+stack.package(
+    name = "digest",
+    extra_deps = ["@stackage//:zlib", "@zlib.hs"],
+    flags =
+        [
+            "-pkg-config",
+    ],
+)
+
+
+# stack.package(name = "http-client")
+# stack.package(name = "http-client-tls")
+# stack.package(name = "tagsoup")
+# stack.package(name = "case-insensitive")
+# stack.package(name = "tls")
 
 # This uses an unpinned version of stack_snapshot, meaning that stack is invoked on every build.
 # To switch to pinned stackage dependencies, run `bazel run @stackage-unpinned//:pin` and
