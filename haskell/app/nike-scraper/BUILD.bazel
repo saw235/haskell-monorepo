@@ -6,6 +6,7 @@ haskell_binary(
         "Main.hs",
         "src/Nike/Data.hs",
         "src/Nike/Scraper.hs",
+        "src/Nike/NavScraper.hs",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -20,6 +21,7 @@ haskell_binary(
         "@stackage//:optparse-applicative",
         "@stackage//:bytestring",
         "@stackage//:aeson-pretty",
+        "@stackage//:containers",
     ],
     # Pass --no-headless to run in non-headless mode: bazel run //haskell/app/nike-scraper -- --no-headless
     args = [],

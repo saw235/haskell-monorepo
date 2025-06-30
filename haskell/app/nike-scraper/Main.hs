@@ -19,8 +19,9 @@ import Test.WebDriver.Commands (getCurrentWindow, closeWindow, windows, closeSes
 import qualified Data.Aeson.Encode.Pretty as AP
 import Data.Aeson (ToJSON)
 import Data.Aeson.Encode.Pretty (encodePretty)
-import Data.List (isPrefixOf)
+import Data.List (isPrefixOf, isInfixOf)
 import qualified Options.Applicative as OA
+import Nike.NavScraper (scrapeNavLinks)
 
 -- | Configuration for Chrome WebDriver
 chromeConfig :: Bool -> WDConfig
@@ -31,13 +32,22 @@ chromeConfig headless = useBrowser (chrome { chromeOptions = opts }) defaultConf
 
 -- | CLI Options
 
-data Options = Options
-  { optUrl        :: String
-  , optOutputFile :: FilePath
+data PageOptions = PageOptions
+  { pageUrl        :: String
+  , pageOutputFile :: FilePath
   }
 
-parseOptions :: OA.Parser Options
-parseOptions = Options
+data NavLinkOptions = NavLinkOptions
+  { navOutputFile :: Maybe FilePath
+  , navAll :: Bool
+  }
+
+data Command
+  = ScrapePage PageOptions
+  | ScrapeNavLinks NavLinkOptions
+
+parsePageOptions :: OA.Parser PageOptions
+parsePageOptions = PageOptions
   <$> OA.strOption
         ( OA.long "url"
        <> OA.metavar "URL"
@@ -49,9 +59,29 @@ parseOptions = Options
        <> OA.value "products.json"
        <> OA.showDefault )
 
-optsParserInfo :: OA.ParserInfo Options
-optsParserInfo = OA.info (parseOptions OA.<**> OA.helper)
-  ( OA.fullDesc <> OA.progDesc "Scrape Nike products from a given URL and output as JSON" )
+parseNavLinkOptions :: OA.Parser NavLinkOptions
+parseNavLinkOptions = NavLinkOptions
+  <$> OA.optional (OA.strOption
+        ( OA.long "output"
+       <> OA.metavar "FILE"
+       <> OA.help "The output file for the navigation links JSON" ))
+  <*> OA.switch
+        ( OA.long "all"
+       <> OA.help "Include all links (not just /w/ links)" )
+
+parseCommand :: OA.Parser Command
+parseCommand = OA.hsubparser
+  ( OA.command "scrape-page"
+      (OA.info (ScrapePage <$> parsePageOptions)
+        (OA.progDesc "Scrape Nike products from a given URL and output as JSON"))
+ <> OA.command "scrape-nav-links"
+      (OA.info (ScrapeNavLinks <$> parseNavLinkOptions)
+        (OA.progDesc "Scrape all category URLs from the Nike navigation menu and output as JSON"))
+  )
+
+optsParserInfo :: OA.ParserInfo Command
+optsParserInfo = OA.info (parseCommand OA.<**> OA.helper)
+  ( OA.fullDesc <> OA.progDesc "Nike scraper CLI" )
 
 -- | Patch browser JS environment to bypass headless detection
 patchHeadlessDetection :: WD ()
@@ -106,27 +136,40 @@ outputProducts jsonOut mOutputPath prods showFn =
 
 main :: IO ()
 main = do
-    opts <- OA.execParser optsParserInfo
-    let url = optUrl opts
-        outputFile = optOutputFile opts
-        headless = False -- Default to non-headless mode; can be extended if needed
-    putStrLn $ "Starting Nike scraper (headless=" ++ show headless ++ ")..."
-    putStrLn $ "Fetching URL: " ++ url
-    html <- runSession (chromeConfig headless) $ do
-        result <- infiniteScroll url (pure ())
-        wins <- windows
-        mapM_ closeWindow wins
-        closeSession
-        return result
-    putStrLn "Successfully fetched HTML source."
-    if T.null html
-      then putStrLn "HTML content is empty, skipping scraping."
-      else do
-        putStrLn "Scraping products from HTML..."
-        let products = scrapeStringLike (T.unpack html) scrapeProducts
-        case products of
-            Just prods -> do
-                putStrLn $ "Successfully scraped " ++ show (length prods) ++ " products."
-                BL.writeFile outputFile (encodePretty prods)
-                putStrLn $ "Scraped data saved to " ++ outputFile
-            Nothing    -> putStrLn "Failed to scrape products." 
+    cmd <- OA.execParser optsParserInfo
+    case cmd of
+      ScrapePage opts -> do
+        let url = pageUrl opts
+            outputFile = pageOutputFile opts
+            headless = False -- Default to non-headless mode; can be extended if needed
+        putStrLn $ "Starting Nike scraper (headless=" ++ show headless ++ ")..."
+        putStrLn $ "Fetching URL: " ++ url
+        html <- runSession (chromeConfig headless) $ do
+            result <- infiniteScroll url (pure ())
+            wins <- windows
+            mapM_ closeWindow wins
+            closeSession
+            return result
+        putStrLn "Successfully fetched HTML source."
+        if T.null html
+          then putStrLn "HTML content is empty, skipping scraping."
+          else do
+            putStrLn "Scraping products from HTML..."
+            let products = scrapeStringLike (T.unpack html) scrapeProducts
+            case products of
+                Just prods -> do
+                    putStrLn $ "Successfully scraped " ++ show (length prods) ++ " products."
+                    BL.writeFile outputFile (encodePretty prods)
+                    putStrLn $ "Scraped data saved to " ++ outputFile
+                Nothing    -> putStrLn "Failed to scrape products."
+      ScrapeNavLinks opts -> do
+        let mOutputFile = navOutputFile opts
+            allLinks = navAll opts
+        putStrLn "Starting navigation link scraper..."
+        navLinks <- scrapeNavLinks
+        let filteredLinks = if allLinks then navLinks else filter ("/w/" `isInfixOf`) navLinks
+        case mOutputFile of
+          Just outputFile -> do
+            BL.writeFile outputFile (encodePretty filteredLinks)
+            putStrLn $ "Navigation links saved to " ++ outputFile
+          Nothing -> BL.putStr (encodePretty filteredLinks) 
