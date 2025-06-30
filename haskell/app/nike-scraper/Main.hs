@@ -19,7 +19,9 @@ import Test.WebDriver.Commands (getCurrentWindow, closeWindow, windows, closeSes
 import qualified Data.Aeson.Encode.Pretty as AP
 import Data.Aeson (ToJSON)
 import Data.Aeson.Encode.Pretty (encodePretty)
-import Data.List (isPrefixOf)
+import Data.List (isPrefixOf, isInfixOf)
+import qualified Options.Applicative as OA
+import Nike.NavScraper (scrapeNavLinks)
 
 -- | Configuration for Chrome WebDriver
 chromeConfig :: Bool -> WDConfig
@@ -28,19 +30,59 @@ chromeConfig headless = useBrowser (chrome { chromeOptions = opts }) defaultConf
     userAgent = "--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
     opts = (if headless then ["--headless"] else []) ++ ["--no-sandbox", "--disable-dev-shm-usage", userAgent]
 
--- | Parse CLI arguments for headless, json, output path, and target URL
-parseArgs :: [String] -> (Bool, Bool, Maybe FilePath, Maybe String)
-parseArgs args =
-    let headless = "--headless" `elem` args
-        jsonOut = "--json" `elem` args
-        mOutputPath = case dropWhile (/= "--output") args of
-                        (_:path:_) -> Just path
-                        _          -> Nothing
-        nonFlagArgs = filter (\a -> not (a `elem` ["--no-headless", "--json"]) && not ("--output" `isPrefixOf` a)) args
-        mUrl = case filter (\a -> "https://www.nike.com/w/" `isPrefixOf` a) nonFlagArgs of
-                 (url:_) -> Just url
-                 _       -> Nothing
-    in (headless, jsonOut, mOutputPath, mUrl)
+-- | CLI Options
+
+data PageOptions = PageOptions
+  { pageUrl        :: String
+  , pageOutputFile :: FilePath
+  }
+
+data NavLinkOptions = NavLinkOptions
+  { navOutputFile :: Maybe FilePath
+  , navAll :: Bool
+  }
+
+data Command
+  = ScrapePage PageOptions
+  | ScrapeNavLinks NavLinkOptions
+
+parsePageOptions :: OA.Parser PageOptions
+parsePageOptions = PageOptions
+  <$> OA.strOption
+        ( OA.long "url"
+       <> OA.metavar "URL"
+       <> OA.help "The Nike product page URL to scrape" )
+  <*> OA.strOption
+        ( OA.long "output"
+       <> OA.metavar "FILE"
+       <> OA.help "The output file for the JSON data"
+       <> OA.value "products.json"
+       <> OA.showDefault )
+
+parseNavLinkOptions :: OA.Parser NavLinkOptions
+parseNavLinkOptions = NavLinkOptions
+  <$> OA.optional (OA.strOption
+        ( OA.long "output"
+       <> OA.metavar "FILE"
+       <> OA.help "The output file for the navigation links JSON" ))
+  <*> OA.switch
+        ( OA.long "all"
+       <> OA.help "Include all links (not just /w/ links)" )
+
+parseCommand :: OA.Parser Command
+parseCommand = OA.hsubparser
+  ( OA.command "scrape-page"
+      (OA.info (ScrapePage <$> parsePageOptions)
+        (OA.progDesc "Scrape Nike products from a given URL and output as JSON"))
+ <> OA.command "scrape-nav-links"
+      (OA.info (ScrapeNavLinks <$> parseNavLinkOptions)
+        (OA.progDesc "Scrape all category URLs from the Nike navigation menu and output as JSON"))
+  )
+
+optsParserInfo :: OA.ParserInfo Command
+optsParserInfo = OA.info (parseCommand OA.<**> OA.helper)
+  ( OA.fullDesc <> OA.progDesc "Nike scraper CLI" )
+
 
 -- | Patch browser JS environment to bypass headless detection
 patchHeadlessDetection :: WD ()
@@ -95,13 +137,13 @@ outputProducts jsonOut mOutputPath prods showFn =
 
 main :: IO ()
 main = do
-    args <- getArgs
-    let (headless, jsonOut, mOutputPath, mUrl) = parseArgs args
-    case mUrl of
-      Nothing -> do
-        putStrLn "Error: Please provide a Nike URL in the format https://www.nike.com/w/<category> as a positional argument."
-        putStrLn "Example: bazel run //haskell/app/nike-scraper -- https://www.nike.com/w/mens-clothing-6ymx6znik1"
-      Just url -> do
+    cmd <- OA.execParser optsParserInfo
+    case cmd of
+      ScrapePage opts -> do
+        let url = pageUrl opts
+            outputFile = pageOutputFile opts
+            headless = False -- Default to non-headless mode; can be extended if needed
+
         putStrLn $ "Starting Nike scraper (headless=" ++ show headless ++ ")..."
         putStrLn $ "Fetching URL: " ++ url
         html <- runSession (chromeConfig headless) $ do
@@ -119,5 +161,18 @@ main = do
             case products of
                 Just prods -> do
                     putStrLn $ "Successfully scraped " ++ show (length prods) ++ " products."
-                    outputProducts jsonOut mOutputPath prods show
-                Nothing    -> putStrLn "Failed to scrape products." 
+                    BL.writeFile outputFile (encodePretty prods)
+                    putStrLn $ "Scraped data saved to " ++ outputFile
+                Nothing    -> putStrLn "Failed to scrape products."
+      ScrapeNavLinks opts -> do
+        let mOutputFile = navOutputFile opts
+            allLinks = navAll opts
+        putStrLn "Starting navigation link scraper..."
+        navLinks <- scrapeNavLinks
+        let filteredLinks = if allLinks then navLinks else filter ("/w/" `isInfixOf`) navLinks
+        case mOutputFile of
+          Just outputFile -> do
+            BL.writeFile outputFile (encodePretty filteredLinks)
+            putStrLn $ "Navigation links saved to " ++ outputFile
+          Nothing -> BL.putStr (encodePretty filteredLinks) 
+
