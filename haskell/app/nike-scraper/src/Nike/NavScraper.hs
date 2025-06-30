@@ -33,6 +33,8 @@ scrapeNavLinks = runSession (useBrowser chrome defaultConfig) $ do
     -- Find all <a> elements within the nav
     linkElems <- findElemsFrom navElem (ByCSS "a[data-testid='link']")
     hrefs <- mapM (\elem -> attr elem "href") linkElems
-    let urls = Set.toList $ Set.fromList $ map T.unpack $ catMaybes hrefs
+    let scrapedUrls = Set.fromList $ map T.unpack $ catMaybes hrefs
+        snkrsUrl = "https://www.nike.com/w/snkrs-exclusives-358n"
+        urls = Set.toList $ Set.insert snkrsUrl scrapedUrls
     closeSession
     return urls 

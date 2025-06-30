@@ -28,13 +28,14 @@ chromeConfig :: Bool -> WDConfig
 chromeConfig headless = useBrowser (chrome { chromeOptions = opts }) defaultConfig
   where
     userAgent = "--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
-    opts = (if headless then ["--headless"] else []) ++ ["--no-sandbox", "--disable-dev-shm-usage", userAgent]
+    opts = (if headless then ["--headless"] else ["--start-minimized"]) ++ ["--no-sandbox", "--disable-dev-shm-usage", userAgent]
 
 -- | CLI Options
 
 data PageOptions = PageOptions
   { pageUrl        :: String
   , pageOutputFile :: FilePath
+  , pageDelay      :: Int
   }
 
 data NavLinkOptions = NavLinkOptions
@@ -57,6 +58,12 @@ parsePageOptions = PageOptions
        <> OA.metavar "FILE"
        <> OA.help "The output file for the JSON data"
        <> OA.value "products.json"
+       <> OA.showDefault )
+  <*> OA.option OA.auto
+        ( OA.long "delay"
+       <> OA.metavar "SECONDS"
+       <> OA.help "Delay between scrolls in seconds (default: 3)"
+       <> OA.value 3
        <> OA.showDefault )
 
 parseNavLinkOptions :: OA.Parser NavLinkOptions
@@ -104,13 +111,13 @@ scrollToBottom = do
     pure ()
 
 -- | Perform infinite scroll until no new products are loaded
-infiniteScroll :: String -> IO () -> WD T.Text
-infiniteScroll url logAction = do
+infiniteScroll :: String -> IO () -> Int -> WD T.Text
+infiniteScroll url logAction delaySec = do
     openPage url
     patchHeadlessDetection
     let scrollLoop prevCount = do
             scrollToBottom
-            liftIO $ threadDelay (3 * 1000000) -- 3 seconds
+            liftIO $ threadDelay (delaySec * 1000000)
             currCount <- countProductCards
             liftIO $ logAction >> putStrLn ("Scrolled. Product count: " ++ show currCount)
             if currCount == prevCount || currCount == 0
@@ -142,12 +149,13 @@ main = do
       ScrapePage opts -> do
         let url = pageUrl opts
             outputFile = pageOutputFile opts
+            delaySec = pageDelay opts
             headless = False -- Default to non-headless mode; can be extended if needed
 
         putStrLn $ "Starting Nike scraper (headless=" ++ show headless ++ ")..."
         putStrLn $ "Fetching URL: " ++ url
         html <- runSession (chromeConfig headless) $ do
-            result <- infiniteScroll url (pure ())
+            result <- infiniteScroll url (pure ()) delaySec
             wins <- windows
             mapM_ closeWindow wins
             closeSession
