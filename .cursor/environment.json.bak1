@@ -1,0 +1,4 @@
+{
+  "agentCanUpdateSnapshot": true,
+  "install": "chmod +x setup.sh && ./setup.sh && bazel build //..."
+}
