@@ -54,6 +54,10 @@ stack.package(
     name = "aeson",
 )
 
+stack.package(
+    name = "random",
+)
+
 
 stack.package(
     name = "bytestring",
@@ -141,13 +145,14 @@ stack.package(
 
 stack.package(
     name = "digest",
-    extra_deps = ["@stackage//:zlib", "@zlib.hs"],
+    extra_deps = ["@zlib.hs"],
     flags =
         [
             "-pkg-config",
     ],
 )
 
+stack.package(name = "aeson-pretty-0.8.10")
 
 # stack.package(name = "http-client")
 # stack.package(name = "http-client-tls")

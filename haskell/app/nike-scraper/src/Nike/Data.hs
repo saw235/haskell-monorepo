@@ -16,7 +16,9 @@ data Product = Product {
     productName  :: String,
     productPrice :: String,
     productImage :: String
-} deriving (Show, Eq)
+} deriving (Show, Eq, Generic)
+
+instance ToJSON Product
 
 data ApiResponse = ApiResponse {
     objects :: [ProductContainer]
