@@ -840,7 +840,7 @@
     "@@rules_haskell~//extensions:stack_snapshot.bzl%stack_snapshot": {
       "general": {
         "bzlTransitiveDigest": "I9dE/IPkeO/mkCmDvxjs6J9WP1Tf8kV6hE6XhXWYcuw=",
-        "usagesDigest": "n62DyPrHrYLH0OMZUHBaGiHG1Ut6qWlBhZ0jTXLUwHA=",
+        "usagesDigest": "Jcs4CtKXFfgUj6v58D+zV+/52dUGaXKRAYA0aFTdKL8=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},
         "envVariables": {},
@@ -870,6 +870,7 @@
               "packages": [
                 "zlib",
                 "aeson",
+                "random",
                 "bytestring",
                 "vector",
                 "containers",
@@ -887,7 +888,9 @@
                 "scalpel",
                 "scalpel-core",
                 "webdriver",
-                "digest"
+                "digest",
+                "aeson-pretty-0.8.10",
+                "optparse-applicative"
               ],
               "flags": {
                 "zlib": [
@@ -911,8 +914,7 @@
               "stack": "@@rules_haskell~~rules_haskell_dependencies~rules_haskell_stack//:stack",
               "stack_update": "'@@rules_haskell~~rules_haskell_dependencies~rules_haskell_stack_update//:stack_update'",
               "extra_deps": {
-                "@@_main~non_module_deps~zlib.hs//:zlib.hs": "zlib streaming-commons digest",
-                "@@rules_haskell~~stack_snapshot~stackage//:zlib": "digest"
+                "@@_main~non_module_deps~zlib.hs//:zlib.hs": "zlib streaming-commons digest"
               },
               "vendored_packages": {},
               "snapshot": "lts-23.22",
@@ -920,6 +922,7 @@
               "packages": [
                 "zlib",
                 "aeson",
+                "random",
                 "bytestring",
                 "vector",
                 "containers",
@@ -937,7 +940,10 @@
                 "scalpel",
                 "scalpel-core",
                 "webdriver",
-                "digest"
+                "digest",
+                "aeson-pretty-0.8.10",
+                "optparse-applicative"
+
               ],
               "flags": {
                 "zlib": [
