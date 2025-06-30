@@ -13,9 +13,12 @@ import GHC.Generics
 import Data.Aeson
 
 data Product = Product {
-    productName  :: String,
-    productPrice :: String,
-    productImage :: String
+    productName     :: String,
+    productPrice    :: String,
+    productImage    :: String,
+    productSubtitle :: String,
+    productVariant  :: String,
+    productUrl      :: String
 } deriving (Show, Eq, Generic)
 
 instance ToJSON Product
