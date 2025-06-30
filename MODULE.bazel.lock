@@ -840,7 +840,7 @@
     "@@rules_haskell~//extensions:stack_snapshot.bzl%stack_snapshot": {
       "general": {
         "bzlTransitiveDigest": "I9dE/IPkeO/mkCmDvxjs6J9WP1Tf8kV6hE6XhXWYcuw=",
-        "usagesDigest": "m4e5o9xBC48mc+da7HkqhaKbt05kmlAYrfVzlOnm1Rg=",
+        "usagesDigest": "Jcs4CtKXFfgUj6v58D+zV+/52dUGaXKRAYA0aFTdKL8=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},
         "envVariables": {},
@@ -889,7 +889,8 @@
                 "scalpel-core",
                 "webdriver",
                 "digest",
-                "aeson-pretty-0.8.10"
+                "aeson-pretty-0.8.10",
+                "optparse-applicative"
               ],
               "flags": {
                 "zlib": [
@@ -940,7 +941,8 @@
                 "scalpel-core",
                 "webdriver",
                 "digest",
-                "aeson-pretty-0.8.10"
+                "aeson-pretty-0.8.10",
+                "optparse-applicative"
               ],
               "flags": {
                 "zlib": [

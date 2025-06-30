@@ -20,6 +20,7 @@ import qualified Data.Aeson.Encode.Pretty as AP
 import Data.Aeson (ToJSON)
 import Data.Aeson.Encode.Pretty (encodePretty)
 import Data.List (isPrefixOf)
+import qualified Options.Applicative as OA
 
 -- | Configuration for Chrome WebDriver
 chromeConfig :: Bool -> WDConfig
@@ -28,19 +29,29 @@ chromeConfig headless = useBrowser (chrome { chromeOptions = opts }) defaultConf
     userAgent = "--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
     opts = (if headless then ["--headless"] else []) ++ ["--no-sandbox", "--disable-dev-shm-usage", userAgent]
 
--- | Parse CLI arguments for headless, json, output path, and target URL
-parseArgs :: [String] -> (Bool, Bool, Maybe FilePath, Maybe String)
-parseArgs args =
-    let headless = "--headless" `elem` args
-        jsonOut = "--json" `elem` args
-        mOutputPath = case dropWhile (/= "--output") args of
-                        (_:path:_) -> Just path
-                        _          -> Nothing
-        nonFlagArgs = filter (\a -> not (a `elem` ["--no-headless", "--json"]) && not ("--output" `isPrefixOf` a)) args
-        mUrl = case filter (\a -> "https://www.nike.com/w/" `isPrefixOf` a) nonFlagArgs of
-                 (url:_) -> Just url
-                 _       -> Nothing
-    in (headless, jsonOut, mOutputPath, mUrl)
+-- | CLI Options
+
+data Options = Options
+  { optUrl        :: String
+  , optOutputFile :: FilePath
+  }
+
+parseOptions :: OA.Parser Options
+parseOptions = Options
+  <$> OA.strOption
+        ( OA.long "url"
+       <> OA.metavar "URL"
+       <> OA.help "The Nike product page URL to scrape" )
+  <*> OA.strOption
+        ( OA.long "output"
+       <> OA.metavar "FILE"
+       <> OA.help "The output file for the JSON data"
+       <> OA.value "products.json"
+       <> OA.showDefault )
+
+optsParserInfo :: OA.ParserInfo Options
+optsParserInfo = OA.info (parseOptions OA.<**> OA.helper)
+  ( OA.fullDesc <> OA.progDesc "Scrape Nike products from a given URL and output as JSON" )
 
 -- | Patch browser JS environment to bypass headless detection
 patchHeadlessDetection :: WD ()
@@ -95,29 +106,27 @@ outputProducts jsonOut mOutputPath prods showFn =
 
 main :: IO ()
 main = do
-    args <- getArgs
-    let (headless, jsonOut, mOutputPath, mUrl) = parseArgs args
-    case mUrl of
-      Nothing -> do
-        putStrLn "Error: Please provide a Nike URL in the format https://www.nike.com/w/<category> as a positional argument."
-        putStrLn "Example: bazel run //haskell/app/nike-scraper -- https://www.nike.com/w/mens-clothing-6ymx6znik1"
-      Just url -> do
-        putStrLn $ "Starting Nike scraper (headless=" ++ show headless ++ ")..."
-        putStrLn $ "Fetching URL: " ++ url
-        html <- runSession (chromeConfig headless) $ do
-            result <- infiniteScroll url (pure ())
-            wins <- windows
-            mapM_ closeWindow wins
-            closeSession
-            return result
-        putStrLn "Successfully fetched HTML source."
-        if T.null html
-          then putStrLn "HTML content is empty, skipping scraping."
-          else do
-            putStrLn "Scraping products from HTML..."
-            let products = scrapeStringLike (T.unpack html) scrapeProducts
-            case products of
-                Just prods -> do
-                    putStrLn $ "Successfully scraped " ++ show (length prods) ++ " products."
-                    outputProducts jsonOut mOutputPath prods show
-                Nothing    -> putStrLn "Failed to scrape products." 
+    opts <- OA.execParser optsParserInfo
+    let url = optUrl opts
+        outputFile = optOutputFile opts
+        headless = False -- Default to non-headless mode; can be extended if needed
+    putStrLn $ "Starting Nike scraper (headless=" ++ show headless ++ ")..."
+    putStrLn $ "Fetching URL: " ++ url
+    html <- runSession (chromeConfig headless) $ do
+        result <- infiniteScroll url (pure ())
+        wins <- windows
+        mapM_ closeWindow wins
+        closeSession
+        return result
+    putStrLn "Successfully fetched HTML source."
+    if T.null html
+      then putStrLn "HTML content is empty, skipping scraping."
+      else do
+        putStrLn "Scraping products from HTML..."
+        let products = scrapeStringLike (T.unpack html) scrapeProducts
+        case products of
+            Just prods -> do
+                putStrLn $ "Successfully scraped " ++ show (length prods) ++ " products."
+                BL.writeFile outputFile (encodePretty prods)
+                putStrLn $ "Scraped data saved to " ++ outputFile
+            Nothing    -> putStrLn "Failed to scrape products." 

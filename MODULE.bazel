@@ -153,6 +153,7 @@ stack.package(
 )
 
 stack.package(name = "aeson-pretty-0.8.10")
+stack.package(name = "optparse-applicative")
 
 # stack.package(name = "http-client")
 # stack.package(name = "http-client-tls")

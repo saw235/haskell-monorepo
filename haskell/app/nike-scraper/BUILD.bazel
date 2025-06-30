@@ -17,6 +17,7 @@ haskell_binary(
         "@stackage//:webdriver",
         "@stackage//:text",
         "@stackage//:aeson",
+        "@stackage//:optparse-applicative",
         "@stackage//:bytestring",
         "@stackage//:aeson-pretty",
     ],
