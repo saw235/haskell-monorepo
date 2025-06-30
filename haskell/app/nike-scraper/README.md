@@ -64,3 +64,4 @@ bazel run //haskell/app/nike-scraper -- scrape-nav-links --all --output nav_link
 
 - If `--output` is omitted, results are printed to stdout.
 - If `--all` is omitted, only `/w/` links are included by default.
+

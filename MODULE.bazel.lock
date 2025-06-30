@@ -943,6 +943,7 @@
                 "digest",
                 "aeson-pretty-0.8.10",
                 "optparse-applicative"
+
               ],
               "flags": {
                 "zlib": [

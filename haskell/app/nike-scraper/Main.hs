@@ -83,6 +83,7 @@ optsParserInfo :: OA.ParserInfo Command
 optsParserInfo = OA.info (parseCommand OA.<**> OA.helper)
   ( OA.fullDesc <> OA.progDesc "Nike scraper CLI" )
 
+
 -- | Patch browser JS environment to bypass headless detection
 patchHeadlessDetection :: WD ()
 patchHeadlessDetection = do
@@ -142,6 +143,7 @@ main = do
         let url = pageUrl opts
             outputFile = pageOutputFile opts
             headless = False -- Default to non-headless mode; can be extended if needed
+
         putStrLn $ "Starting Nike scraper (headless=" ++ show headless ++ ")..."
         putStrLn $ "Fetching URL: " ++ url
         html <- runSession (chromeConfig headless) $ do
@@ -173,3 +175,4 @@ main = do
             BL.writeFile outputFile (encodePretty filteredLinks)
             putStrLn $ "Navigation links saved to " ++ outputFile
           Nothing -> BL.putStr (encodePretty filteredLinks) 
+
