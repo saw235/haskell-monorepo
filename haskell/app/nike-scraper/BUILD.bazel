@@ -18,5 +18,8 @@ haskell_binary(
         "@stackage//:text",
         "@stackage//:aeson",
         "@stackage//:bytestring",
+        "@stackage//:aeson-pretty",
     ],
+    # Pass --no-headless to run in non-headless mode: bazel run //haskell/app/nike-scraper -- --no-headless
+    args = [],
 )
