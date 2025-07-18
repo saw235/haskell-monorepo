@@ -1,39 +1,39 @@
-{-# LANGUAGE OverloadedStrings   #-}
+{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 
 module MCP.Server
   ( -- * Server Runtime
-    runMcpServerStdio
-  , runMcpServerHttp
-  , runMcpServerHttpWithConfig
+    runMcpServerStdio,
+    runMcpServerHttp,
+    runMcpServerHttpWithConfig,
 
     -- * Transport Configuration
-  , HttpConfig(..)
+    HttpConfig (..),
 
     -- * Utility Functions
-  , jsonValueToText
+    jsonValueToText,
 
     -- * Re-exports
-  , module MCP.Server.Types
-  ) where
+    module MCP.Server.Types,
+  )
+where
 
-import           Control.Monad.IO.Class (MonadIO)
-import           Data.Aeson
-import           Data.Text              (Text)
-import qualified Data.Text              as T
-
-import           MCP.Server.Transport.Stdio (transportRunStdio)
-import           MCP.Server.Transport.Http (HttpConfig(..), transportRunHttp, defaultHttpConfig)
-import           MCP.Server.Types
+import Control.Monad.IO.Class (MonadIO)
+import Data.Aeson
+import Data.Text (Text)
+import qualified Data.Text as T
+import MCP.Server.Transport.Http (HttpConfig (..), defaultHttpConfig, transportRunHttp)
+import MCP.Server.Transport.Stdio (transportRunStdio)
+import MCP.Server.Types
 
 -- | Convert JSON Value to Text representation suitable for handlers
 jsonValueToText :: Value -> Text
 jsonValueToText (String t) = t
-jsonValueToText (Number n) = 
-    -- Check if it's a whole number, if so format as integer
-    if fromInteger (round n) == n
-        then T.pack $ show (round n :: Integer)
-        else T.pack $ show n
+jsonValueToText (Number n) =
+  -- Check if it's a whole number, if so format as integer
+  if fromInteger (round n) == n
+    then T.pack $ show (round n :: Integer)
+    else T.pack $ show n
 jsonValueToText (Bool True) = "true"
 jsonValueToText (Bool False) = "false"
 jsonValueToText Null = ""
