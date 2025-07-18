@@ -1,0 +1,97 @@
+load("@rules_haskell//haskell:defs.bzl", "haskell_binary")
+
+haskell_binary(
+    name = "adidas-scraper",
+    srcs = [
+        "Main.hs",
+        "src/Adidas/Data.hs",
+        "src/Adidas/Scraper.hs",
+        "src/Adidas/NavScraper.hs",
+        "src/Adidas/AntiFingerprint.hs",
+        "src/Adidas/FingerprintConfig.hs",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        # Per user instruction, //:base is the correct dependency.
+        "//:base",
+        "@stackage//:scalpel",
+        "@stackage//:scalpel-core",
+        "@stackage//:attoparsec",
+        "@stackage//:webdriver",
+        "@stackage//:text",
+        "@stackage//:aeson",
+        "@stackage//:optparse-applicative",
+        "@stackage//:bytestring",
+        "@stackage//:aeson-pretty",
+        "@stackage//:containers",
+        "@stackage//:random",
+    ],
+    # Pass --no-headless to run in non-headless mode: bazel run //haskell/app/adidas-scraper -- --no-headless
+    args = [],
+)
+
+# Generate a wrapper script with the JAR path substituted at build time
+genrule(
+    name = "adidas-scraper-wrapper",
+    srcs = ["run_with_selenium.sh"],
+    tools = ["//external/selenium:selenium_server_jar"],
+    outs = ["adidas-scraper-with-selenium.sh"],
+    cmd = """
+        sed 's|SELENIUM_JAR_PLACEHOLDER|$(location //external/selenium:selenium_server_jar)|g' \
+            $(location run_with_selenium.sh) > $@
+        chmod +x $@
+    """,
+)
+
+# Wrapper target that manages Selenium server
+sh_binary(
+    name = "adidas-scraper-with-selenium",
+    srcs = [":adidas-scraper-wrapper"],
+    data = [
+        ":adidas-scraper",
+        "//external/selenium:selenium_server_jar",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+# Fingerprint test binary
+haskell_binary(
+    name = "fingerprint-test",
+    srcs = [
+        "test_fingerprint_comprehensive.hs",
+        "src/Adidas/AntiFingerprint.hs",
+        "src/Adidas/FingerprintConfig.hs",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//:base",
+        "@stackage//:webdriver",
+        "@stackage//:text",
+        "@stackage//:random",
+    ],
+    args = [],
+)
+
+# Generate a wrapper script for the fingerprint test
+genrule(
+    name = "fingerprint-test-wrapper",
+    srcs = ["run_fingerprint_test.sh"],
+    tools = ["//external/selenium:selenium_server_jar"],
+    outs = ["fingerprint-test-with-selenium.sh"],
+    cmd = """
+        sed 's|SELENIUM_JAR_PLACEHOLDER|$(location //external/selenium:selenium_server_jar)|g' \
+            $(location run_fingerprint_test.sh) > $@
+        chmod +x $@
+    """,
+)
+
+# Wrapper target for fingerprint test with Selenium
+sh_binary(
+    name = "fingerprint-test-with-selenium",
+    srcs = [":fingerprint-test-wrapper"],
+    data = [
+        ":fingerprint-test",
+        "//external/selenium:selenium_server_jar",
+    ],
+    visibility = ["//visibility:public"],
+) 
