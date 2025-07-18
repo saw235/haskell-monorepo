@@ -1,4 +1,9 @@
 {
   "agentCanUpdateSnapshot": true,
-  "install": "chmod +x setup.sh && ./setup.sh && bazel build //..."
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": "."
+  },
+  "install": "",
+  "start": "sudo service docker start"
 }
