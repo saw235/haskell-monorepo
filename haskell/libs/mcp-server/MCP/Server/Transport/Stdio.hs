@@ -1,27 +1,24 @@
-{-# LANGUAGE OverloadedStrings   #-}
+{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 
 module MCP.Server.Transport.Stdio
   ( -- * STDIO Transport
-    transportRunStdio
-  ) where
+    transportRunStdio,
+  )
+where
 
-import           Control.Monad          (when)
-import           Control.Monad.IO.Class (MonadIO, liftIO)
-import           Data.Aeson
-import qualified Data.ByteString.Lazy   as BSL
-import qualified Data.Text              as T
-import qualified Data.Text.Encoding     as TE
-import qualified Data.Text.IO           as TIO
-import           System.IO              (hFlush, hPutStrLn, stderr, stdout)
-
-import           MCP.Server.Handlers
-import           MCP.Server.JsonRpc
-import           MCP.Server.Types
-
-
--- | Transport-specific implementation for STDIO
-import           System.IO              (hSetEncoding, utf8)
+import Control.Monad (when)
+import Control.Monad.IO.Class (MonadIO, liftIO)
+import Data.Aeson
+import qualified Data.ByteString.Lazy as BSL
+import qualified Data.Text as T
+import qualified Data.Text.Encoding as TE
+import qualified Data.Text.IO as TIO
+import MCP.Server.Handlers
+import MCP.Server.JsonRpc
+import MCP.Server.Types
+-- \| Transport-specific implementation for STDIO
+import System.IO (hFlush, hPutStrLn, hSetEncoding, stderr, stdout, utf8)
 
 transportRunStdio :: (MonadIO m) => McpServerInfo -> McpServerHandlers m -> m ()
 transportRunStdio serverInfo handlers = do
