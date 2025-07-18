@@ -26,3 +26,27 @@ haskell_binary(
     # Pass --no-headless to run in non-headless mode: bazel run //haskell/app/nike-scraper -- --no-headless
     args = [],
 )
+
+# Generate a wrapper script with the JAR path substituted at build time
+genrule(
+    name = "nike-scraper-wrapper",
+    srcs = ["run_with_selenium.sh"],
+    tools = ["//external/selenium:selenium_server_jar"],
+    outs = ["nike-scraper-with-selenium.sh"],
+    cmd = """
+        sed 's|SELENIUM_JAR_PLACEHOLDER|$(location //external/selenium:selenium_server_jar)|g' \
+            $(location run_with_selenium.sh) > $@
+        chmod +x $@
+    """,
+)
+
+# Wrapper target that manages Selenium server
+sh_binary(
+    name = "nike-scraper-with-selenium",
+    srcs = [":nike-scraper-wrapper"],
+    data = [
+        ":nike-scraper",
+        "//external/selenium:selenium_server_jar",
+    ],
+    visibility = ["//visibility:public"],
+)

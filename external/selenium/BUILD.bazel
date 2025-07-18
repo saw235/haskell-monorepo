@@ -1,0 +1,17 @@
+# Selenium Server standalone JAR
+# This file manages the Selenium server dependency for the nike-scraper
+
+package(default_visibility = ["//visibility:public"])
+
+# Filegroup for the Selenium server JAR
+filegroup(
+    name = "selenium_server_jar",
+    srcs = ["selenium-server-standalone-3.141.59.jar"],
+    visibility = ["//visibility:public"],
+)
+
+# Alias for easier reference
+alias(
+    name = "selenium",
+    actual = ":selenium_server_jar",
+) 
