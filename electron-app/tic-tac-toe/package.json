@@ -1,0 +1,45 @@
+{
+  "name": "electron-tic-tac-toe",
+  "version": "1.0.0",
+  "description": "A Tic-Tac-Toe Electron app with Haskell backend",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --dev",
+    "build": "electron-builder",
+    "dist": "npm run build"
+  },
+  "keywords": ["electron", "tic-tac-toe", "haskell", "bazel"],
+  "author": "Your Name",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^28.0.0",
+    "electron-builder": "^24.6.4"
+  },
+  "dependencies": {
+    "node-fetch": "^2.6.7"
+  },
+  "build": {
+    "appId": "com.example.electron-tic-tac-toe",
+    "productName": "Tic-Tac-Toe",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main.js",
+      "renderer.js",
+      "index.html",
+      "styles.css",
+      "node_modules/**/*"
+    ],
+    "mac": {
+      "category": "public.app-category.games"
+    },
+    "win": {
+      "target": "nsis"
+    },
+    "linux": {
+      "target": "AppImage"
+    }
+  }
+} 

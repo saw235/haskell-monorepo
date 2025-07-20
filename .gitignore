@@ -3,3 +3,5 @@ bazel-bin
 bazel-out
 bazel-testlogs
 bazel-haskell-monorepo 
+
+**/node_modules

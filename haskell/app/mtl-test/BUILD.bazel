@@ -1,0 +1,31 @@
+# Load rules_haskell rules.
+load(
+    "@rules_haskell//haskell:defs.bzl",
+    "haskell_binary",
+)
+
+# MTL compilation test application
+haskell_binary(
+    name = "mtl-test",
+    srcs = [":Main.hs"],
+    deps = [
+        "//:base",
+        "@stackage//:mtl",
+        "@stackage//:transformers",
+        "@stackage//:text",
+        "@stackage//:random",
+    ],
+)
+
+# Advanced MTL compilation test application (with Writer monad)
+haskell_binary(
+    name = "mtl-test-advanced",
+    srcs = [":AdvancedMain.hs"],
+    deps = [
+        "//:base",
+        "@stackage//:mtl",
+        "@stackage//:transformers",
+        "@stackage//:text",
+        "@stackage//:random",
+    ],
+) 
