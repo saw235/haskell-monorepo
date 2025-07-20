@@ -1,57 +1,63 @@
-{-# LANGUAGE OverloadedStrings   #-}
+{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 
 module MCP.Server.Transport.Http
   ( -- * HTTP Transport
-    HttpConfig(..)
-  , transportRunHttp
-  , defaultHttpConfig
-  ) where
+    HttpConfig (..),
+    transportRunHttp,
+    defaultHttpConfig,
+  )
+where
 
-import           Control.Monad            (when)
-import           Data.Aeson
-import qualified Data.ByteString.Lazy     as BSL
-import           Data.String              (IsString (fromString))
-import           Data.Text                (Text)
-import qualified Data.Text                as T
-import qualified Data.Text.Encoding       as TE
-import           Network.HTTP.Types
-import qualified Network.Wai              as Wai
+import Control.Monad (when)
+import Data.Aeson
+import qualified Data.ByteString.Lazy as BSL
+import Data.String (IsString (fromString))
+import Data.Text (Text)
+import qualified Data.Text as T
+import qualified Data.Text.Encoding as TE
+import MCP.Server.Handlers
+import MCP.Server.JsonRpc
+import MCP.Server.Types
+import Network.HTTP.Types
+import qualified Network.Wai as Wai
 import qualified Network.Wai.Handler.Warp as Warp
-import           System.IO                (hPutStrLn, stderr)
-
-import           MCP.Server.Handlers
-import           MCP.Server.JsonRpc
-import           MCP.Server.Types
+import System.IO (hPutStrLn, stderr)
 
 -- | HTTP transport configuration following MCP 2025-03-26 Streamable HTTP specification
 data HttpConfig = HttpConfig
-  { httpPort     :: Int      -- ^ Port to listen on
-  , httpHost     :: String   -- ^ Host to bind to (default "localhost")
-  , httpEndpoint :: String   -- ^ MCP endpoint path (default "/mcp")
-  , httpVerbose  :: Bool     -- ^ Enable verbose logging (default False)
-  } deriving (Show, Eq)
+  { -- | Port to listen on
+    httpPort :: Int,
+    -- | Host to bind to (default "localhost")
+    httpHost :: String,
+    -- | MCP endpoint path (default "/mcp")
+    httpEndpoint :: String,
+    -- | Enable verbose logging (default False)
+    httpVerbose :: Bool
+  }
+  deriving (Show, Eq)
 
 -- | Default HTTP configuration
 defaultHttpConfig :: HttpConfig
-defaultHttpConfig = HttpConfig
-  { httpPort = 3000
-  , httpHost = "localhost"
-  , httpEndpoint = "/mcp"
-  , httpVerbose = False
-  }
+defaultHttpConfig =
+  HttpConfig
+    { httpPort = 3000,
+      httpHost = "localhost",
+      httpEndpoint = "/mcp",
+      httpVerbose = False
+    }
 
 -- | Helper for conditional logging
 logVerbose :: HttpConfig -> String -> IO ()
 logVerbose config msg = when (httpVerbose config) $ hPutStrLn stderr msg
 
-
 -- | Transport-specific implementation for HTTP
 transportRunHttp :: HttpConfig -> McpServerInfo -> McpServerHandlers IO -> IO ()
 transportRunHttp config serverInfo handlers = do
-  let settings = Warp.setHost (fromString $ httpHost config) $
-                 Warp.setPort (httpPort config) $
-                 Warp.defaultSettings
+  let settings =
+        Warp.setHost (fromString $ httpHost config) $
+          Warp.setPort (httpPort config) $
+            Warp.defaultSettings
 
   putStrLn $ "Starting MCP HTTP server on " ++ httpHost config ++ ":" ++ show (httpPort config) ++ httpEndpoint config
   Warp.runSettings settings (mcpApplication config serverInfo handlers)
@@ -73,22 +79,25 @@ handleMcpRequest config serverInfo handlers req respond = do
   case Wai.requestMethod req of
     -- GET requests for endpoint discovery
     "GET" -> do
-      let discoveryResponse = object
-            [ "name" .= serverName serverInfo
-            , "version" .= serverVersion serverInfo
-            , "description" .= serverInstructions serverInfo
-            , "protocolVersion" .= ("2025-03-26" :: Text)
-            , "capabilities" .= object
-                [ "tools" .= object []
-                , "prompts" .= object []
-                , "resources" .= object []
-                ]
-            ]
+      let discoveryResponse =
+            object
+              [ "name" .= serverName serverInfo,
+                "version" .= serverVersion serverInfo,
+                "description" .= serverInstructions serverInfo,
+                "protocolVersion" .= ("2025-03-26" :: Text),
+                "capabilities"
+                  .= object
+                    [ "tools" .= object [],
+                      "prompts" .= object [],
+                      "resources" .= object []
+                    ]
+              ]
       logVerbose config $ "Sending server discovery response: " ++ show discoveryResponse
-      respond $ Wai.responseLBS
-        status200
-        [("Content-Type", "application/json"), ("Access-Control-Allow-Origin", "*")]
-        (encode discoveryResponse)
+      respond $
+        Wai.responseLBS
+          status200
+          [("Content-Type", "application/json"), ("Access-Control-Allow-Origin", "*")]
+          (encode discoveryResponse)
 
     -- POST requests for JSON-RPC messages
     "POST" -> do
@@ -98,19 +107,22 @@ handleMcpRequest config serverInfo handlers req respond = do
       handleJsonRpcRequest config serverInfo handlers body respond
 
     -- OPTIONS for CORS preflight
-    "OPTIONS" -> respond $ Wai.responseLBS
-      status200
-      [ ("Access-Control-Allow-Origin", "*")
-      , ("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
-      , ("Access-Control-Allow-Headers", "Content-Type")
-      ]
-      ""
-
+    "OPTIONS" ->
+      respond $
+        Wai.responseLBS
+          status200
+          [ ("Access-Control-Allow-Origin", "*"),
+            ("Access-Control-Allow-Methods", "GET, POST, OPTIONS"),
+            ("Access-Control-Allow-Headers", "Content-Type")
+          ]
+          ""
     -- Unsupported methods
-    _ -> respond $ Wai.responseLBS
-      status405
-      [("Content-Type", "text/plain"), ("Allow", "GET, POST, OPTIONS")]
-      "Method Not Allowed"
+    _ ->
+      respond $
+        Wai.responseLBS
+          status405
+          [("Content-Type", "text/plain"), ("Allow", "GET, POST, OPTIONS")]
+          "Method Not Allowed"
 
 -- | Handle JSON-RPC request from HTTP body
 handleJsonRpcRequest :: HttpConfig -> McpServerInfo -> McpServerHandlers IO -> BSL.ByteString -> (Wai.Response -> IO Wai.ResponseReceived) -> IO Wai.ResponseReceived
@@ -118,11 +130,11 @@ handleJsonRpcRequest config serverInfo handlers body respond = do
   case eitherDecode body of
     Left err -> do
       hPutStrLn stderr $ "JSON parse error: " ++ err
-      respond $ Wai.responseLBS
-        status400
-        [("Content-Type", "application/json")]
-        (encode $ object ["error" .= ("Invalid JSON" :: Text)])
-
+      respond $
+        Wai.responseLBS
+          status400
+          [("Content-Type", "application/json")]
+          (encode $ object ["error" .= ("Invalid JSON" :: Text)])
     Right jsonValue -> handleSingleJsonRpc config serverInfo handlers jsonValue respond
 
 -- | Handle a single JSON-RPC message
@@ -131,11 +143,11 @@ handleSingleJsonRpc config serverInfo handlers jsonValue respond = do
   case parseJsonRpcMessage jsonValue of
     Left err -> do
       hPutStrLn stderr $ "JSON-RPC parse error: " ++ err
-      respond $ Wai.responseLBS
-        status400
-        [("Content-Type", "application/json")]
-        (encode $ object ["error" .= ("Invalid JSON-RPC" :: Text)])
-
+      respond $
+        Wai.responseLBS
+          status400
+          [("Content-Type", "application/json")]
+          (encode $ object ["error" .= ("Invalid JSON-RPC" :: Text)])
     Right message -> do
       logVerbose config $ "Processing HTTP message: " ++ show (getMessageSummary message)
       maybeResponse <- handleMcpMessage serverInfo handlers message
@@ -144,15 +156,16 @@ handleSingleJsonRpc config serverInfo handlers jsonValue respond = do
         Just responseMsg -> do
           let responseJson = encode $ encodeJsonRpcMessage responseMsg
           logVerbose config $ "Sending HTTP response for: " ++ show (getMessageSummary message)
-          respond $ Wai.responseLBS
-            status200
-            [("Content-Type", "application/json"), ("Access-Control-Allow-Origin", "*")]
-            responseJson
-
+          respond $
+            Wai.responseLBS
+              status200
+              [("Content-Type", "application/json"), ("Access-Control-Allow-Origin", "*")]
+              responseJson
         Nothing -> do
           logVerbose config $ "No response needed for: " ++ show (getMessageSummary message)
           -- For notifications, return 200 with empty JSON object (per MCP spec)
-          respond $ Wai.responseLBS 
-            status200 
-            [("Content-Type", "application/json"), ("Access-Control-Allow-Origin", "*")] 
-            "{}"
+          respond $
+            Wai.responseLBS
+              status200
+              [("Content-Type", "application/json"), ("Access-Control-Allow-Origin", "*")]
+              "{}"
