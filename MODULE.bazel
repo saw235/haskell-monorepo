@@ -58,6 +58,15 @@ stack.package(
     name = "random",
 )
 
+stack.package(
+    name = "mtl",
+)
+
+
+stack.package(
+    name = "transformers",
+)
+
 
 stack.package(
     name = "bytestring",

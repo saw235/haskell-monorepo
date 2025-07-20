@@ -840,7 +840,7 @@
     "@@rules_haskell~//extensions:stack_snapshot.bzl%stack_snapshot": {
       "general": {
         "bzlTransitiveDigest": "I9dE/IPkeO/mkCmDvxjs6J9WP1Tf8kV6hE6XhXWYcuw=",
-        "usagesDigest": "Jcs4CtKXFfgUj6v58D+zV+/52dUGaXKRAYA0aFTdKL8=",
+        "usagesDigest": "XaO4ZwPKRmgxqWk/NvtYpMV1UUp+qdlOQf5Z+nza0N4=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},
         "envVariables": {},
@@ -871,6 +871,8 @@
                 "zlib",
                 "aeson",
                 "random",
+                "mtl",
+                "transformers",
                 "bytestring",
                 "vector",
                 "containers",
@@ -923,6 +925,8 @@
                 "zlib",
                 "aeson",
                 "random",
+                "mtl",
+                "transformers",
                 "bytestring",
                 "vector",
                 "containers",
@@ -943,7 +947,6 @@
                 "digest",
                 "aeson-pretty-0.8.10",
                 "optparse-applicative"
-
               ],
               "flags": {
                 "zlib": [
