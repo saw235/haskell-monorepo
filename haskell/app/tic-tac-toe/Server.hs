@@ -1,15 +1,18 @@
-{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards #-}
 
 module Server where
 
 import Control.Monad (unless, when)
 import Control.Monad.State (State, evalState, get, modify, put, runState)
-import Data.Aeson (FromJSON, ToJSON, encode, decode)
+import Data.Aeson (FromJSON, ToJSON, decode, encode)
+import qualified Data.ByteString.Char8 as BS
+import qualified Data.ByteString.Lazy as LBS
 import Data.List (intercalate, transpose)
 import Data.Maybe (fromJust, isJust)
 import GHC.Generics (Generic)
+<<<<<<< HEAD
 import Network.Wai (Application, Response, responseLBS, requestMethod)
 import Network.Wai.Internal (getRequestBodyChunk)
 import Network.Wai.Handler.Warp (run, runSettings, defaultSettings, setPort)
@@ -65,16 +68,33 @@ logValidMoves moves = do
 -- =============================================================================
 -- JSON types for HTTP API communication between client and server
 -- Uses Aeson for automatic JSON serialization/deserialization
+=======
+-- Re-export game types and logic from Main
+import qualified Main as Game
+import Network.HTTP.Types (methodGet, methodPost, status200, status400, status404)
+import Network.Wai (Application, Response, requestMethod, responseLBS)
+import Network.Wai.Handler.Warp (run)
+import Network.Wai.Internal (getRequestBodyChunk)
+>>>>>>> a6933c31e5cbe3d71159618d705c37a44b45fcda
 
 data GameRequest = GameRequest
+<<<<<<< HEAD
   { action :: String      -- Game action: "new_game", "make_move", "get_state"
   , position :: Maybe Game.Position  -- Optional position for moves
   } deriving (Show, Generic)
+=======
+  { action :: String,
+    position :: Maybe Game.Position
+  }
+  deriving (Show, Generic)
+>>>>>>> a6933c31e5cbe3d71159618d705c37a44b45fcda
 
 instance FromJSON GameRequest
+
 instance ToJSON GameRequest
 
 data GameResponse = GameResponse
+<<<<<<< HEAD
   { board :: [[String]]           -- 3x3 board representation for JSON
   , currentPlayer :: String       -- "X" or "O"
   , gameOver :: Bool              -- Whether the game has ended
@@ -82,6 +102,16 @@ data GameResponse = GameResponse
   , message :: String             -- Human-readable status message
   , validMoves :: [Game.Position] -- Available moves for client validation
   } deriving (Show, Generic)
+=======
+  { board :: [[String]],
+    currentPlayer :: String,
+    gameOver :: Bool,
+    winner :: Maybe String,
+    message :: String,
+    validMoves :: [Game.Position]
+  }
+  deriving (Show, Generic)
+>>>>>>> a6933c31e5cbe3d71159618d705c37a44b45fcda
 
 instance ToJSON GameResponse
 
@@ -120,7 +150,7 @@ data ServerState = ServerState
 
 -- Initial server state with empty game
 initialServerState :: ServerState
-initialServerState = ServerState { gameState = Game.initialGameState }
+initialServerState = ServerState {gameState = Game.initialGameState}
 
 -- =============================================================================
 -- GAME ACTION PROCESSING - STM VERSION
@@ -237,27 +267,28 @@ makeMoveResponse pos serverState = do
 
 -- Generate response for current game state
 getStateResponse :: ServerState -> GameResponse
-getStateResponse serverState = 
+getStateResponse serverState =
   let state = gameState serverState
-  in GameResponse
-    { board = boardToJson (Game.board state)
-    , currentPlayer = show (Game.currentPlayer state)
-    , gameOver = Game.gameOver state
-    , winner = fmap show (Game.winner state)
-    , message = "Current game state"
-    , validMoves = Game.validMoves (Game.board state)
-    }
+   in GameResponse
+        { board = boardToJson (Game.board state),
+          currentPlayer = show (Game.currentPlayer state),
+          gameOver = Game.gameOver state,
+          winner = fmap show (Game.winner state),
+          message = "Current game state",
+          validMoves = Game.validMoves (Game.board state)
+        }
 
 -- Generate error response with empty board
 errorResponse :: String -> GameResponse
-errorResponse msg = GameResponse
-  { board = boardToJson Game.emptyBoard
-  , currentPlayer = "X"
-  , gameOver = False
-  , winner = Nothing
-  , message = msg
-  , validMoves = []
-  }
+errorResponse msg =
+  GameResponse
+    { board = boardToJson Game.emptyBoard,
+      currentPlayer = "X",
+      gameOver = False,
+      winner = Nothing,
+      message = msg,
+      validMoves = []
+    }
 
 -- =============================================================================
 -- WAI APPLICATION - STM VERSION
@@ -302,7 +333,6 @@ app stateVar request respond = do
           logError "Failed to parse JSON request"
           let errorResp = errorResponse "Invalid JSON"
           respond $ responseLBS status400 [("Content-Type", "application/json")] (encode errorResp)
-    
     (method, "GET") | method == methodGet -> do
       logDebug "Handling GET request for current state"
       -- Atomic read operation
@@ -310,7 +340,6 @@ app stateVar request respond = do
       let response = getStateResponse currentState
       logGameState "GET request state" (gameState currentState)
       respond $ responseLBS status200 [("Content-Type", "application/json")] (encode response)
-    
     _ -> do
       logError $ "Method not allowed: " ++ show (requestMethod request)
       let errorResp = errorResponse "Method not allowed"
@@ -325,9 +354,11 @@ app stateVar request respond = do
 corsMiddleware :: Application -> Application
 corsMiddleware app request respond = do
   app request $ \response -> do
-    let headers = [("Access-Control-Allow-Origin", "*")
-                  , ("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
-                  , ("Access-Control-Allow-Headers", "Content-Type")]
+    let headers =
+          [ ("Access-Control-Allow-Origin", "*"),
+            ("Access-Control-Allow-Methods", "GET, POST, OPTIONS"),
+            ("Access-Control-Allow-Headers", "Content-Type")
+          ]
     respond response
 
 -- =============================================================================
