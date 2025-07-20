@@ -28,6 +28,6 @@ jobs:
           # Clean up node_modules before committing
           clean_node_folder: true
           # Use author's identity for commits
-          git_identity: author
+          git_identity: prettier-action
           # Ensure we have proper token for pushing
           github_token: ${{ secrets.GITHUB_TOKEN }} 

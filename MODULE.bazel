@@ -202,7 +202,7 @@ tic_tac_toe_electron = use_extension("@aspect_rules_js//npm:extensions.bzl", "np
 
 tic_tac_toe_electron.npm_translate_lock(
     name = "npm_tic_tac_toe",
-    pnpm_lock = "//haskell/app/tic-tac-toe-electron:pnpm-lock.yaml",
+    pnpm_lock = "//electron-app/tic-tac-toe:pnpm-lock.yaml",
     verify_node_modules_ignored = "//:.bazelignore",
 )
 
