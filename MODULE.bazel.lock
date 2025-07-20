@@ -399,7 +399,7 @@
     "@@aspect_rules_ts~//ts:extensions.bzl%ext": {
       "general": {
         "bzlTransitiveDigest": "h1hftyFCdJgiHD9blfFcMAiEk5ltEoUdNkuHPIkg/hM=",
-        "usagesDigest": "JR5evflfXH+907svVhif/EJrnxzMLJa+SLoCx7lXi/Y=",
+        "usagesDigest": "aUXdkdH9gH/iDzEuCklfyVYoWzieqonHSF+QyJmDivY=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},
         "envVariables": {},
@@ -840,7 +840,7 @@
     "@@rules_haskell~//extensions:stack_snapshot.bzl%stack_snapshot": {
       "general": {
         "bzlTransitiveDigest": "I9dE/IPkeO/mkCmDvxjs6J9WP1Tf8kV6hE6XhXWYcuw=",
-        "usagesDigest": "ie6cAfu1s+sbthetHTvTqxn2HKAkyx+7btv3iQS78N4=",
+        "usagesDigest": "CqMxybP/YUdFI3awM04WCTdOqLLUXfojYWQ/J39f0Zc=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},
         "envVariables": {},
@@ -886,6 +886,7 @@
                 "webdriver",
                 "aeson-pretty-0.8.10",
                 "optparse-applicative",
+                "QuickCheck",
                 "containers",
                 "stm",
                 "zlib",
@@ -941,6 +942,7 @@
                 "webdriver",
                 "aeson-pretty-0.8.10",
                 "optparse-applicative",
+                "QuickCheck",
                 "containers",
                 "stm",
                 "zlib",

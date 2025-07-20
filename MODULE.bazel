@@ -59,6 +59,7 @@ SIMPLE_PACKAGES = [
     "webdriver",
     "aeson-pretty-0.8.10",
     "optparse-applicative",
+    "QuickCheck",
 ]
 
 # Simple packages with no special configuration

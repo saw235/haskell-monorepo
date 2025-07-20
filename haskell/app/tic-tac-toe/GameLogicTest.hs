@@ -211,8 +211,9 @@ myShowCounts counts =
 -- TEST SUITE ASSEMBLY
 -- =============================================================================
 
-tests :: Test
-tests =
+-- HUnit tests
+hunitTests :: Test
+hunitTests =
   TestList
     [ TestLabel "Empty Board" testEmptyBoard,
       TestLabel "Initial Game State" testInitialGameState,
@@ -228,17 +229,29 @@ tests =
 
 main :: IO ()
 main = do
-  putStrLn "Running GameLogic tests..."
+  putStrLn "Running GameLogic HUnit tests..."
   putStrLn "========================================"
 
-  -- Use our custom test runner
-  counts <- runTestsWithLabels tests
+  -- Run HUnit tests
+  putStrLn "\n=== Running HUnit Tests ==="
+  hunitCounts <- runTestsWithLabels hunitTests
 
   putStrLn "========================================"
-  putStrLn $ "Test Summary:"
-  putStrLn $ "  Cases: " ++ show (cases counts)
-  putStrLn $ "  Tried: " ++ show (tried counts)
-  putStrLn $ "  Errors: " ++ show (errors counts)
-  putStrLn $ "  Failures: " ++ show (failures counts)
+  putStrLn $ "HUnit Test Summary:"
+  putStrLn $ "  Cases: " ++ show (cases hunitCounts)
+  putStrLn $ "  Tried: " ++ show (tried hunitCounts)
+  putStrLn $ "  Errors: " ++ show (errors hunitCounts)
+  putStrLn $ "  Failures: " ++ show (failures hunitCounts)
 
-  if failures counts > 0 || errors counts > 0 then Exit.exitFailure else Exit.exitSuccess
+  putStrLn "\n========================================"
+  putStrLn "HUnit tests completed!"
+
+  -- Exit with failure if HUnit tests failed
+  if failures hunitCounts > 0 || errors hunitCounts > 0 
+    then do
+      putStrLn $ "ERROR: " ++ show (failures hunitCounts + errors hunitCounts) ++ " tests failed!"
+      putStrLn "Please review the failing tests above."
+      Exit.exitFailure 
+    else do
+      putStrLn "All HUnit tests passed!"
+      Exit.exitSuccess

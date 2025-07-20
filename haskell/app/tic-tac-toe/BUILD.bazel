@@ -30,7 +30,7 @@ haskell_binary(
     visibility = ["//visibility:public"],
 )
 
-# Test for GameLogic module
+# Test for GameLogic module (now includes QuickCheck)
 haskell_test(
     name = "game_logic_test",
     srcs = [":GameLogicTest.hs"],
@@ -38,8 +38,25 @@ haskell_test(
         ":game-logic-lib",
         "//:base",
         "@stackage//:HUnit",
+        "@stackage//:QuickCheck",
         "@stackage//:mtl",
+        "@stackage//:random",
     ],
+    visibility = ["//visibility:public"],
+)
+
+# QuickCheck test suite for GameLogic
+haskell_test(
+    name = "game_logic_quickcheck",
+    srcs = [":GameLogicQuickCheck.hs"],
+    deps = [
+        ":game-logic-lib",
+        "//:base",
+        "@stackage//:QuickCheck",
+        "@stackage//:mtl",
+        "@stackage//:random",
+    ],
+    args = ["--seed", "1337"],
     visibility = ["//visibility:public"],
 )
 
