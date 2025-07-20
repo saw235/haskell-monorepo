@@ -4,30 +4,15 @@ load(
     "haskell_binary",
 )
 
-# Tic-tac-toe game application (pure functional version)
+# Tic-tac-toe game application (console version)
 haskell_binary(
     name = "tic-tac-toe",
-    srcs = [":Main.hs"],
+    srcs = [":Main.hs", ":GameLogic.hs"],
+    main_file = "Main.hs",
     deps = [
         "//:base",
         "@stackage//:mtl",
         "@stackage//:transformers",
-    ],
-)
-
-# Tic-tac-toe server application (HTTP API for Electron frontend)
-haskell_binary(
-    name = "tic-tac-toe-server",
-    srcs = [":ServerMain.hs", ":Server.hs", ":Main.hs"],
-    deps = [
-        "//:base",
-        "@stackage//:mtl",
-        "@stackage//:transformers",
-        "@stackage//:aeson",
-        "@stackage//:wai",
-        "@stackage//:warp",
-        "@stackage//:http-types",
-        "@stackage//:bytestring",
     ],
 )
 

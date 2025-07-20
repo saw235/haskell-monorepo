@@ -1,0 +1,134 @@
+load("@aspect_rules_js//js:defs.bzl", "js_binary")
+load("@aspect_rules_js//npm:defs.bzl", "npm_package")
+
+package(default_visibility = ["//visibility:public"])
+
+# Package the Electron app
+npm_package(
+    name = "package",
+    srcs = [
+        "//electron-app/tic-tac-toe:srcs",
+        ":package_json",
+        ":node_modules",
+    ],
+    package = "electron-tic-tac-toe",
+)
+
+# Package.json
+filegroup(
+    name = "package_json",
+    srcs = ["package.json"],
+)
+
+# Node modules
+filegroup(
+    name = "node_modules",
+    srcs = glob(["node_modules/**/*"]),
+)
+
+# Source files
+filegroup(
+    name = "srcs",
+    srcs = [
+        "main.js",
+        "preload.js",
+        "renderer.js",
+        "index.html",
+        "styles.css",
+    ],
+)
+
+# All app files in a single filegroup to avoid duplication
+filegroup(
+    name = "app-files",
+    srcs = [
+        ":package.json",
+        ":main.js",
+        ":preload.js",
+        ":index.html",
+        ":styles.css",
+        ":renderer.js",
+        ":node_modules",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+# Executable target to run the Electron app using pnpm dlx
+genrule(
+    name = "electron-tic-tac-toe-runner",
+    srcs = [":app-files"],
+    outs = ["run-electron.sh"],
+    cmd = """cat > $@ << 'EOF'
+#!/bin/bash
+# Get the directory where the runfiles are located
+SCRIPT_DIR="$$(dirname "$$0")"
+RUNFILES_DIR="$${SCRIPT_DIR}/electron-tic-tac-toe.runfiles/_main/electron-app/tic-tac-toe"
+
+# Change to the directory with the electron app files
+cd "$${RUNFILES_DIR}"
+
+# Use pnpm dlx to run electron
+pnpm dlx electron . $$@
+EOF
+chmod +x $@
+""",
+    visibility = ["//visibility:public"],
+)
+
+# Wrapper script runner that passes server location
+genrule(
+    name = "tic-tac-toe-wrapper",
+    srcs = ["run-tic-tac-toe.sh"],
+    outs = ["run-tic-tac-toe-wrapper.sh"],
+    cmd = """cat > $@ << 'EOF'
+#!/bin/bash
+# Pass the server location to the wrapper script
+exec "$$(dirname "$$0")/run-tic-tac-toe.sh" "$(location //haskell/app/tic-tac-toe-server:server)" "$$@"
+EOF
+chmod +x $@
+""",
+    tools = ["//haskell/app/tic-tac-toe-server:server"],
+    visibility = ["//visibility:public"],
+)
+
+# Run target for normal mode
+sh_binary(
+    name = "electron-tic-tac-toe",
+    srcs = [":electron-tic-tac-toe-runner"],
+    data = [":app-files"],
+    visibility = ["//visibility:public"],
+)
+
+# Run target for development mode
+sh_binary(
+    name = "electron-tic-tac-toe-dev",
+    srcs = [":electron-tic-tac-toe-runner"],
+    data = [":app-files"],
+    args = ["--dev"],
+    visibility = ["//visibility:public"],
+)
+
+# Wrapper target that runs both server and app
+sh_binary(
+    name = "tic-tac-toe",
+    srcs = [":tic-tac-toe-wrapper"],
+    data = [
+        ":app-files",
+        "run-tic-tac-toe.sh",
+        "//haskell/app/tic-tac-toe-server:server",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+# Wrapper target for development mode
+sh_binary(
+    name = "tic-tac-toe-dev",
+    srcs = [":tic-tac-toe-wrapper"],
+    data = [
+        ":app-files",
+        "run-tic-tac-toe.sh",
+        "//haskell/app/tic-tac-toe-server:server",
+    ],
+    args = ["--dev"],
+    visibility = ["//visibility:public"],
+) 

@@ -1,0 +1,43 @@
+# Load rules_haskell rules.
+load(
+    "@rules_haskell//haskell:defs.bzl",
+    "haskell_binary",
+)
+
+# Tic-tac-toe server application (HTTP API for Electron frontend)
+haskell_binary(
+    name = "server",
+    srcs = [":ServerMain.hs", ":Server.hs", ":GameLogic.hs"],
+    main_file = "ServerMain.hs",
+    deps = [
+        "//:base",
+        "@stackage//:mtl",
+        "@stackage//:transformers",
+        "@stackage//:aeson",
+        "@stackage//:wai",
+        "@stackage//:warp",
+        "@stackage//:http-types",
+        "@stackage//:bytestring",
+        "@stackage//:stm",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+# Alias for backward compatibility
+haskell_binary(
+    name = "tic-tac-toe-server",
+    srcs = [":ServerMain.hs", ":Server.hs", ":GameLogic.hs"],
+    main_file = "ServerMain.hs",
+    deps = [
+        "//:base",
+        "@stackage//:mtl",
+        "@stackage//:transformers",
+        "@stackage//:aeson",
+        "@stackage//:wai",
+        "@stackage//:warp",
+        "@stackage//:http-types",
+        "@stackage//:bytestring",
+        "@stackage//:stm",
+    ],
+    visibility = ["//visibility:public"],
+) 
