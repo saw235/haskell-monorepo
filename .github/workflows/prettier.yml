@@ -15,18 +15,19 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          # Fetch depth 0 to enable only_changed option
-          fetch-depth: 0
+          # Use token for authentication when pushing changes
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Prettify code
         uses: creyD/prettier_action@v4.6
         with:
-          # Only format changed files in the electron-app folder
-          only_changed: true
+          # Format all files in the electron-app folder
           prettier_options: --write electron-app/**/*.{js,ts,css,html,md,json}
           # Use a descriptive commit message
           commit_message: "style: format electron-app code with prettier"
           # Clean up node_modules before committing
           clean_node_folder: true
           # Use author's identity for commits
-          git_identity: author 
+          git_identity: author
+          # Ensure we have proper token for pushing
+          github_token: ${{ secrets.GITHUB_TOKEN }} 
