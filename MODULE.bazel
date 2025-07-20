@@ -186,6 +186,7 @@ node = use_extension("@rules_nodejs//nodejs:extensions.bzl", "node", dev_depende
 node.toolchain(node_version = "16.14.2")
 #################################
 
+# npm workspace for mcp-shrimp-task-manager
 mcp_shrimp_task_manager = use_extension("@aspect_rules_js//npm:extensions.bzl", "npm", dev_dependency = True)
 
 mcp_shrimp_task_manager.npm_translate_lock(
@@ -195,6 +196,28 @@ mcp_shrimp_task_manager.npm_translate_lock(
 )
 
 use_repo(mcp_shrimp_task_manager, "npm")
+
+# npm workspace for tic-tac-toe-electron
+tic_tac_toe_electron = use_extension("@aspect_rules_js//npm:extensions.bzl", "npm", dev_dependency = True)
+
+tic_tac_toe_electron.npm_translate_lock(
+    name = "npm_tic_tac_toe",
+    pnpm_lock = "//haskell/app/tic-tac-toe-electron:pnpm-lock.yaml",
+    verify_node_modules_ignored = "//:.bazelignore",
+)
+
+use_repo(tic_tac_toe_electron, "npm_tic_tac_toe")
+
+# npm workspace for electron-hello-world
+electron_hello_world = use_extension("@aspect_rules_js//npm:extensions.bzl", "npm", dev_dependency = True)
+
+electron_hello_world.npm_translate_lock(
+    name = "npm_electron_hello_world",
+    pnpm_lock = "//electron-app/hello-world:pnpm-lock.yaml",
+    verify_node_modules_ignored = "//:.bazelignore",
+)
+
+use_repo(electron_hello_world, "npm_electron_hello_world")
 
 pnpm = use_extension("@aspect_rules_js//npm:extensions.bzl", "pnpm")
 

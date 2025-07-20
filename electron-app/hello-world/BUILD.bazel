@@ -1,0 +1,74 @@
+load("@aspect_rules_js//js:defs.bzl", "js_binary")
+load("@aspect_rules_js//npm:defs.bzl", "npm_package")
+load("@npm_electron_hello_world//:defs.bzl", "npm_link_all_packages")
+
+package(default_visibility = ["//visibility:public"])
+
+npm_link_all_packages(name = "node_modules")
+
+# All app files in a single filegroup to avoid duplication
+filegroup(
+    name = "app-files",
+    srcs = [
+        ":package.json",
+        ":main.js",
+        ":preload.js",
+        ":index.html",
+        ":styles.css",
+        ":renderer.js",
+        ":node_modules",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+# Package for distribution (without node_modules)
+npm_package(
+    name = "electron-hello-world-package",
+    srcs = [
+        ":package.json",
+        ":main.js",
+        ":preload.js",
+        ":index.html",
+        ":styles.css",
+        ":renderer.js",
+    ],
+)
+
+# Executable target to run the Electron app using pnpm dlx
+genrule(
+    name = "electron-hello-world-runner",
+    srcs = [":app-files"],
+    outs = ["run-electron.sh"],
+    cmd = """cat > $@ << 'EOF'
+#!/bin/bash
+# Get the directory where the runfiles are located
+SCRIPT_DIR="$$(dirname "$$0")"
+RUNFILES_DIR="$${SCRIPT_DIR}/electron-hello-world.runfiles/_main/electron-app/hello-world"
+
+# Change to the directory with the electron app files
+cd "$${RUNFILES_DIR}"
+
+# Use pnpm dlx to run electron
+pnpm dlx electron . $$@
+EOF
+chmod +x $@
+""",
+    visibility = ["//visibility:public"],
+)
+
+# Run target for normal mode
+sh_binary(
+    name = "electron-hello-world",
+    srcs = [":electron-hello-world-runner"],
+    data = [":app-files"],
+    visibility = ["//visibility:public"],
+)
+
+# Run target for development mode
+sh_binary(
+    name = "electron-hello-world-dev",
+    srcs = [":electron-hello-world-runner"],
+    data = [":app-files"],
+    args = ["--dev"],
+    visibility = ["//visibility:public"],
+) 
