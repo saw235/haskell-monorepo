@@ -1,0 +1,37 @@
+name: Prettier Formatting
+
+# This action works with pull requests and pushes
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  prettier:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          # Fetch depth 0 to enable only_changed option
+          fetch-depth: 0
+          ref: ${{ github.head_ref }}
+          # Use token for authentication when pushing changes
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Prettify code
+        uses: creyD/prettier_action@v4.6
+        with:
+          # Format all files in the electron-app folder
+          prettier_options: --write electron-app/**/*.{js,ts,css,html,md,json}
+          only_changed: true
+          # Use a descriptive commit message
+          commit_message: "style: format electron-app code with prettier"
+          # Clean up node_modules before committing
+          clean_node_folder: true
+          # Use author's identity for commits
+          git_identity: actions
+          # Ensure we have proper token for pushing
+          github_token: ${{ secrets.GITHUB_TOKEN }} 

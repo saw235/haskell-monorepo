@@ -116,7 +116,7 @@
     "//:non_module_deps.bzl%non_module_deps": {
       "general": {
         "bzlTransitiveDigest": "0N0rzQ1rNaEnlArWzPeaUDJJvTh/z5gUrMvzsJRgm/E=",
-        "usagesDigest": "qkfuclecbMVEZ8FJLJeQ/YRuyYL6WgXuGYEf0ALAuXo=",
+        "usagesDigest": "O3QGaye4lozculcA8brwOKNC9M0ERtB/RkZM0kgMlIY=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},
         "envVariables": {},
@@ -399,7 +399,7 @@
     "@@aspect_rules_ts~//ts:extensions.bzl%ext": {
       "general": {
         "bzlTransitiveDigest": "h1hftyFCdJgiHD9blfFcMAiEk5ltEoUdNkuHPIkg/hM=",
-        "usagesDigest": "JR5evflfXH+907svVhif/EJrnxzMLJa+SLoCx7lXi/Y=",
+        "usagesDigest": "aUXdkdH9gH/iDzEuCklfyVYoWzieqonHSF+QyJmDivY=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},
         "envVariables": {},
@@ -474,7 +474,7 @@
     "@@rules_haskell~//extensions:haskell_toolchains.bzl%haskell_toolchains": {
       "general": {
         "bzlTransitiveDigest": "4Gb81roel66/j16a43ysWkgCex2beMKvwR0GoEXre1g=",
-        "usagesDigest": "+Ydsrs9ZutHCH/s/Kx0wk0BbQ10Q5celOMEtuuO4dRo=",
+        "usagesDigest": "/o4pvgWuXemLXVTAk5uM0KJZg6NsLYkoKoe540VPyuA=",
         "recordedFileInputs": {
           "@@rules_haskell~//haskell/private/ghc_bindist_generated.json": "0be7e35cb98d664beef98aef76b3278597ea9bc14d7e2e0c212be82379ecb5aa"
         },
@@ -840,7 +840,7 @@
     "@@rules_haskell~//extensions:stack_snapshot.bzl%stack_snapshot": {
       "general": {
         "bzlTransitiveDigest": "I9dE/IPkeO/mkCmDvxjs6J9WP1Tf8kV6hE6XhXWYcuw=",
-        "usagesDigest": "Jcs4CtKXFfgUj6v58D+zV+/52dUGaXKRAYA0aFTdKL8=",
+        "usagesDigest": "CqMxybP/YUdFI3awM04WCTdOqLLUXfojYWQ/J39f0Zc=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},
         "envVariables": {},
@@ -868,29 +868,33 @@
               "snapshot": "lts-23.22",
               "stack_snapshot_json": "@@//:stackage_snapshot.json",
               "packages": [
-                "zlib",
                 "aeson",
                 "random",
+                "mtl",
+                "transformers",
                 "bytestring",
                 "vector",
-                "containers",
-                "stm",
                 "template-haskell",
                 "text",
                 "network-uri",
                 "wai",
-                "streaming-commons",
                 "warp",
                 "http-types",
-                "attoparsec",
-                "data-default-0.8.0.0",
-                "tls-2.1.2",
+                "HUnit",
                 "scalpel",
                 "scalpel-core",
                 "webdriver",
-                "digest",
                 "aeson-pretty-0.8.10",
-                "optparse-applicative"
+                "optparse-applicative",
+                "QuickCheck",
+                "containers",
+                "stm",
+                "zlib",
+                "streaming-commons",
+                "digest",
+                "attoparsec",
+                "data-default-0.8.0.0",
+                "tls-2.1.2"
               ],
               "flags": {
                 "zlib": [
@@ -920,30 +924,33 @@
               "snapshot": "lts-23.22",
               "stack_snapshot_json": "@@//:stackage_snapshot.json",
               "packages": [
-                "zlib",
                 "aeson",
                 "random",
+                "mtl",
+                "transformers",
                 "bytestring",
                 "vector",
-                "containers",
-                "stm",
                 "template-haskell",
                 "text",
                 "network-uri",
                 "wai",
-                "streaming-commons",
                 "warp",
                 "http-types",
-                "attoparsec",
-                "data-default-0.8.0.0",
-                "tls-2.1.2",
+                "HUnit",
                 "scalpel",
                 "scalpel-core",
                 "webdriver",
-                "digest",
                 "aeson-pretty-0.8.10",
-                "optparse-applicative"
-
+                "optparse-applicative",
+                "QuickCheck",
+                "containers",
+                "stm",
+                "zlib",
+                "streaming-commons",
+                "digest",
+                "attoparsec",
+                "data-default-0.8.0.0",
+                "tls-2.1.2"
               ],
               "flags": {
                 "zlib": [
@@ -1034,7 +1041,7 @@
     "@@rules_nodejs~//nodejs:extensions.bzl%node": {
       "general": {
         "bzlTransitiveDigest": "SqbzUarOVzAfK28Ca5+NIU3LUwnW/b3h0xXBUS97oyI=",
-        "usagesDigest": "BkGR2PKeEzALFwx986R2I4GqvAB11H9oH0q5ZvFRGa0=",
+        "usagesDigest": "jSlBefkeqF7vpIYJagsCL+NSKIqAtYBS3y8ySyxGRPo=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},
         "envVariables": {},

@@ -1,0 +1,67 @@
+# Load rules_haskell rules.
+load(
+    "@rules_haskell//haskell:defs.bzl",
+    "haskell_binary",
+    "haskell_test",
+)
+
+# Tic-tac-toe server application (HTTP API for Electron frontend)
+haskell_binary(
+    name = "server",
+    srcs = [":ServerMain.hs", ":Server.hs"],
+    main_file = "ServerMain.hs",
+    deps = [
+        "//haskell/app/tic-tac-toe:game-logic-lib",
+        "//:base",
+        "@stackage//:mtl",
+        "@stackage//:transformers",
+        "@stackage//:aeson",
+        "@stackage//:wai",
+        "@stackage//:warp",
+        "@stackage//:http-types",
+        "@stackage//:bytestring",
+        "@stackage//:stm",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+# Test for Server module
+haskell_test(
+    name = "server_test",
+    srcs = [":ServerTest.hs", ":Server.hs"],
+    main_file = "ServerTest.hs",
+    deps = [
+        "//haskell/app/tic-tac-toe:game-logic-lib",
+        "//:base",
+        "@stackage//:HUnit",
+        "@stackage//:mtl",
+        "@stackage//:transformers",
+        "@stackage//:aeson",
+        "@stackage//:wai",
+        "@stackage//:warp",
+        "@stackage//:http-types",
+        "@stackage//:bytestring",
+        "@stackage//:stm",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+# Alias for backward compatibility
+haskell_binary(
+    name = "tic-tac-toe-server",
+    srcs = [":ServerMain.hs", ":Server.hs"],
+    main_file = "ServerMain.hs",
+    deps = [
+        "//haskell/app/tic-tac-toe:game-logic-lib",
+        "//:base",
+        "@stackage//:mtl",
+        "@stackage//:transformers",
+        "@stackage//:aeson",
+        "@stackage//:wai",
+        "@stackage//:warp",
+        "@stackage//:http-types",
+        "@stackage//:bytestring",
+        "@stackage//:stm",
+    ],
+    visibility = ["//visibility:public"],
+) 

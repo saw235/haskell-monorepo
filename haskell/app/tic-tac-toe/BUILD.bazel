@@ -1,0 +1,62 @@
+# Load rules_haskell rules.
+load(
+    "@rules_haskell//haskell:defs.bzl",
+    "haskell_binary",
+    "haskell_library",
+    "haskell_test",
+)
+
+# Shared GameLogic library that can be used by both client and server
+haskell_library(
+    name = "game-logic-lib",
+    srcs = [":GameLogic.hs"],
+    deps = [
+        "//:base",
+        "@stackage//:mtl",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+# Tic-tac-toe client application
+haskell_binary(
+    name = "tic-tac-toe",
+    srcs = [":Main.hs"],
+    main_file = "Main.hs",
+    deps = [
+        ":game-logic-lib",
+        "//:base",
+        "@stackage//:mtl",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+# Test for GameLogic module (now includes QuickCheck)
+haskell_test(
+    name = "game_logic_test",
+    srcs = [":GameLogicTest.hs"],
+    deps = [
+        ":game-logic-lib",
+        "//:base",
+        "@stackage//:HUnit",
+        "@stackage//:QuickCheck",
+        "@stackage//:mtl",
+        "@stackage//:random",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+# QuickCheck test suite for GameLogic
+haskell_test(
+    name = "game_logic_quickcheck",
+    srcs = [":GameLogicQuickCheck.hs"],
+    deps = [
+        ":game-logic-lib",
+        "//:base",
+        "@stackage//:QuickCheck",
+        "@stackage//:mtl",
+        "@stackage//:random",
+    ],
+    args = ["--seed", "1337"],
+    visibility = ["//visibility:public"],
+)
+
