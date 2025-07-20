@@ -15,6 +15,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
+          # Fetch depth 0 to enable only_changed option
+          fetch-depth: 0
+          ref: ${{ github.head_ref }}
           # Use token for authentication when pushing changes
           token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -23,6 +26,7 @@ jobs:
         with:
           # Format all files in the electron-app folder
           prettier_options: --write electron-app/**/*.{js,ts,css,html,md,json}
+          only_changed: true
           # Use a descriptive commit message
           commit_message: "style: format electron-app code with prettier"
           # Clean up node_modules before committing
