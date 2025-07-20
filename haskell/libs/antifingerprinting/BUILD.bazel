@@ -1,0 +1,15 @@
+load("@rules_haskell//haskell:defs.bzl", "haskell_library")
+
+haskell_library(
+    name = "antifingerprinting",
+    srcs = glob(["src/**/*.hs"]),
+    src_strip_prefix = "src",
+    visibility = ["//visibility:public"],
+    deps = [
+        "@stackage//:aeson",
+        "//:base",
+        "@stackage//:containers",
+        "@stackage//:random",
+        "@stackage//:text",
+    ],
+) 

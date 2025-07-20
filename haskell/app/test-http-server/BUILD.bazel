@@ -1,0 +1,18 @@
+load("@rules_haskell//haskell:defs.bzl", "haskell_binary")
+
+exports_files(["test.html"])
+
+haskell_binary(
+    name = "test-http-server",
+    srcs = ["Main.hs"],
+    data = ["test.html"],
+    args = ["$(location test.html)"],
+    deps = [
+        "//:base",
+        "@stackage//:wai",
+        "@stackage//:warp",
+        "@stackage//:http-types",
+        "@stackage//:bytestring",
+    ],
+    visibility = ["//visibility:public"],
+) 
