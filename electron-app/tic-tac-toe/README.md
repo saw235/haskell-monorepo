@@ -81,6 +81,17 @@ This app demonstrates a clean separation between frontend and backend with prope
 - **Bazel** (for build system and process management)
 - **pnpm** (for Electron package management)
 
+## Initial Setup
+
+Before running the app for the first time, you need to install the Node.js dependencies:
+
+```bash
+# Install Electron dependencies using Bazel-managed pnpm
+bazel run -- @pnpm//:pnpm --dir $PWD/electron-app/tic-tac-toe install
+```
+
+This command uses the Bazel-managed pnpm to install all required dependencies for the Electron app.
+
 ## Quick Start
 
 ### Option 1: Bazel Wrapper (Recommended)
