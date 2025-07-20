@@ -247,11 +247,11 @@ main = do
   putStrLn "HUnit tests completed!"
 
   -- Exit with failure if HUnit tests failed
-  if failures hunitCounts > 0 || errors hunitCounts > 0 
+  if failures hunitCounts > 0 || errors hunitCounts > 0
     then do
       putStrLn $ "ERROR: " ++ show (failures hunitCounts + errors hunitCounts) ++ " tests failed!"
       putStrLn "Please review the failing tests above."
-      Exit.exitFailure 
+      Exit.exitFailure
     else do
       putStrLn "All HUnit tests passed!"
       Exit.exitSuccess

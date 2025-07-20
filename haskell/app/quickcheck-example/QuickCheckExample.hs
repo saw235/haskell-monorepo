@@ -1,6 +1,6 @@
 module Main where
 
-import Data.List (sort, reverse)
+import Data.List (reverse, sort)
 import System.Random (randomRIO)
 import System.Exit (exitFailure)
 
@@ -16,8 +16,8 @@ type Property = Bool
 
 -- Test configuration
 data TestConfig = TestConfig
-  { numTests :: Int
-  , maxShrinks :: Int
+  { numTests :: Int,
+    maxShrinks :: Int
   }
 
 defaultConfig :: TestConfig
@@ -28,13 +28,13 @@ randomInt :: (Int, Int) -> IO Int
 randomInt (min, max) = randomRIO (min, max)
 
 randomList :: Int -> IO [Int]
-randomList len = sequence [randomInt (-100, 100) | _ <- [1..len]]
+randomList len = sequence [randomInt (-100, 100) | _ <- [1 .. len]]
 
 -- Test runner that generates random inputs and returns success/failure
 quickCheck :: String -> (Int -> IO Bool) -> IO Bool
 quickCheck name prop = do
   putStrLn $ "Testing: " ++ name
-  results <- sequence [prop i | i <- [1..100]]
+  results <- sequence [prop i | i <- [1 .. 100]]
   let passed = length (filter id results)
   let failed = length (filter not results)
   putStrLn $ "  Passed: " ++ show passed ++ " tests"
@@ -98,7 +98,7 @@ prop_abs_negative_positive x = if x < 0 then abs x > 0 else abs x >= 0
 -- This property is FALSE - it will fail for some inputs
 -- QuickCheck would find the smallest counterexample
 prop_false_property :: Int -> Bool
-prop_false_property x = x * x >= x  -- This fails for x = 0
+prop_false_property x = x * x >= x -- This fails for x = 0
 
 -- =============================================================================
 -- TEST GENERATORS
@@ -175,7 +175,7 @@ findSmallestCounterexample prop x = do
   let failures = filter (not . prop) candidates
   case failures of
     [] -> return Nothing
-    (smallest:_) -> return (Just smallest)
+    (smallest : _) -> return (Just smallest)
 
 -- =============================================================================
 -- MAIN FUNCTION
@@ -186,7 +186,7 @@ main = do
   putStrLn "=== QuickCheck-Style Property Testing Examples ==="
   putStrLn "This demonstrates the core concepts of property-based testing"
   putStrLn ""
-  
+
   putStrLn "1. Testing addition commutativity..."
   test1 <- quickCheck "Addition is commutative" generateAdditionTest
   
@@ -220,7 +220,7 @@ main = do
   case counterexample of
     Just x -> putStrLn $ "  Smallest counterexample: " ++ show x
     Nothing -> putStrLn "  No counterexample found"
-  
+
   putStrLn "\n=== QuickCheck Examples Completed ==="
   putStrLn ""
   putStrLn "Key Concepts Demonstrated:"
