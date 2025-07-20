@@ -2,17 +2,44 @@
 load(
     "@rules_haskell//haskell:defs.bzl",
     "haskell_binary",
+    "haskell_library",
+    "haskell_test",
 )
 
-# Tic-tac-toe game application (console version)
-haskell_binary(
-    name = "tic-tac-toe",
-    srcs = [":Main.hs", ":GameLogic.hs"],
-    main_file = "Main.hs",
+# Shared GameLogic library that can be used by both client and server
+haskell_library(
+    name = "game-logic-lib",
+    srcs = [":GameLogic.hs"],
     deps = [
         "//:base",
         "@stackage//:mtl",
-        "@stackage//:transformers",
     ],
+    visibility = ["//visibility:public"],
+)
+
+# Tic-tac-toe client application
+haskell_binary(
+    name = "tic-tac-toe",
+    srcs = [":Main.hs"],
+    main_file = "Main.hs",
+    deps = [
+        ":game-logic-lib",
+        "//:base",
+        "@stackage//:mtl",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+# Test for GameLogic module
+haskell_test(
+    name = "game_logic_test",
+    srcs = [":GameLogicTest.hs"],
+    deps = [
+        ":game-logic-lib",
+        "//:base",
+        "@stackage//:HUnit",
+        "@stackage//:mtl",
+    ],
+    visibility = ["//visibility:public"],
 )
 

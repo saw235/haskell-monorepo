@@ -1,4 +1,4 @@
-module(name = "your_project_name_here", version = "0.1")
+module(name = "haskell-monorepo", version = "0.1")
 
 # Haskell
 bazel_dep(name = "rules_haskell", version = "1.0")
@@ -36,47 +36,35 @@ use_repo(
 
 stack.stack_snapshot_json(label = "//:stackage_snapshot.json")
 
-stack.package(
-    name = "zlib",
-    extra_deps = ["@zlib.hs"],
-    flags =
-        # Sets the default explicitly to demonstrate the flags attribute.
-        [
-            "-non-blocking-ffi",
-            "-pkg-config",
-    ],
-)
-
 # LTS snapshot published for ghc-9.4.6 (default version used by rules_haskell)
 stack.snapshot(name = "lts-23.22")
 
-stack.package(
-    name = "aeson",
-)
+# Package definitions for stack extension
+SIMPLE_PACKAGES = [
+    "aeson",
+    "random",
+    "mtl",
+    "transformers",
+    "bytestring",
+    "vector",
+    "template-haskell",
+    "text",
+    "network-uri",
+    "wai",
+    "warp",
+    "http-types",
+    "HUnit",
+    "scalpel",
+    "scalpel-core",
+    "webdriver",
+    "aeson-pretty-0.8.10",
+    "optparse-applicative",
+]
 
-stack.package(
-    name = "random",
-)
+# Simple packages with no special configuration
+[stack.package(name = pkg) for pkg in SIMPLE_PACKAGES]
 
-stack.package(
-    name = "mtl",
-)
-
-
-stack.package(
-    name = "transformers",
-)
-
-
-stack.package(
-    name = "bytestring",
-)
-
-stack.package(
-    name = "vector",
-)
-
-
+# Packages with setup dependencies
 stack.package(
     name = "containers",
     setup_deps = ["@Cabal//:Cabal"],
@@ -87,20 +75,14 @@ stack.package(
     setup_deps = ["@Cabal//:Cabal"],
 )
 
+# Packages with extra dependencies
 stack.package(
-    name = "template-haskell",
-)
-
-stack.package(
-    name = "text",
-)
-
-stack.package(
-    name = "network-uri",
-)
-
-stack.package(
-    name = "wai",
+    name = "zlib",
+    extra_deps = ["@zlib.hs"],
+    flags = [
+        "-non-blocking-ffi",
+        "-pkg-config",
+    ],
 )
 
 stack.package(
@@ -108,62 +90,35 @@ stack.package(
     extra_deps = ["@zlib.hs"],
 )
 
-
 stack.package(
-    name = "warp",
+    name = "digest",
+    extra_deps = ["@zlib.hs"],
+    flags = [
+        "-pkg-config",
+    ],
 )
 
-stack.package(
-    name = "http-types",
-)
-
+# Packages with complex configurations
 stack.package(
     name = "attoparsec",
-    components =
-        [
-            # attoparsec contains an internal library which is not exposed publicly,
-            # but required to build the public library, hence the declaration of
-            # those 2 components, as well as the explicit declaration of the
-            # dependency between them.
-            "lib",
-            "lib:attoparsec-internal",
-        ],
+    components = [
+        # attoparsec contains an internal library which is not exposed publicly,
+        # but required to build the public library, hence the declaration of
+        # those 2 components, as well as the explicit declaration of the
+        # dependency between them.
+        "lib",
+        "lib:attoparsec-internal",
+    ],
     components_dependencies = {
         "lib:attoparsec": ["lib:attoparsec-internal"],
     },
 )
 
-stack.package(
-    name = "data-default-0.8.0.0",
-)
+# Versioned packages
+stack.package(name = "data-default-0.8.0.0")
+stack.package(name = "tls-2.1.2")
 
-stack.package(
-    name = "tls-2.1.2",
-)
-
-stack.package(
-    name = "scalpel",
-)
-stack.package(
-    name = "scalpel-core",
-)
-
-stack.package(
-    name = "webdriver",
-)
-
-stack.package(
-    name = "digest",
-    extra_deps = ["@zlib.hs"],
-    flags =
-        [
-            "-pkg-config",
-    ],
-)
-
-stack.package(name = "aeson-pretty-0.8.10")
-stack.package(name = "optparse-applicative")
-
+# Commented out packages for future reference
 # stack.package(name = "http-client")
 # stack.package(name = "http-client-tls")
 # stack.package(name = "tagsoup")

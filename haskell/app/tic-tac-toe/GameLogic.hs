@@ -86,7 +86,7 @@ data GameState = GameState
     gameOver :: Bool,
     winner :: Maybe Player
   }
-  deriving (Show)
+  deriving (Show, Eq)
 
 -- |
 -- Pure game monad type using State for managing game state.

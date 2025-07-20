@@ -75,7 +75,7 @@ data GameRequest = GameRequest
   { action :: String, -- Game action: "new_game", "make_move", "get_state"
     position :: Maybe Game.Position -- Optional position for moves
   }
-  deriving (Show, Generic)
+  deriving (Show, Eq, Generic)
 
 instance FromJSON GameRequest
 
@@ -89,9 +89,10 @@ data GameResponse = GameResponse
     message :: String, -- Human-readable status message
     validMoves :: [Game.Position] -- Available moves for client validation
   }
-  deriving (Show, Generic)
+  deriving (Show, Eq, Generic)
 
 instance ToJSON GameResponse
+instance FromJSON GameResponse
 
 -- =============================================================================
 -- BOARD CONVERSION UTILITIES
@@ -125,6 +126,7 @@ jsonToBoard jsonBoard = map (map stringToCell) jsonBoard
 data ServerState = ServerState
   { gameState :: Game.GameState -- Current game state from GameLogic
   }
+  deriving (Show, Eq)
 
 -- Initial server state with empty game
 initialServerState :: ServerState
