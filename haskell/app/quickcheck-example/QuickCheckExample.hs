@@ -1,8 +1,8 @@
 module Main where
 
 import Data.List (reverse, sort)
-import System.Random (randomRIO)
 import System.Exit (exitFailure)
+import System.Random (randomRIO)
 
 -- =============================================================================
 -- SIMPLE QUICKCHECK-STYLE PROPERTY TESTING (MANUAL IMPLEMENTATION)
@@ -189,31 +189,31 @@ main = do
 
   putStrLn "1. Testing addition commutativity..."
   test1 <- quickCheck "Addition is commutative" generateAdditionTest
-  
+
   putStrLn "\n2. Testing addition associativity..."
   test2 <- quickCheck "Addition is associative" generateAssociativeTest
-  
+
   putStrLn "\n3. Testing zero identity..."
   test3 <- quickCheck "Zero is identity for addition" generateZeroIdentityTest
-  
+
   putStrLn "\n4. Testing list reverse inverse..."
   test4 <- quickCheck "Reverse is its own inverse" generateReverseTest
-  
+
   putStrLn "\n5. Testing sort idempotence..."
   test5 <- quickCheck "Sort is idempotent" generateSortTest
-  
+
   putStrLn "\n6. Testing concatenation length..."
   test6 <- quickCheck "Concatenation length property" generateConcatTest
-  
+
   putStrLn "\n7. Testing absolute value non-negative..."
   test7 <- quickCheck "Absolute value is non-negative" generateAbsTest
-  
+
   putStrLn "\n8. Testing absolute value of negative numbers..."
   test8 <- quickCheck "Absolute value of negative is positive" generateAbsNegativeTest
-  
+
   putStrLn "\n9. Testing a property that will fail (demonstrating shrinking)..."
   test9 <- quickCheck "False property (should fail)" generateFalseTest
-  
+
   putStrLn "\n10. Demonstrating shrinking..."
   putStrLn "Finding smallest counterexample for false property:"
   counterexample <- findSmallestCounterexample prop_false_property 5
@@ -229,7 +229,7 @@ main = do
   putStrLn "3. Test Execution: Running properties with many inputs"
   putStrLn "4. Shrinking: Finding smaller counterexamples when tests fail"
   putStrLn "5. Reporting: Clear feedback on test results"
-  
+
   -- Exit with appropriate code based on test results
   let allTestsPassed = test1 && test2 && test3 && test4 && test5 && test6 && test7 && test8 && test9
   if allTestsPassed
@@ -238,4 +238,4 @@ main = do
       return ()
     else do
       putStrLn "\nFAIL: Some tests failed!"
-      System.Exit.exitFailure 
+      System.Exit.exitFailure
