@@ -92,6 +92,7 @@ data GameResponse = GameResponse
   deriving (Show, Eq, Generic)
 
 instance ToJSON GameResponse
+
 instance FromJSON GameResponse
 
 -- =============================================================================
