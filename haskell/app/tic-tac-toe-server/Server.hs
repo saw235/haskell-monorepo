@@ -1,29 +1,28 @@
-{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards #-}
 
 module Server where
 
-import Control.Monad (unless, when)
-import Control.Monad.State (State, evalState, get, modify, put, runState)
-import Data.Aeson (FromJSON, ToJSON, encode, decode)
-import Data.List (intercalate, transpose)
-import Data.Maybe (fromJust, isJust)
-import GHC.Generics (Generic)
-import Network.Wai (Application, Response, responseLBS, requestMethod)
-import Network.Wai.Internal (getRequestBodyChunk)
-import Network.Wai.Handler.Warp (run, runSettings, defaultSettings, setPort)
-import Network.HTTP.Types (status200, status400, status404, methodPost, methodGet)
-import qualified Data.ByteString.Lazy as LBS
-import qualified Data.ByteString.Char8 as BS
-import System.IO (hPutStrLn, stderr, stdout)
 -- STM (Software Transactional Memory) for atomic state management
 -- Provides transactional state updates with automatic rollback on failure
 -- Replaces IORef for better concurrency safety
-import Control.Concurrent.STM (STM, TVar, newTVar, readTVar, writeTVar, atomically)
-
+import Control.Concurrent.STM (STM, TVar, atomically, newTVar, readTVar, writeTVar)
+import Control.Monad (unless, when)
+import Control.Monad.State (State, evalState, get, modify, put, runState)
+import Data.Aeson (FromJSON, ToJSON, decode, encode)
+import qualified Data.ByteString.Char8 as BS
+import qualified Data.ByteString.Lazy as LBS
+import Data.List (intercalate, transpose)
+import Data.Maybe (fromJust, isJust)
+import GHC.Generics (Generic)
 -- Import game types and logic from GameLogic
 import qualified GameLogic as Game
+import Network.HTTP.Types (methodGet, methodPost, status200, status400, status404)
+import Network.Wai (Application, Response, requestMethod, responseLBS)
+import Network.Wai.Handler.Warp (defaultSettings, run, runSettings, setPort)
+import Network.Wai.Internal (getRequestBodyChunk)
+import System.IO (hPutStrLn, stderr, stdout)
 
 -- =============================================================================
 -- LOGGING SYSTEM
@@ -44,10 +43,16 @@ logError msg = hPutStrLn stderr $ "[ERROR] " ++ msg
 -- Used for debugging state transitions and game flow
 logGameState :: String -> Game.GameState -> IO ()
 logGameState context state = do
-  logDebug $ context ++ " - Board: " ++ showBoard (Game.board state) ++ 
-              ", Current Player: " ++ show (Game.currentPlayer state) ++
-              ", Game Over: " ++ show (Game.gameOver state) ++
-              ", Winner: " ++ maybe "None" show (Game.winner state)
+  logDebug $
+    context
+      ++ " - Board: "
+      ++ showBoard (Game.board state)
+      ++ ", Current Player: "
+      ++ show (Game.currentPlayer state)
+      ++ ", Game Over: "
+      ++ show (Game.gameOver state)
+      ++ ", Winner: "
+      ++ maybe "None" show (Game.winner state)
   where
     showBoard board = intercalate "|" $ map showRow board
     showRow row = "[" ++ intercalate "," (map showCell row) ++ "]"
@@ -67,21 +72,24 @@ logValidMoves moves = do
 -- Uses Aeson for automatic JSON serialization/deserialization
 
 data GameRequest = GameRequest
-  { action :: String      -- Game action: "new_game", "make_move", "get_state"
-  , position :: Maybe Game.Position  -- Optional position for moves
-  } deriving (Show, Generic)
+  { action :: String, -- Game action: "new_game", "make_move", "get_state"
+    position :: Maybe Game.Position -- Optional position for moves
+  }
+  deriving (Show, Generic)
 
 instance FromJSON GameRequest
+
 instance ToJSON GameRequest
 
 data GameResponse = GameResponse
-  { board :: [[String]]           -- 3x3 board representation for JSON
-  , currentPlayer :: String       -- "X" or "O"
-  , gameOver :: Bool              -- Whether the game has ended
-  , winner :: Maybe String        -- Winner if game is over
-  , message :: String             -- Human-readable status message
-  , validMoves :: [Game.Position] -- Available moves for client validation
-  } deriving (Show, Generic)
+  { board :: [[String]], -- 3x3 board representation for JSON
+    currentPlayer :: String, -- "X" or "O"
+    gameOver :: Bool, -- Whether the game has ended
+    winner :: Maybe String, -- Winner if game is over
+    message :: String, -- Human-readable status message
+    validMoves :: [Game.Position] -- Available moves for client validation
+  }
+  deriving (Show, Generic)
 
 instance ToJSON GameResponse
 
@@ -115,12 +123,12 @@ jsonToBoard jsonBoard = map (map stringToCell) jsonBoard
 -- This is the shared state that persists across HTTP requests
 
 data ServerState = ServerState
-  { gameState :: Game.GameState  -- Current game state from GameLogic
+  { gameState :: Game.GameState -- Current game state from GameLogic
   }
 
 -- Initial server state with empty game
 initialServerState :: ServerState
-initialServerState = ServerState { gameState = Game.initialGameState }
+initialServerState = ServerState {gameState = Game.initialGameState}
 
 -- =============================================================================
 -- GAME ACTION PROCESSING - STM VERSION
@@ -132,7 +140,7 @@ initialServerState = ServerState { gameState = Game.initialGameState }
 processGameActionSTM :: GameRequest -> ServerState -> STM (GameResponse, ServerState)
 processGameActionSTM request serverState = case action request of
   "new_game" -> do
-    let newServerState = ServerState { gameState = Game.initialGameState }
+    let newServerState = ServerState {gameState = Game.initialGameState}
     return (createNewGameResponse, newServerState)
   "make_move" -> case position request of
     Just pos -> makeMoveResponseSTM pos serverState
@@ -140,14 +148,15 @@ processGameActionSTM request serverState = case action request of
   "get_state" -> return (getStateResponse serverState, serverState)
   _ -> return (errorResponse "Unknown action", serverState)
   where
-    createNewGameResponse = GameResponse
-      { board = boardToJson (Game.board Game.initialGameState)
-      , currentPlayer = show (Game.currentPlayer Game.initialGameState)
-      , gameOver = Game.gameOver Game.initialGameState
-      , winner = fmap show (Game.winner Game.initialGameState)
-      , message = "New game started"
-      , validMoves = Game.validMoves (Game.board Game.initialGameState)
-      }
+    createNewGameResponse =
+      GameResponse
+        { board = boardToJson (Game.board Game.initialGameState),
+          currentPlayer = show (Game.currentPlayer Game.initialGameState),
+          gameOver = Game.gameOver Game.initialGameState,
+          winner = fmap show (Game.winner Game.initialGameState),
+          message = "New game started",
+          validMoves = Game.validMoves (Game.board Game.initialGameState)
+        }
 
 -- =============================================================================
 -- GAME ACTION PROCESSING - IO VERSION (LEGACY)
@@ -162,7 +171,7 @@ processGameAction request serverState = do
   case action request of
     "new_game" -> do
       logInfo "Starting new game"
-      let newServerState = ServerState { gameState = Game.initialGameState }
+      let newServerState = ServerState {gameState = Game.initialGameState}
       logGameState "New game state" (gameState newServerState)
       logValidMoves (Game.validMoves (Game.board Game.initialGameState))
       return (createNewGameResponse, newServerState)
@@ -181,14 +190,15 @@ processGameAction request serverState = do
       logError $ "Unknown action: " ++ action request
       return (errorResponse "Unknown action", serverState)
   where
-    createNewGameResponse = GameResponse
-      { board = boardToJson (Game.board Game.initialGameState)
-      , currentPlayer = show (Game.currentPlayer Game.initialGameState)
-      , gameOver = Game.gameOver Game.initialGameState
-      , winner = fmap show (Game.winner Game.initialGameState)
-      , message = "New game started"
-      , validMoves = Game.validMoves (Game.board Game.initialGameState)
-      }
+    createNewGameResponse =
+      GameResponse
+        { board = boardToJson (Game.board Game.initialGameState),
+          currentPlayer = show (Game.currentPlayer Game.initialGameState),
+          gameOver = Game.gameOver Game.initialGameState,
+          winner = fmap show (Game.winner Game.initialGameState),
+          message = "New game started",
+          validMoves = Game.validMoves (Game.board Game.initialGameState)
+        }
 
 -- Make move response (STM version - pure logic)
 -- Handles move validation and state updates within STM transactions
@@ -196,8 +206,8 @@ processGameAction request serverState = do
 makeMoveResponseSTM :: Game.Position -> ServerState -> STM (GameResponse, ServerState)
 makeMoveResponseSTM pos serverState = do
   let (result, newGameState) = runState (Game.gameEngine (Game.MakeMove pos)) (gameState serverState)
-      newServerState = ServerState { gameState = newGameState }
-  
+      newServerState = ServerState {gameState = newGameState}
+
   case result of
     Left errorMsg -> return (errorResponse errorMsg, serverState)
     Right _ -> return (getStateResponse newServerState, newServerState)
@@ -209,10 +219,10 @@ makeMoveResponse :: Game.Position -> ServerState -> IO (GameResponse, ServerStat
 makeMoveResponse pos serverState = do
   logDebug $ "Attempting move at position: " ++ show pos
   logGameState "Before move" (gameState serverState)
-  
+
   let (result, newGameState) = runState (Game.gameEngine (Game.MakeMove pos)) (gameState serverState)
-      newServerState = ServerState { gameState = newGameState }
-  
+      newServerState = ServerState {gameState = newGameState}
+
   case result of
     Left errorMsg -> do
       logError $ "Move failed: " ++ errorMsg
@@ -221,13 +231,13 @@ makeMoveResponse pos serverState = do
       logInfo $ "Move successful at position: " ++ show pos
       logGameState "After move" newGameState
       logValidMoves (Game.validMoves (Game.board newGameState))
-      
+
       -- Log game end conditions
       when (Game.gameOver newGameState) $ do
         case Game.winner newGameState of
           Just winner -> logInfo $ "Game over! Winner: " ++ show winner
           Nothing -> logInfo "Game over! It's a draw"
-      
+
       return (getStateResponse newServerState, newServerState)
 
 -- =============================================================================
@@ -237,33 +247,34 @@ makeMoveResponse pos serverState = do
 
 -- Generate response for current game state
 getStateResponse :: ServerState -> GameResponse
-getStateResponse serverState = 
+getStateResponse serverState =
   let state = gameState serverState
-  in GameResponse
-    { board = boardToJson (Game.board state)
-    , currentPlayer = show (Game.currentPlayer state)
-    , gameOver = Game.gameOver state
-    , winner = fmap show (Game.winner state)
-    , message = "Current game state"
-    , validMoves = Game.validMoves (Game.board state)
-    }
+   in GameResponse
+        { board = boardToJson (Game.board state),
+          currentPlayer = show (Game.currentPlayer state),
+          gameOver = Game.gameOver state,
+          winner = fmap show (Game.winner state),
+          message = "Current game state",
+          validMoves = Game.validMoves (Game.board state)
+        }
 
 -- Generate error response with empty board
 errorResponse :: String -> GameResponse
-errorResponse msg = GameResponse
-  { board = boardToJson Game.emptyBoard
-  , currentPlayer = "X"
-  , gameOver = False
-  , winner = Nothing
-  , message = msg
-  , validMoves = []
-  }
+errorResponse msg =
+  GameResponse
+    { board = boardToJson Game.emptyBoard,
+      currentPlayer = "X",
+      gameOver = False,
+      winner = Nothing,
+      message = msg,
+      validMoves = []
+    }
 
 -- =============================================================================
 -- WAI APPLICATION - STM VERSION
 -- =============================================================================
 -- Main HTTP application using STM for atomic state management
--- 
+--
 -- ARCHITECTURAL DECISIONS:
 -- 1. Uses TVar instead of IORef for thread-safe state management
 -- 2. Wraps state operations in atomically for transactional safety
@@ -281,12 +292,12 @@ errorResponse msg = GameResponse
 app :: TVar ServerState -> Application
 app stateVar request respond = do
   logDebug $ "Received " ++ show (requestMethod request) ++ " request"
-  
+
   case (requestMethod request, BS.unpack $ requestMethod request) of
     (method, "POST") | method == methodPost -> do
       body <- getRequestBodyChunk request
       logDebug $ "POST body: " ++ show body
-      
+
       case decode (LBS.fromStrict body) of
         Just gameRequest -> do
           logDebug $ "Parsed request: " ++ show gameRequest
@@ -302,7 +313,6 @@ app stateVar request respond = do
           logError "Failed to parse JSON request"
           let errorResp = errorResponse "Invalid JSON"
           respond $ responseLBS status400 [("Content-Type", "application/json")] (encode errorResp)
-    
     (method, "GET") | method == methodGet -> do
       logDebug "Handling GET request for current state"
       -- Atomic read operation
@@ -310,7 +320,6 @@ app stateVar request respond = do
       let response = getStateResponse currentState
       logGameState "GET request state" (gameState currentState)
       respond $ responseLBS status200 [("Content-Type", "application/json")] (encode response)
-    
     _ -> do
       logError $ "Method not allowed: " ++ show (requestMethod request)
       let errorResp = errorResponse "Method not allowed"
@@ -325,9 +334,11 @@ app stateVar request respond = do
 corsMiddleware :: Application -> Application
 corsMiddleware app request respond = do
   app request $ \response -> do
-    let headers = [("Access-Control-Allow-Origin", "*")
-                  , ("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
-                  , ("Access-Control-Allow-Headers", "Content-Type")]
+    let headers =
+          [ ("Access-Control-Allow-Origin", "*"),
+            ("Access-Control-Allow-Methods", "GET, POST, OPTIONS"),
+            ("Access-Control-Allow-Headers", "Content-Type")
+          ]
     respond response
 
 -- =============================================================================
@@ -354,11 +365,11 @@ startServer port = do
   logInfo "Debug logging enabled - all game events will be logged"
   logInfo "Using STM for state management with Warp's automatic threading"
   logGameState "Initial server state" (gameState initialServerState)
-  
+
   -- Initialize STM state variable
   stateVar <- atomically $ newTVar initialServerState
-  
+
   -- Configure Warp with custom settings
   -- Note: Warp automatically handles multi-threading - no setThreads needed
   let settings = setPort port defaultSettings
-  runSettings settings (corsMiddleware (app stateVar)) 
+  runSettings settings (corsMiddleware (app stateVar))

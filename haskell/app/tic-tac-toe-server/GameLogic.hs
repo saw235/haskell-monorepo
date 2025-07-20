@@ -133,4 +133,4 @@ gameEngine (MakeMove pos) = do
   success <- makeMoveState pos
   if success
     then return $ Right "Move successful"
-    else return $ Left "Invalid move" 
+    else return $ Left "Invalid move"
