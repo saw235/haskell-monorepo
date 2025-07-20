@@ -1,7 +1,7 @@
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-module AdvancedMain where
+module Main where
 
 import Control.Monad.Except (ExceptT, catchError, runExceptT, throwError)
 import Control.Monad.IO.Class (liftIO)
@@ -13,8 +13,8 @@ import qualified Data.Text as T
 import qualified Data.Text.IO as TIO
 import System.Random (randomRIO)
 
--- Advanced monad stack: ExceptT Text (WriterT [Text] (StateT AppState (ReaderT Config IO)))
-type AdvancedAppM = ExceptT Text (WriterT [Text] (StateT AppState (ReaderT Config IO)))
+-- Advanced monad stack: ReaderT Config (StateT AppState (WriterT [Text] (ExceptT Text IO)))
+type AdvancedAppM = ReaderT Config (StateT AppState (WriterT [Text] (ExceptT Text IO)))
 
 -- Configuration data
 data Config = Config
@@ -167,12 +167,12 @@ main = do
   TIO.putStrLn ""
 
   -- Run our monad stack
-  result <- runReaderT (runStateT (runWriterT (runExceptT mainApp)) initialState) initialConfig
+  result <- runExceptT $ runWriterT $ runStateT (runReaderT mainApp initialConfig) initialState
 
   case result of
     Left err -> do
       TIO.putStrLn $ "Error: " <> err
-    Right (_, (finalState, logs)) -> do
+    Right (((), finalState), logs) -> do
       TIO.putStrLn "=== Execution Log ==="
       mapM_ TIO.putStrLn logs
       TIO.putStrLn ""
