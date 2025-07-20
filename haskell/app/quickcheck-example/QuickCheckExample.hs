@@ -1,6 +1,6 @@
 module Main where
 
-import Data.List (sort, reverse)
+import Data.List (reverse, sort)
 import System.Random (randomRIO)
 
 -- =============================================================================
@@ -15,8 +15,8 @@ type Property = Bool
 
 -- Test configuration
 data TestConfig = TestConfig
-  { numTests :: Int
-  , maxShrinks :: Int
+  { numTests :: Int,
+    maxShrinks :: Int
   }
 
 defaultConfig :: TestConfig
@@ -27,13 +27,13 @@ randomInt :: (Int, Int) -> IO Int
 randomInt (min, max) = randomRIO (min, max)
 
 randomList :: Int -> IO [Int]
-randomList len = sequence [randomInt (-100, 100) | _ <- [1..len]]
+randomList len = sequence [randomInt (-100, 100) | _ <- [1 .. len]]
 
 -- Test runner that generates random inputs
 quickCheck :: String -> (Int -> IO Bool) -> IO ()
 quickCheck name prop = do
   putStrLn $ "Testing: " ++ name
-  results <- sequence [prop i | i <- [1..100]]
+  results <- sequence [prop i | i <- [1 .. 100]]
   let passed = length (filter id results)
   let failed = length (filter not results)
   putStrLn $ "  Passed: " ++ show passed ++ " tests"
@@ -93,7 +93,7 @@ prop_abs_negative_positive x = if x < 0 then abs x > 0 else abs x >= 0
 -- This property is FALSE - it will fail for some inputs
 -- QuickCheck would find the smallest counterexample
 prop_false_property :: Int -> Bool
-prop_false_property x = x * x >= x  -- This fails for x = 0
+prop_false_property x = x * x >= x -- This fails for x = 0
 
 -- =============================================================================
 -- TEST GENERATORS
@@ -170,7 +170,7 @@ findSmallestCounterexample prop x = do
   let failures = filter (not . prop) candidates
   case failures of
     [] -> return Nothing
-    (smallest:_) -> return (Just smallest)
+    (smallest : _) -> return (Just smallest)
 
 -- =============================================================================
 -- MAIN FUNCTION
@@ -181,41 +181,41 @@ main = do
   putStrLn "=== QuickCheck-Style Property Testing Examples ==="
   putStrLn "This demonstrates the core concepts of property-based testing"
   putStrLn ""
-  
+
   putStrLn "1. Testing addition commutativity..."
   quickCheck "Addition is commutative" generateAdditionTest
-  
+
   putStrLn "\n2. Testing addition associativity..."
   quickCheck "Addition is associative" generateAssociativeTest
-  
+
   putStrLn "\n3. Testing zero identity..."
   quickCheck "Zero is identity for addition" generateZeroIdentityTest
-  
+
   putStrLn "\n4. Testing list reverse inverse..."
   quickCheck "Reverse is its own inverse" generateReverseTest
-  
+
   putStrLn "\n5. Testing sort idempotence..."
   quickCheck "Sort is idempotent" generateSortTest
-  
+
   putStrLn "\n6. Testing concatenation length..."
   quickCheck "Concatenation length property" generateConcatTest
-  
+
   putStrLn "\n7. Testing absolute value non-negative..."
   quickCheck "Absolute value is non-negative" generateAbsTest
-  
+
   putStrLn "\n8. Testing absolute value of negative numbers..."
   quickCheck "Absolute value of negative is positive" generateAbsNegativeTest
-  
+
   putStrLn "\n9. Testing a property that will fail (demonstrating shrinking)..."
   quickCheck "False property (should fail)" generateFalseTest
-  
+
   putStrLn "\n10. Demonstrating shrinking..."
   putStrLn "Finding smallest counterexample for false property:"
   counterexample <- findSmallestCounterexample prop_false_property 5
   case counterexample of
     Just x -> putStrLn $ "  Smallest counterexample: " ++ show x
     Nothing -> putStrLn "  No counterexample found"
-  
+
   putStrLn "\n=== QuickCheck Examples Completed ==="
   putStrLn ""
   putStrLn "Key Concepts Demonstrated:"
@@ -223,4 +223,4 @@ main = do
   putStrLn "2. Test Generation: Random input generation"
   putStrLn "3. Test Execution: Running properties with many inputs"
   putStrLn "4. Shrinking: Finding smaller counterexamples when tests fail"
-  putStrLn "5. Reporting: Clear feedback on test results" 
+  putStrLn "5. Reporting: Clear feedback on test results"
