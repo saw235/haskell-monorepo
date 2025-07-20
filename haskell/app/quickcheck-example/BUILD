@@ -1,6 +1,17 @@
-load("@rules_haskell//haskell:defs.bzl", "haskell_binary")
+load("@rules_haskell//haskell:defs.bzl", "haskell_binary", "haskell_test")
 
-# Manual QuickCheck-style example (no external dependencies)
+# Manual QuickCheck-style example as a test
+haskell_test(
+    name = "quickcheck-example-test",
+    srcs = ["QuickCheckExample.hs"],
+    deps = [
+        "//:base",
+        "@stackage//:random",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+# Keep the binary version for manual execution
 haskell_binary(
     name = "quickcheck-example",
     srcs = ["QuickCheckExample.hs"],

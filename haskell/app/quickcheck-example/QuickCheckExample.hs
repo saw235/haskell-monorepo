@@ -2,6 +2,7 @@ module Main where
 
 import Data.List (sort, reverse)
 import System.Random (randomRIO)
+import System.Exit (exitFailure)
 
 -- =============================================================================
 -- SIMPLE QUICKCHECK-STYLE PROPERTY TESTING (MANUAL IMPLEMENTATION)
@@ -29,8 +30,8 @@ randomInt (min, max) = randomRIO (min, max)
 randomList :: Int -> IO [Int]
 randomList len = sequence [randomInt (-100, 100) | _ <- [1..len]]
 
--- Test runner that generates random inputs
-quickCheck :: String -> (Int -> IO Bool) -> IO ()
+-- Test runner that generates random inputs and returns success/failure
+quickCheck :: String -> (Int -> IO Bool) -> IO Bool
 quickCheck name prop = do
   putStrLn $ "Testing: " ++ name
   results <- sequence [prop i | i <- [1..100]]
@@ -39,8 +40,12 @@ quickCheck name prop = do
   putStrLn $ "  Passed: " ++ show passed ++ " tests"
   putStrLn $ "  Failed: " ++ show failed ++ " tests"
   if failed == 0
-    then putStrLn $ "  ✓ " ++ name ++ " passed all tests!"
-    else putStrLn $ "  ✗ " ++ name ++ " failed " ++ show failed ++ " tests!"
+    then do
+      putStrLn $ "  PASS: " ++ name ++ " passed all tests!"
+      return True
+    else do
+      putStrLn $ "  FAIL: " ++ name ++ " failed " ++ show failed ++ " tests!"
+      return False
 
 -- =============================================================================
 -- PROPERTY DEFINITIONS
@@ -183,31 +188,31 @@ main = do
   putStrLn ""
   
   putStrLn "1. Testing addition commutativity..."
-  quickCheck "Addition is commutative" generateAdditionTest
+  test1 <- quickCheck "Addition is commutative" generateAdditionTest
   
   putStrLn "\n2. Testing addition associativity..."
-  quickCheck "Addition is associative" generateAssociativeTest
+  test2 <- quickCheck "Addition is associative" generateAssociativeTest
   
   putStrLn "\n3. Testing zero identity..."
-  quickCheck "Zero is identity for addition" generateZeroIdentityTest
+  test3 <- quickCheck "Zero is identity for addition" generateZeroIdentityTest
   
   putStrLn "\n4. Testing list reverse inverse..."
-  quickCheck "Reverse is its own inverse" generateReverseTest
+  test4 <- quickCheck "Reverse is its own inverse" generateReverseTest
   
   putStrLn "\n5. Testing sort idempotence..."
-  quickCheck "Sort is idempotent" generateSortTest
+  test5 <- quickCheck "Sort is idempotent" generateSortTest
   
   putStrLn "\n6. Testing concatenation length..."
-  quickCheck "Concatenation length property" generateConcatTest
+  test6 <- quickCheck "Concatenation length property" generateConcatTest
   
   putStrLn "\n7. Testing absolute value non-negative..."
-  quickCheck "Absolute value is non-negative" generateAbsTest
+  test7 <- quickCheck "Absolute value is non-negative" generateAbsTest
   
   putStrLn "\n8. Testing absolute value of negative numbers..."
-  quickCheck "Absolute value of negative is positive" generateAbsNegativeTest
+  test8 <- quickCheck "Absolute value of negative is positive" generateAbsNegativeTest
   
   putStrLn "\n9. Testing a property that will fail (demonstrating shrinking)..."
-  quickCheck "False property (should fail)" generateFalseTest
+  test9 <- quickCheck "False property (should fail)" generateFalseTest
   
   putStrLn "\n10. Demonstrating shrinking..."
   putStrLn "Finding smallest counterexample for false property:"
@@ -223,4 +228,14 @@ main = do
   putStrLn "2. Test Generation: Random input generation"
   putStrLn "3. Test Execution: Running properties with many inputs"
   putStrLn "4. Shrinking: Finding smaller counterexamples when tests fail"
-  putStrLn "5. Reporting: Clear feedback on test results" 
+  putStrLn "5. Reporting: Clear feedback on test results"
+  
+  -- Exit with appropriate code based on test results
+  let allTestsPassed = test1 && test2 && test3 && test4 && test5 && test6 && test7 && test8 && test9
+  if allTestsPassed
+    then do
+      putStrLn "\nPASS: All tests passed!"
+      return ()
+    else do
+      putStrLn "\nFAIL: Some tests failed!"
+      System.Exit.exitFailure 
