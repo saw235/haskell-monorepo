@@ -2,28 +2,29 @@
 
 module AntiFingerprinting.Generator
   ( -- * Fingerprint Generation
-    generateFingerprint
-  , generateFingerprintWithOptions
-  , generateFingerprintWithSeed
-  
+    generateFingerprint,
+    generateFingerprintWithOptions,
+    generateFingerprintWithSeed,
+
     -- * Component Generators
-  , generateUserAgent
-  , generateNavigator
-  , generateScreen
-  , generateWebGL
-  , generateCanvas
-  
+    generateUserAgent,
+    generateNavigator,
+    generateScreen,
+    generateWebGL,
+    generateCanvas,
+
     -- * Default Options
-  , defaultFingerprintOptions
-  ) where
+    defaultFingerprintOptions,
+  )
+where
 
 import AntiFingerprinting.Types
-import Data.Text (Text)
-import qualified Data.Text as T
+import Data.List (nub)
 import Data.Map.Strict (Map)
 import qualified Data.Map.Strict as Map
-import System.Random (StdGen, randomR, mkStdGen)
-import Data.List (nub)
+import Data.Text (Text)
+import qualified Data.Text as T
+import System.Random (StdGen, mkStdGen, randomR)
 
 -- | Pick a random element from a non-empty list, returning the element and the new generator
 pickRandom :: StdGen -> [a] -> (a, StdGen)
@@ -63,33 +64,36 @@ generateFingerprintWithSeed seed options = fingerprint
     version = Version 100 0 0 Nothing
     -- Generate user agent string
     userAgentStr = generateUserAgentString browser version os device
-    userAgent = UserAgent
-      { userAgentString = userAgentStr
-      , userAgentBrowser = browser
-      , userAgentVersion = version
-      , userAgentOperatingSystem = os
-      , userAgentDevice = device
-      }
+    userAgent =
+      UserAgent
+        { userAgentString = userAgentStr,
+          userAgentBrowser = browser,
+          userAgentVersion = version,
+          userAgentOperatingSystem = os,
+          userAgentDevice = device
+        }
     navigator = generateNavigator userAgent language locales
     screen = generateScreen device
     webgl = generateWebGL browser os
     canvas = generateCanvas
-    headers = Map.fromList
-      [ ("User-Agent", userAgentString userAgent)
-      , ("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
-      , ("Accept-Language", language)
-      , ("Accept-Encoding", "gzip, deflate, br")
-      ]
-    fingerprint = Fingerprint
-      { fingerprintUserAgent = userAgent
-      , fingerprintNavigator = navigator
-      , fingerprintScreen = screen
-      , fingerprintWebGL = webgl
-      , fingerprintCanvas = canvas
-      , fingerprintHeaders = headers
-      , fingerprintTimezone = timezone
-      , fingerprintLocales = locales
-      }
+    headers =
+      Map.fromList
+        [ ("User-Agent", userAgentString userAgent),
+          ("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"),
+          ("Accept-Language", language),
+          ("Accept-Encoding", "gzip, deflate, br")
+        ]
+    fingerprint =
+      Fingerprint
+        { fingerprintUserAgent = userAgent,
+          fingerprintNavigator = navigator,
+          fingerprintScreen = screen,
+          fingerprintWebGL = webgl,
+          fingerprintCanvas = canvas,
+          fingerprintHeaders = headers,
+          fingerprintTimezone = timezone,
+          fingerprintLocales = locales
+        }
 
 -- | Generate a user agent string and components
 generateUserAgent :: StdGen -> FingerprintOptions -> UserAgent
@@ -98,30 +102,31 @@ generateUserAgent gen options = userAgent
     -- Select browser based on constraints
     browserConstraint = head (optionsBrowsers options)
     browser = browserName browserConstraint
-    
+
     -- Select operating system
     os = head (optionsOperatingSystems options)
-    
+
     -- Select device
     device = head (optionsDevices options)
-    
+
     -- Generate version
     version = Version 100 0 0 Nothing
-    
+
     -- Generate user agent string
     userAgentStr = generateUserAgentString browser version os device
-    
-    userAgent = UserAgent
-      { userAgentString = userAgentStr
-      , userAgentBrowser = browser
-      , userAgentVersion = version
-      , userAgentOperatingSystem = os
-      , userAgentDevice = device
-      }
+
+    userAgent =
+      UserAgent
+        { userAgentString = userAgentStr,
+          userAgentBrowser = browser,
+          userAgentVersion = version,
+          userAgentOperatingSystem = os,
+          userAgentDevice = device
+        }
 
 -- | Generate user agent string based on components
 generateUserAgentString :: Browser -> Version -> OperatingSystem -> Device -> Text
-generateUserAgentString Chrome _ Windows Desktop = 
+generateUserAgentString Chrome _ Windows Desktop =
   "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
 generateUserAgentString Chrome _ MacOS Desktop =
   "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
@@ -131,7 +136,7 @@ generateUserAgentString Firefox _ MacOS Desktop =
   "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/115.0"
 generateUserAgentString Safari _ MacOS Desktop =
   "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.1 Safari/605.1.15"
-generateUserAgentString browser _ os device = 
+generateUserAgentString browser _ os device =
   "Mozilla/5.0 (" <> formatOSDevice os device <> ") AppleWebKit/537.36 Chrome/120.0.0.0"
 
 -- | Format OS and device for user agent string
@@ -149,28 +154,29 @@ generateNavigator userAgent language languages = navigator
   where
     browser = userAgentBrowser userAgent
     os = userAgentOperatingSystem userAgent
-    
+
     platform = generatePlatform os
     vendor = generateVendor browser
-    
-    navigator = Navigator
-      { navigatorUserAgent = userAgentString userAgent
-      , navigatorLanguage = language
-      , navigatorLanguages = languages
-      , navigatorPlatform = platform
-      , navigatorCookieEnabled = True
-      , navigatorDoNotTrack = Nothing
-      , navigatorHardwareConcurrency = 8
-      , navigatorMaxTouchPoints = 0
-      , navigatorVendor = vendor
-      , navigatorVendorSub = ""
-      , navigatorProductSub = "20030107"
-      , navigatorAppCodeName = "Mozilla"
-      , navigatorAppName = "Netscape"
-      , navigatorAppVersion = userAgentString userAgent
-      , navigatorBuildID = generateBuildID browser
-      , navigatorOscpu = generateOscpu os
-      }
+
+    navigator =
+      Navigator
+        { navigatorUserAgent = userAgentString userAgent,
+          navigatorLanguage = language,
+          navigatorLanguages = languages,
+          navigatorPlatform = platform,
+          navigatorCookieEnabled = True,
+          navigatorDoNotTrack = Nothing,
+          navigatorHardwareConcurrency = 8,
+          navigatorMaxTouchPoints = 0,
+          navigatorVendor = vendor,
+          navigatorVendorSub = "",
+          navigatorProductSub = "20030107",
+          navigatorAppCodeName = "Mozilla",
+          navigatorAppName = "Netscape",
+          navigatorAppVersion = userAgentString userAgent,
+          navigatorBuildID = generateBuildID browser,
+          navigatorOscpu = generateOscpu os
+        }
 
 -- | Generate platform string
 generatePlatform :: OperatingSystem -> Text
@@ -207,18 +213,19 @@ generateScreen device = screen
       Desktop -> (1920, 1080, 1.0)
       Mobile -> (375, 667, 2.0)
       Tablet -> (768, 1024, 1.5)
-    
-    screen = Screen
-      { screenWidth = width
-      , screenHeight = height
-      , screenAvailWidth = width
-      , screenAvailHeight = height - 40
-      , screenColorDepth = 24
-      , screenPixelDepth = 24
-      , screenDevicePixelRatio = ratio
-      , screenOrientationType = if width > height then "landscape-primary" else "portrait-primary"
-      , screenOrientationAngle = if width > height then 0 else 90
-      }
+
+    screen =
+      Screen
+        { screenWidth = width,
+          screenHeight = height,
+          screenAvailWidth = width,
+          screenAvailHeight = height - 40,
+          screenColorDepth = 24,
+          screenPixelDepth = 24,
+          screenDevicePixelRatio = ratio,
+          screenOrientationType = if width > height then "landscape-primary" else "portrait-primary",
+          screenOrientationAngle = if width > height then 0 else 90
+        }
 
 -- | Generate WebGL properties
 generateWebGL :: Browser -> OperatingSystem -> WebGL
@@ -226,17 +233,18 @@ generateWebGL browser os = webgl
   where
     vendor = generateWebGLVendor os
     renderer = generateWebGLRenderer os
-    
-    webgl = WebGL
-      { webglVendor = vendor
-      , webglRenderer = renderer
-      , webglVersion = "WebGL 1.0"
-      , webglShadingLanguageVersion = "WebGL GLSL ES 1.0"
-      , webglUnmaskedVendor = vendor
-      , webglUnmaskedRenderer = renderer
-      , webglSupportedExtensions = generateWebGLExtensions browser
-      , webglParameters = Map.empty
-      }
+
+    webgl =
+      WebGL
+        { webglVendor = vendor,
+          webglRenderer = renderer,
+          webglVersion = "WebGL 1.0",
+          webglShadingLanguageVersion = "WebGL GLSL ES 1.0",
+          webglUnmaskedVendor = vendor,
+          webglUnmaskedRenderer = renderer,
+          webglSupportedExtensions = generateWebGLExtensions browser,
+          webglParameters = Map.empty
+        }
 
 -- | Generate WebGL vendor
 generateWebGLVendor :: OperatingSystem -> Text
@@ -252,46 +260,48 @@ generateWebGLRenderer _ = "Mesa DRI Intel(R) UHD Graphics 620 (KBL GT2)"
 
 -- | Generate WebGL extensions
 generateWebGLExtensions :: Browser -> [Text]
-generateWebGLExtensions Chrome = 
-  [ "ANGLE_instanced_arrays"
-  , "EXT_blend_minmax"
-  , "OES_element_index_uint"
-  , "OES_standard_derivatives"
-  , "OES_texture_float"
-  , "WEBGL_compressed_texture_s3tc"
-  , "WEBGL_debug_renderer_info"
-  , "WEBGL_depth_texture"
-  , "WEBGL_lose_context"
+generateWebGLExtensions Chrome =
+  [ "ANGLE_instanced_arrays",
+    "EXT_blend_minmax",
+    "OES_element_index_uint",
+    "OES_standard_derivatives",
+    "OES_texture_float",
+    "WEBGL_compressed_texture_s3tc",
+    "WEBGL_debug_renderer_info",
+    "WEBGL_depth_texture",
+    "WEBGL_lose_context"
   ]
-generateWebGLExtensions Firefox = 
-  [ "EXT_blend_minmax"
-  , "OES_element_index_uint"
-  , "OES_standard_derivatives"
-  , "OES_texture_float"
-  , "WEBGL_compressed_texture_s3tc"
-  , "WEBGL_debug_renderer_info"
-  , "WEBGL_depth_texture"
-  , "WEBGL_lose_context"
+generateWebGLExtensions Firefox =
+  [ "EXT_blend_minmax",
+    "OES_element_index_uint",
+    "OES_standard_derivatives",
+    "OES_texture_float",
+    "WEBGL_compressed_texture_s3tc",
+    "WEBGL_debug_renderer_info",
+    "WEBGL_depth_texture",
+    "WEBGL_lose_context"
   ]
 generateWebGLExtensions _ = generateWebGLExtensions Chrome
 
 -- | Generate canvas fingerprint
 generateCanvas :: Canvas
-generateCanvas = Canvas
-  { canvasFingerprint = "1234567890"
-  , canvasNoiseEnabled = False
-  }
+generateCanvas =
+  Canvas
+    { canvasFingerprint = "1234567890",
+      canvasNoiseEnabled = False
+    }
 
 -- | Default fingerprint options
 defaultFingerprintOptions :: FingerprintOptions
-defaultFingerprintOptions = FingerprintOptions
-  { optionsDevices = [Desktop]
-  , optionsOperatingSystems = [Windows, MacOS, Linux]
-  , optionsBrowsers = 
-      [ BrowserConstraint Chrome (Just (Version 90 0 0 Nothing)) Nothing
-      , BrowserConstraint Firefox (Just (Version 88 0 0 Nothing)) Nothing
-      , BrowserConstraint Safari (Just (Version 14 0 0 Nothing)) Nothing
-      ]
-  , optionsLocales = ["en-US", "en"]
-  , optionsTimezones = ["America/New_York", "Europe/London", "Asia/Tokyo"]
-  } 
+defaultFingerprintOptions =
+  FingerprintOptions
+    { optionsDevices = [Desktop],
+      optionsOperatingSystems = [Windows, MacOS, Linux],
+      optionsBrowsers =
+        [ BrowserConstraint Chrome (Just (Version 90 0 0 Nothing)) Nothing,
+          BrowserConstraint Firefox (Just (Version 88 0 0 Nothing)) Nothing,
+          BrowserConstraint Safari (Just (Version 14 0 0 Nothing)) Nothing
+        ],
+      optionsLocales = ["en-US", "en"],
+      optionsTimezones = ["America/New_York", "Europe/London", "Asia/Tokyo"]
+    }

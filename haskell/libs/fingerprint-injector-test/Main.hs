@@ -4,26 +4,24 @@
 --
 -- This demonstrates how to use the fingerprint-injector library with WebDriver,
 -- similar to the nike-scraper application.
-
 module Main where
 
-import FingerprintTest
-import FingerprintInjector
-import System.Exit (exitFailure, exitSuccess)
+import Control.Monad.IO.Class (liftIO)
 import Data.Text (Text)
 import qualified Data.Text as T
 import qualified Data.Text.IO as TIO
+import FingerprintInjector
+import FingerprintTest
 import Options.Applicative
+import System.Exit (exitFailure, exitSuccess)
+import System.IO (getLine)
 import System.Random (randomIO)
 import Test.WebDriver
 import Test.WebDriver.Commands
-import Control.Monad.IO.Class (liftIO)
-import System.IO (getLine)
 
 -- | CLI Options
-
 data Command
-  = RunTests Bool Bool  -- headless, keepBrowser
+  = RunTests Bool Bool -- headless, keepBrowser
   | RunDemo Bool (Maybe Int)
   | ShowFingerprint (Maybe Int)
   | DebugBrowser Bool (Maybe Int)
@@ -41,29 +39,33 @@ cliParser :: Parser Command
 cliParser =
   subparser
     ( command "demo" (info (RunDemo <$> headlessFlag <*> optional seedOption) (progDesc "Run a demo injection"))
-   <> command "show-fingerprint" (info (ShowFingerprint <$> optional seedOption) (progDesc "Show a sample generated fingerprint"))
-   <> command "debug-browser" (info (DebugBrowser <$> headlessFlag <*> optional seedOption) (progDesc "Open a browser for manual debugging and inject a fingerprint"))
+        <> command "show-fingerprint" (info (ShowFingerprint <$> optional seedOption) (progDesc "Show a sample generated fingerprint"))
+        <> command "debug-browser" (info (DebugBrowser <$> headlessFlag <*> optional seedOption) (progDesc "Open a browser for manual debugging and inject a fingerprint"))
     )
-  <|> (RunTests <$> headlessFlag <*> keepBrowserFlag)
+    <|> (RunTests <$> headlessFlag <*> keepBrowserFlag)
 
 seedOption :: Parser Int
-seedOption = option auto (
-  long "seed"
-  <> metavar "SEED"
-  <> help "Seed for fingerprint generation (integer)"
-  )
+seedOption =
+  option
+    auto
+    ( long "seed"
+        <> metavar "SEED"
+        <> help "Seed for fingerprint generation (integer)"
+    )
 
 optsParserInfo :: ParserInfo Command
-optsParserInfo = info (cliParser <**> helper)
-  ( fullDesc
- <> progDesc "Fingerprint Injector Test Suite"
- <> header "fingerprint-injector-test - test browser fingerprint injection"
-  )
+optsParserInfo =
+  info
+    (cliParser <**> helper)
+    ( fullDesc
+        <> progDesc "Fingerprint Injector Test Suite"
+        <> header "fingerprint-injector-test - test browser fingerprint injection"
+    )
 
 main :: IO ()
 main = do
   cmd <- execParser optsParserInfo
-  print cmd  -- Debug print to show parsed command and headless value
+  print cmd -- Debug print to show parsed command and headless value
   case cmd of
     RunTests headless keepBrowser -> runTests headless keepBrowser
     RunDemo headless mSeed -> runDemo headless mSeed
@@ -93,11 +95,11 @@ runTests headless keepBrowser = do
   putStrLn $ "Running tests in " ++ (if headless then "headless" else "visible") ++ " mode..."
   putStrLn "NOTE: Make sure Chrome/Chromium and chromedriver are installed!"
   putStrLn ""
-  
+
   results <- runFingerprintTests headless keepBrowser
-  
+
   let failedTests = filter (not . testPassed) results
-  
+
   if null failedTests
     then do
       putStrLn "🎉 All tests passed!"
@@ -139,7 +141,7 @@ showSampleFingerprint mSeed = do
   putStrLn ""
   putStrLn "This fingerprint was generated using the AntiFingerprinting library."
   putStrLn "It provides realistic browser characteristics that can be injected"
-  putStrLn "into WebDriver sessions for web scraping and automation." 
+  putStrLn "into WebDriver sessions for web scraping and automation."
 
 -- | Open a browser for manual debugging and inject a fingerprint
 debugBrowser :: Bool -> Maybe Int -> IO ()
@@ -154,12 +156,13 @@ debugBrowser headless mSeed = do
     -- Inject the fingerprint
     injectFingerprint fingerprint
     -- Print the injected values to the browser console
-    let jsMsg = "console.log('[Injected Fingerprint]');" <>
-                "console.log('UserAgent:', navigator.userAgent);" <>
-                "console.log('Platform:', navigator.platform);" <>
-                "console.log('Vendor:', navigator.vendor);" <>
-                "try { var canvas = document.createElement('canvas'); var gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl'); if (gl) { var debugInfo = gl.getExtension('WEBGL_debug_renderer_info'); if (debugInfo) { console.log('WebGL Vendor:', gl.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL)); console.log('WebGL Renderer:', gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL)); }}} catch (e) { console.log('WebGL not supported or error:', e); }"
+    let jsMsg =
+          "console.log('[Injected Fingerprint]');"
+            <> "console.log('UserAgent:', navigator.userAgent);"
+            <> "console.log('Platform:', navigator.platform);"
+            <> "console.log('Vendor:', navigator.vendor);"
+            <> "try { var canvas = document.createElement('canvas'); var gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl'); if (gl) { var debugInfo = gl.getExtension('WEBGL_debug_renderer_info'); if (debugInfo) { console.log('WebGL Vendor:', gl.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL)); console.log('WebGL Renderer:', gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL)); }}} catch (e) { console.log('WebGL not supported or error:', e); }"
     _ <- (executeJS [] jsMsg :: WD ())
     liftIO $ putStrLn "[DEBUG] Browser opened, fingerprint injected, and values printed to browser console. Press Enter to close the browser..."
     _ <- liftIO getLine
-    closeSession 
+    closeSession
