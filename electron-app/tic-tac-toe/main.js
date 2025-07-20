@@ -1,3 +1,22 @@
+/**
+ * @fileoverview Tic-Tac-Toe Electron Main Process
+ * @description Main process for the Tic-Tac-Toe Electron application.
+ * Handles window creation, IPC communication, and HTTP requests to the Haskell backend.
+ * 
+ * This module serves as the bridge between the Electron renderer process and the
+ * Haskell HTTP server, providing a clean API for game operations.
+ * 
+ * Architecture:
+ * - Creates and manages the main application window
+ * - Handles IPC communication with renderer process
+ * - Makes HTTP requests to Haskell backend server
+ * - Manages application lifecycle events
+ * 
+ * @author Tic-Tac-Toe Development Team
+ * @version 1.0.0
+ * @license MIT
+ */
+
 const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
 const fetch = require('node-fetch');
@@ -9,6 +28,18 @@ let mainWindow;
 const SERVER_PORT = 8081;
 const SERVER_URL = `http://localhost:${SERVER_PORT}`;
 
+/**
+ * Creates the main application window with appropriate settings.
+ * 
+ * The window is configured with:
+ * - Fixed size (600x700) for consistent UI
+ * - Context isolation enabled for security
+ * - Preload script for safe IPC communication
+ * - Custom application icon
+ * - Non-resizable for consistent layout
+ * 
+ * @returns {void}
+ */
 function createWindow() {
   // Create the browser window
   mainWindow = new BrowserWindow({
@@ -41,7 +72,14 @@ function createWindow() {
 // This method will be called when Electron has finished initialization
 app.whenReady().then(createWindow);
 
-// IPC handlers for game communication
+/**
+ * IPC handler for starting a new game.
+ * 
+ * Makes a POST request to the Haskell server to initialize a new game state.
+ * Returns the new game state to the renderer process.
+ * 
+ * @returns {Promise<Object>} Object containing success status and game data or error
+ */
 ipcMain.handle('game-new-game', async () => {
   try {
     const response = await fetch(`${SERVER_URL}`, {
@@ -66,6 +104,16 @@ ipcMain.handle('game-new-game', async () => {
   }
 });
 
+/**
+ * IPC handler for making a move in the game.
+ * 
+ * Makes a POST request to the Haskell server with the specified position.
+ * The position should be an array [row, col] with 0-based indices.
+ * 
+ * @param {Event} event - IPC event object
+ * @param {Array<number>} position - [row, col] coordinates for the move
+ * @returns {Promise<Object>} Object containing success status and updated game data or error
+ */
 ipcMain.handle('game-make-move', async (event, position) => {
   try {
     const response = await fetch(`${SERVER_URL}`, {
@@ -91,6 +139,14 @@ ipcMain.handle('game-make-move', async (event, position) => {
   }
 });
 
+/**
+ * IPC handler for getting the current game state.
+ * 
+ * Makes a GET request to the Haskell server to retrieve the current
+ * game state without making any changes.
+ * 
+ * @returns {Promise<Object>} Object containing success status and current game data or error
+ */
 ipcMain.handle('game-get-state', async () => {
   try {
     const response = await fetch(`${SERVER_URL}`, {

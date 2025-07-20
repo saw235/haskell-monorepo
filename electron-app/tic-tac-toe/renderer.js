@@ -1,16 +1,39 @@
-// Game state
+/**
+ * @fileoverview Tic-Tac-Toe Electron Renderer Process
+ * @description Renderer process for the Tic-Tac-Toe Electron application.
+ * Handles the user interface, game state management, and communication with the main process.
+ * 
+ * This module manages the game UI, handles user interactions, and coordinates
+ * with the main process to communicate with the Haskell backend server.
+ * 
+ * Architecture:
+ * - Manages game state and UI updates
+ * - Handles user interactions (clicks, keyboard shortcuts)
+ * - Communicates with main process via IPC
+ * - Provides visual feedback and animations
+ * - Monitors connection status to backend
+ * 
+ * @author Tic-Tac-Toe Development Team
+ * @version 1.0.0
+ * @license MIT
+ */
+
+// Game state object containing all current game information
 let gameState = {
-    board: [[' ', ' ', ' '], [' ', ' ', ' '], [' ', ' ', ' ']],
-    currentPlayer: 'X',
-    gameOver: false,
-    winner: null,
-    validMoves: []
+    board: [[' ', ' ', ' '], [' ', ' ', ' '], [' ', ' ', ' ']], // 3x3 game board
+    currentPlayer: 'X', // Current player (X or O)
+    gameOver: false, // Whether the game has ended
+    winner: null, // Winner if game is over (X, O, or null for tie)
+    validMoves: [] // List of valid move positions
 };
 
-// DOM elements
+// DOM element references for efficient updates
 let gameBoard, currentPlayerEl, gameStatusEl, newGameBtn, resetBtn, connectionStatusEl;
 
-// Wait for the DOM to be fully loaded
+/**
+ * Initializes the application when the DOM is fully loaded.
+ * Sets up event listeners, initializes the game, and starts connection monitoring.
+ */
 document.addEventListener('DOMContentLoaded', () => {
     initializeElements();
     setupEventListeners();
@@ -19,6 +42,10 @@ document.addEventListener('DOMContentLoaded', () => {
     startConnectionCheck();
 });
 
+/**
+ * Initializes references to DOM elements for efficient updates.
+ * Caches element references to avoid repeated DOM queries.
+ */
 function initializeElements() {
     gameBoard = document.getElementById('game-board');
     currentPlayerEl = document.getElementById('current-player');
@@ -28,11 +55,19 @@ function initializeElements() {
     connectionStatusEl = document.getElementById('connection-status');
 }
 
+/**
+ * Sets up event listeners for user interactions.
+ * Binds click handlers to buttons and keyboard shortcuts.
+ */
 function setupEventListeners() {
     newGameBtn.addEventListener('click', startNewGame);
     resetBtn.addEventListener('click', resetGame);
 }
 
+/**
+ * Displays application information including Electron version and platform.
+ * Uses the gameAPI exposed through the preload script.
+ */
 function displayAppInfo() {
     if (window.gameAPI) {
         document.getElementById('electron-version').textContent = window.gameAPI.getAppVersion();
@@ -40,6 +75,12 @@ function displayAppInfo() {
     }
 }
 
+/**
+ * Initializes the game by starting a new game and setting up the initial state.
+ * Handles connection errors and updates the UI accordingly.
+ * 
+ * @returns {Promise<void>}
+ */
 async function initializeGame() {
     try {
         const result = await window.gameAPI.newGame();
@@ -57,6 +98,10 @@ async function initializeGame() {
     }
 }
 
+/**
+ * Starts periodic connection checking to monitor backend server status.
+ * Checks connection every 5 seconds and updates the UI accordingly.
+ */
 function startConnectionCheck() {
     // Check connection every 5 seconds
     setInterval(async () => {
@@ -69,6 +114,12 @@ function startConnectionCheck() {
     }, 5000);
 }
 
+/**
+ * Updates the connection status indicator in the UI.
+ * Shows visual feedback about the connection to the Haskell backend.
+ * 
+ * @param {boolean} connected - Whether the connection is active
+ */
 function updateConnectionStatus(connected) {
     const statusDot = connectionStatusEl.querySelector('.status-dot');
     const statusText = connectionStatusEl.querySelector('.status-text');
@@ -82,6 +133,12 @@ function updateConnectionStatus(connected) {
     }
 }
 
+/**
+ * Starts a new game by requesting a fresh game state from the backend.
+ * Updates the UI and shows success/error messages to the user.
+ * 
+ * @returns {Promise<void>}
+ */
 async function startNewGame() {
     try {
         const result = await window.gameAPI.newGame();
@@ -97,10 +154,22 @@ async function startNewGame() {
     }
 }
 
+/**
+ * Resets the game by starting a new game.
+ * Alias for startNewGame for better semantic clarity.
+ * 
+ * @returns {Promise<void>}
+ */
 async function resetGame() {
     await startNewGame();
 }
 
+/**
+ * Updates the local game state with data from the backend.
+ * Triggers UI updates to reflect the new state.
+ * 
+ * @param {Object} data - Game state data from the backend
+ */
 function updateGameState(data) {
     gameState = {
         board: data.board,
@@ -113,6 +182,10 @@ function updateGameState(data) {
     updateUI();
 }
 
+/**
+ * Updates the user interface to reflect the current game state.
+ * Updates player display, game status, and board appearance.
+ */
 function updateUI() {
     // Update current player display
     currentPlayerEl.textContent = gameState.currentPlayer;
@@ -136,6 +209,11 @@ function updateUI() {
     }
 }
 
+/**
+ * Renders the game board in the DOM.
+ * Creates clickable cells for each position and applies appropriate styling.
+ * Handles winning cell highlighting and disabled state for filled cells.
+ */
 function renderBoard() {
     gameBoard.innerHTML = '';
     
@@ -164,6 +242,15 @@ function renderBoard() {
     }
 }
 
+/**
+ * Handles clicks on game board cells.
+ * Validates the move and sends it to the backend if valid.
+ * Shows error messages for invalid moves.
+ * 
+ * @param {number} row - Row index (0-2)
+ * @param {number} col - Column index (0-2)
+ * @returns {Promise<void>}
+ */
 async function handleCellClick(row, col) {
     // Don't allow moves if game is over or cell is already filled
     if (gameState.gameOver || gameState.board[row][col] !== ' ') {
@@ -183,6 +270,13 @@ async function handleCellClick(row, col) {
     }
 }
 
+/**
+ * Shows a winner announcement overlay when a player wins.
+ * Displays a celebratory message with the winner's name.
+ * Auto-removes after 5 seconds or when manually dismissed.
+ * 
+ * @param {string} winner - The winning player (X or O)
+ */
 function showWinnerAnnouncement(winner) {
     // Remove existing announcement
     const existing = document.querySelector('.winner-announcement');
@@ -208,6 +302,11 @@ function showWinnerAnnouncement(winner) {
     }, 5000);
 }
 
+/**
+ * Shows a tie announcement overlay when the game ends in a draw.
+ * Displays a message indicating the tie and encouraging another game.
+ * Auto-removes after 6 seconds or when manually dismissed.
+ */
 function showTieAnnouncement() {
     // Remove existing announcements
     const existingWinner = document.querySelector('.winner-announcement');
@@ -234,6 +333,14 @@ function showTieAnnouncement() {
     }, 6000);
 }
 
+/**
+ * Shows a temporary toast notification message.
+ * Creates a styled notification that appears in the top-right corner.
+ * Auto-removes after 3 seconds.
+ * 
+ * @param {string} message - The message to display
+ * @param {string} type - The type of message ('error', 'success', or 'info')
+ */
 function showMessage(message, type = 'info') {
     // Create a simple toast notification
     const toast = document.createElement('div');
@@ -262,7 +369,11 @@ function showMessage(message, type = 'info') {
     }, 3000);
 }
 
-// Keyboard shortcuts
+/**
+ * Sets up keyboard shortcuts for game actions.
+ * - 'N' or 'n': Start new game
+ * - 'R' or 'r': Reset game
+ */
 document.addEventListener('keydown', (event) => {
     if (event.key === 'n' || event.key === 'N') {
         startNewGame();
