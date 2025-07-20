@@ -1,0 +1,17 @@
+# Load rules_haskell rules.
+load(
+    "@rules_haskell//haskell:defs.bzl",
+    "haskell_binary",
+)
+
+# Tic-tac-toe game application (pure functional version)
+haskell_binary(
+    name = "tic-tac-toe",
+    srcs = [":Main.hs"],
+    deps = [
+        "//:base",
+        "@stackage//:mtl",
+        "@stackage//:transformers",
+    ],
+)
+
