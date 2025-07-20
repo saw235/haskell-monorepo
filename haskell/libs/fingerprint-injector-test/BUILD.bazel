@@ -1,0 +1,48 @@
+load("@rules_haskell//haskell:defs.bzl", "haskell_library", "haskell_binary")
+
+haskell_library(
+    name = "fingerprint-injector-test-lib",
+    srcs = ["src/FingerprintTest.hs"],
+    src_strip_prefix = "src",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//haskell/libs/fingerprint-injector:fingerprint-injector",
+        "@stackage//:aeson",
+        "//:base",
+        "@stackage//:text",
+        "@stackage//:webdriver",
+    ],
+)
+
+haskell_binary(
+    name = "fingerprint-injector-test",
+    srcs = ["Main.hs"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":fingerprint-injector-test-lib",
+        "//haskell/libs/fingerprint-injector:fingerprint-injector",
+        "//:base",
+        "@stackage//:text",
+        "@stackage//:webdriver",
+        "@stackage//:optparse-applicative",
+        "@stackage//:random",
+    ],
+)
+
+sh_binary(
+    name = "fingerprint-injector-test-all",
+    srcs = ["run_all.sh"],
+    data = [
+        "//haskell/app/test-http-server:test-http-server",
+        "//external/selenium:selenium-server-standalone-3.141.59.jar",
+        ":fingerprint-injector-test",
+        "//haskell/app/test-http-server:test.html",
+    ],
+    args = [
+        "$(location //haskell/app/test-http-server:test-http-server)",
+        "$(location //external/selenium:selenium-server-standalone-3.141.59.jar)",
+        "$(location :fingerprint-injector-test)",
+        "$(location //haskell/app/test-http-server:test.html)",
+    ],
+    visibility = ["//visibility:public"],
+) 
