@@ -1,70 +1,72 @@
-# Tic-Tac-Toe Game
+# Tic-Tac-Toe - Haskell Backend
 
-A simple command-line tic-tac-toe game implemented in Haskell.
+This directory contains the Haskell backend for the Tic-Tac-Toe game, including both the original CLI version and the HTTP server for the Electron frontend.
 
-## How to Play
+## Project Structure
 
-1. **Build the game:**
-   ```bash
-   bazel build //haskell/app/tic-tac-toe:tic-tac-toe
-   ```
+The Tic-Tac-Toe project is now organized into two separate directories:
 
-2. **Run the game:**
-   ```bash
-   bazel run //haskell/app/tic-tac-toe:tic-tac-toe
-   ```
-
-3. **Game Rules:**
-   - Players take turns placing X and O on the 3x3 board
-   - Enter moves as "row column" (e.g., "2 3" for row 2, column 3)
-   - First player to get 3 in a row (horizontally, vertically, or diagonally) wins
-   - If the board fills up without a winner, it's a tie
-
-## Game Features
-
-- **Interactive gameplay** with clear board display
-- **Input validation** to prevent invalid moves
-- **Win detection** for all possible winning combinations
-- **Tie detection** when the board is full
-- **User-friendly interface** with numbered rows and columns
-
-## Example Game Session
-
-```
-Welcome to Tic-Tac-Toe!
-Players take turns placing X and O on the board.
-The first player to get 3 in a row (horizontally, vertically, or diagonally) wins!
-
-    1   2   3
-  +---+---+---+
-1 |   |   |   |
-2 |   |   |   |
-3 |   |   |   |
-  +---+---+---+
-
-Player X's turn
-Enter row (1-3) and column (1-3) separated by space (e.g., '2 3'):
-> 1 1
-
-    1   2   3
-  +---+---+---+
-1 | X |   |   |
-2 |   |   |   |
-3 |   |   |   |
-  +---+---+---+
-```
-
-## Implementation Details
-
-The game is built using:
-- **Pure Haskell** with no external dependencies beyond base
-- **Functional programming** principles with immutable game state
-- **Pattern matching** for game logic
-- **Maybe types** for safe input parsing and move validation
-- **List comprehensions** for board operations and win detection
+- **`tic-tac-toe/`** (this directory) - Haskell backend
+- **`tic-tac-toe-electron/`** - Electron frontend
 
 ## Files
 
-- `Main.hs` - Complete game implementation
+- `Main.hs` - Original CLI game logic and pure functional game engine
+- `Server.hs` - HTTP API server implementation for Electron frontend
+- `ServerMain.hs` - Server entry point
 - `BUILD.bazel` - Bazel build configuration
-- `README.md` - This documentation 
+- `README.md` - This file
+
+## Building and Running
+
+### CLI Version (Original)
+```bash
+# Build the CLI version
+bazel build //haskell/app/tic-tac-toe:tic-tac-toe
+
+# Run the CLI version
+bazel run //haskell/app/tic-tac-toe:tic-tac-toe
+```
+
+### Server Version (for Electron Frontend)
+```bash
+# Build the server
+bazel build //haskell/app/tic-tac-toe:tic-tac-toe-server
+
+# Run the server
+bazel run //haskell/app/tic-tac-toe:tic-tac-toe-server
+```
+
+The server will start on `http://localhost:3000` and provide HTTP API endpoints for the Electron frontend.
+
+## API Endpoints
+
+- `GET /` - Get current game state
+- `POST /` - Make game actions
+  - `{"action": "new_game"}` - Start a new game
+  - `{"action": "make_move", "position": [row, col]}` - Make a move
+  - `{"action": "get_state"}` - Get current state
+
+## Game Logic
+
+The game logic is implemented in pure Haskell using the State monad, ensuring:
+
+- **Immutability**: Game state is never modified in place
+- **Purity**: All game logic is pure functions
+- **Type Safety**: Strong typing prevents invalid game states
+- **Testability**: Pure functions are easy to test
+
+## Architecture
+
+- **Game Engine**: Pure functional game logic in `Main.hs`
+- **HTTP Server**: WAI-based server in `Server.hs`
+- **State Management**: Uses State monad for game state
+- **JSON API**: Aeson for JSON serialization/deserialization
+
+## Frontend
+
+For the Electron frontend, see the `../tic-tac-toe-electron/` directory.
+
+## Development
+
+To modify the game logic, edit `Main.hs`. To modify the server behavior, edit `Server.hs`. The server automatically re-exports all game logic from `Main.hs`. 

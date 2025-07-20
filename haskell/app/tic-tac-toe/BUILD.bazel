@@ -15,3 +15,19 @@ haskell_binary(
     ],
 )
 
+# Tic-tac-toe server application (HTTP API for Electron frontend)
+haskell_binary(
+    name = "tic-tac-toe-server",
+    srcs = [":ServerMain.hs", ":Server.hs", ":Main.hs"],
+    deps = [
+        "//:base",
+        "@stackage//:mtl",
+        "@stackage//:transformers",
+        "@stackage//:aeson",
+        "@stackage//:wai",
+        "@stackage//:warp",
+        "@stackage//:http-types",
+        "@stackage//:bytestring",
+    ],
+)
+
