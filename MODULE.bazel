@@ -42,6 +42,7 @@ stack.snapshot(name = "lts-23.22")
 # Package definitions for stack extension
 SIMPLE_PACKAGES = [
     "aeson",
+    "aivika-6.1.1",
     "random",
     "mtl",
     "transformers",
