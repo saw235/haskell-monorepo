@@ -30,7 +30,7 @@ initialPopulation = 1000.0
 model :: Simulation Results
 model = do
   -- Integrate the differential equation: dP/dt = r * P
-  population <- integ (liftM (* growthRate) population) initialPopulation
+  population <- integ ((* growthRate) <$> population) initialPopulation
 
   return $
     results
