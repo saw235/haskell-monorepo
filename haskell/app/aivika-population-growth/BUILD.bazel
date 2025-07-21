@@ -1,0 +1,16 @@
+# Load rules_haskell rules.
+load(
+    "@rules_haskell//haskell:defs.bzl",
+    "haskell_binary",
+)
+
+# Aivika population growth simulation
+haskell_binary(
+    name = "aivika-population-growth",
+    srcs = [":Main.hs"],
+    deps = [
+        "//:base",
+        "@stackage//:aivika",
+        "@stackage//:mtl",
+    ],
+)
