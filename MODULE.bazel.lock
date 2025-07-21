@@ -840,7 +840,7 @@
     "@@rules_haskell~//extensions:stack_snapshot.bzl%stack_snapshot": {
       "general": {
         "bzlTransitiveDigest": "I9dE/IPkeO/mkCmDvxjs6J9WP1Tf8kV6hE6XhXWYcuw=",
-        "usagesDigest": "CqMxybP/YUdFI3awM04WCTdOqLLUXfojYWQ/J39f0Zc=",
+        "usagesDigest": "m0IgWY0soJS8iocnztRN6ciTn4IAEXlfh6lAFMzqvTM=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},
         "envVariables": {},
@@ -869,6 +869,7 @@
               "stack_snapshot_json": "@@//:stackage_snapshot.json",
               "packages": [
                 "aeson",
+                "aivika-6.1.1",
                 "random",
                 "mtl",
                 "transformers",
@@ -925,6 +926,7 @@
               "stack_snapshot_json": "@@//:stackage_snapshot.json",
               "packages": [
                 "aeson",
+                "aivika-6.1.1",
                 "random",
                 "mtl",
                 "transformers",
