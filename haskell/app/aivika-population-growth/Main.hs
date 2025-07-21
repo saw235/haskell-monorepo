@@ -1,4 +1,5 @@
 {-# LANGUAGE RecursiveDo #-}
+
 -- Simple Population Growth Model using Aivika
 --
 -- This example demonstrates exponential population growth using system dynamics.
