@@ -31,7 +31,7 @@ model :: Simulation Results
 model = do
   -- Integrate the differential equation: dP/dt = r * P
   population <- integ (liftM (* growthRate) population) initialPopulation
-  
+
   return $
     results
       [ resultSource "t" "Time (years)" time,
@@ -52,10 +52,10 @@ main = do
   putStrLn "Results at key time points:"
   putStrLn "Time (years) | Population"
   putStrLn "-------------|------------"
-  
+
   -- Print results at years 0, 5, 10, 15, 20
   let timePoints = [0, 5, 10, 15, 20]
   printSimulationResultsInTimes timePoints printResultSourceInEnglish model specs
-  
+
   putStrLn ""
   putStrLn "Simulation complete!"
