@@ -15,6 +15,20 @@ The simulation models a ball bouncing under gravity with realistic physics, incl
 - `Main.hs` - The main simulation code
 - `BUILD.bazel` - Bazel build configuration
 - `README.md` - This documentation file
+- `docs/` - Comprehensive Aivika library documentation
+
+## Documentation
+
+This project includes comprehensive documentation for the Aivika library in the `docs/` directory:
+
+- **[docs/README.md](docs/README.md)** - Documentation overview and navigation guide
+- **[docs/01-overview.md](docs/01-overview.md)** - Library overview and key concepts
+- **[docs/02-core-simulation.md](docs/02-core-simulation.md)** - Core simulation framework
+- **[docs/03-system-dynamics.md](docs/03-system-dynamics.md)** - Differential equation solving
+- **[docs/04-results-and-output.md](docs/04-results-and-output.md)** - Results collection and output
+- **[docs/05-queue-and-resource-management.md](docs/05-queue-and-resource-management.md)** - Queue and resource management
+- **[docs/06-process-and-statistics.md](docs/06-process-and-statistics.md)** - Process modeling and statistics
+- **[docs/07-practical-examples-and-index.md](docs/07-practical-examples-and-index.md)** - Real-world examples and quick reference
 
 ## Building and Running
 
