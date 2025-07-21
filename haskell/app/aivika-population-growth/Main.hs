@@ -1,3 +1,4 @@
+{-# LANGUAGE RecursiveDo #-}
 -- Simple Population Growth Model using Aivika
 --
 -- This example demonstrates exponential population growth using system dynamics.
@@ -28,7 +29,7 @@ initialPopulation = 1000.0
 
 -- | Population growth model
 model :: Simulation Results
-model = do
+model = mdo
   -- Integrate the differential equation: dP/dt = r * P
   population <- integ ((* growthRate) <$> population) initialPopulation
 
