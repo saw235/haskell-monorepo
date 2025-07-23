@@ -1029,7 +1029,7 @@
     "@@rules_haskell~//extensions:stack_snapshot.bzl%stack_snapshot": {
       "general": {
         "bzlTransitiveDigest": "I9dE/IPkeO/mkCmDvxjs6J9WP1Tf8kV6hE6XhXWYcuw=",
-        "usagesDigest": "m0IgWY0soJS8iocnztRN6ciTn4IAEXlfh6lAFMzqvTM=",
+        "usagesDigest": "V+D4T87ip4r5EwNCnCmzPA54q37O+HcF0mEll4+t1kE=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},
         "envVariables": {},
@@ -1077,6 +1077,7 @@
                 "aeson-pretty-0.8.10",
                 "optparse-applicative",
                 "QuickCheck",
+                "websockets",
                 "containers",
                 "stm",
                 "zlib",
@@ -1134,6 +1135,7 @@
                 "aeson-pretty-0.8.10",
                 "optparse-applicative",
                 "QuickCheck",
+                "websockets",
                 "containers",
                 "stm",
                 "zlib",

@@ -1,0 +1,45 @@
+load("@rules_haskell//haskell:defs.bzl", "haskell_binary", "haskell_library", "haskell_test")
+
+haskell_library(
+    name = "websocket-server-lib",
+    srcs = [
+        "src/Types.hs",
+        "src/Calculator.hs", 
+        "src/KeyboardHandler.hs",
+        "src/MessageHandler.hs",
+        "src/WebSocketServer.hs",
+    ],
+    deps = [
+        "//:base",
+        "@stackage//:websockets",
+        "@stackage//:text",
+        "@stackage//:aeson",
+        "@stackage//:bytestring",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+haskell_binary(
+    name = "websocket-server",
+    srcs = ["Main.hs"],
+    deps = [
+        ":websocket-server-lib",
+        "//:base",
+        "@stackage//:websockets",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+haskell_test(
+    name = "websocket-server-test",
+    srcs = ["test/TestSpec.hs"],
+    deps = [
+        ":websocket-server-lib",
+        "//:base",
+        "@stackage//:HUnit",
+        "@stackage//:aeson",
+        "@stackage//:bytestring",
+        "@stackage//:text",
+    ],
+    visibility = ["//visibility:public"],
+)

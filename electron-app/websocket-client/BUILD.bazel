@@ -1,0 +1,206 @@
+load("@aspect_rules_js//js:defs.bzl", "js_binary")
+load("@aspect_rules_js//npm:defs.bzl", "npm_package")
+
+package(default_visibility = ["//visibility:public"])
+
+# Source files
+filegroup(
+    name = "srcs",
+    srcs = [
+        "main.js",
+        "preload.js", 
+        "renderer.js",
+        "index.html",
+        "styles.css",
+    ],
+)
+
+# Package.json
+filegroup(
+    name = "package_json",
+    srcs = ["package.json"],
+)
+
+# Node modules
+filegroup(
+    name = "node_modules", 
+    srcs = glob(["node_modules/**/*"]),
+)
+
+# All app files in a single filegroup
+filegroup(
+    name = "app-files",
+    srcs = [
+        ":package.json",
+        ":main.js",
+        ":preload.js",
+        ":index.html", 
+        ":styles.css",
+        ":renderer.js",
+        ":node_modules",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+# Executable target to run the Electron app using pnpm dlx
+genrule(
+    name = "electron-websocket-client-runner",
+    srcs = [":app-files"],
+    outs = ["run-electron.sh"],
+    cmd = """cat > $@ << 'EOF'
+#!/bin/bash
+# Get the directory where the runfiles are located
+SCRIPT_DIR="$$(dirname "$$0")"
+RUNFILES_DIR="$${SCRIPT_DIR}/websocket-client.runfiles/_main/electron-app/websocket-client"
+
+# Change to the directory with the electron app files
+cd "$${RUNFILES_DIR}"
+
+# Use pnpm dlx to run electron
+pnpm dlx electron . $$@
+EOF
+chmod +x $@
+""",
+    visibility = ["//visibility:public"],
+)
+
+# Create wrapper script that starts both server and client
+genrule(
+    name = "run-websocket-demo.sh",
+    outs = ["run-websocket-demo.sh"],
+    cmd = """cat > $@ << 'EOF'
+#!/bin/bash
+
+# Flag to prevent multiple cleanup calls
+CLEANUP_DONE=false
+
+# Function to cleanup on exit
+cleanup() {
+    if [ "$$CLEANUP_DONE" = true ]; then
+        return
+    fi
+    CLEANUP_DONE=true
+    
+    echo "Cleaning up..."
+    if [ ! -z "$$SERVER_PID" ]; then
+        echo "Stopping Haskell WebSocket server (PID: $$SERVER_PID)..."
+        kill $$SERVER_PID 2>/dev/null || true
+        wait $$SERVER_PID 2>/dev/null || true
+    fi
+    if [ ! -z "$$ELECTRON_PID" ]; then
+        echo "Stopping Electron app (PID: $$ELECTRON_PID)..."
+        kill $$ELECTRON_PID 2>/dev/null || true
+        wait $$ELECTRON_PID 2>/dev/null || true
+    fi
+    exit 0
+}
+
+# Set up signal handlers
+trap cleanup SIGINT SIGTERM EXIT
+
+# Get the directory where the runfiles are located
+SCRIPT_DIR="$$(dirname "$$0")"
+RUNFILES_DIR="$${SCRIPT_DIR}/websocket-demo.runfiles"
+
+# Find the server binary
+SERVER_BINARY="$${RUNFILES_DIR}/_main/haskell/app/websocket-server/websocket-server"
+
+if [ ! -f "$$SERVER_BINARY" ]; then
+    echo "Error: WebSocket server binary not found at $$SERVER_BINARY"
+    echo "Available files in runfiles:"
+    find "$${RUNFILES_DIR}" -name "*websocket*" -type f 2>/dev/null || echo "No websocket files found"
+    exit 1
+fi
+
+# Start the Haskell WebSocket server
+echo "Starting Haskell WebSocket server on localhost:9160..."
+cd "$$(dirname "$$SERVER_BINARY")"
+"$$SERVER_BINARY" &
+SERVER_PID=$$!
+echo "Haskell WebSocket server started with PID: $$SERVER_PID"
+
+# Wait a moment for server to start
+sleep 2
+
+# Check if server is running
+if ! kill -0 $$SERVER_PID 2>/dev/null; then
+    echo "Error: Haskell WebSocket server failed to start"
+    exit 1
+fi
+
+echo "WebSocket server is running, you can test it at ws://127.0.0.1:9160"
+
+# Start the Electron app
+echo "Starting Electron WebSocket client..."
+cd "$${RUNFILES_DIR}/_main/electron-app/websocket-client"
+pnpm dlx electron . "$$@" &
+ELECTRON_PID=$$!
+echo "Electron WebSocket client started with PID: $$ELECTRON_PID"
+
+# Wait for Electron process to exit and then cleanup
+wait $$ELECTRON_PID
+echo "Electron app closed, cleaning up..."
+cleanup
+EOF
+chmod +x $@
+""",
+    visibility = ["//visibility:public"],
+)
+
+# Wrapper genrule that passes server location
+genrule(
+    name = "websocket-demo-wrapper",
+    srcs = [":run-websocket-demo.sh"],
+    outs = ["run-websocket-demo-wrapper.sh"],
+    cmd = """cat > $@ << 'EOF'
+#!/bin/bash
+# Pass the server location to the wrapper script
+exec "$$(dirname "$$0")/run-websocket-demo.sh" "$$@"
+EOF
+chmod +x $@
+""",
+    tools = ["//haskell/app/websocket-server:websocket-server"],
+    visibility = ["//visibility:public"],
+)
+
+# Run target for normal mode
+sh_binary(
+    name = "electron-websocket-client",
+    srcs = [":electron-websocket-client-runner"],
+    data = [":app-files"],
+    visibility = ["//visibility:public"],
+)
+
+# Run target for development mode
+sh_binary(
+    name = "electron-websocket-client-dev",
+    srcs = [":electron-websocket-client-runner"],
+    data = [":app-files"],
+    args = ["--dev"],
+    visibility = ["//visibility:public"],
+)
+
+# Wrapper target that runs both server and client
+sh_binary(
+    name = "websocket-demo",
+    srcs = [":websocket-demo-wrapper"],
+    data = [
+        ":app-files",
+        ":run-websocket-demo.sh",
+        "//haskell/app/websocket-server:websocket-server",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+# Wrapper target for development mode
+sh_binary(
+    name = "websocket-demo-dev",
+    srcs = [":websocket-demo-wrapper"],
+    data = [
+        ":app-files", 
+        ":run-websocket-demo.sh",
+        "//haskell/app/websocket-server:websocket-server",
+    ],
+    args = ["--dev"],
+    visibility = ["//visibility:public"],
+)
