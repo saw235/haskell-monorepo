@@ -2,16 +2,15 @@
 
 module Main where
 
+import Calculator
 import Data.Aeson (decode)
 import qualified Data.ByteString.Lazy.Char8 as L8
 import Data.Text (Text)
 import qualified Data.Text as T
+import KeyboardHandler
+import MessageHandler
 import qualified System.Exit as Exit
 import Test.HUnit
-
-import MessageHandler
-import Calculator
-import KeyboardHandler
 import Types
 
 -- Message Response Tests
@@ -19,29 +18,35 @@ testCreateWelcomeResponse :: Test
 testCreateWelcomeResponse = TestCase $ do
   let response = createResponse "welcome" "Hello from Haskell server!"
   let decoded = decode response :: Maybe ServerMessage
-  assertEqual "Welcome response should decode correctly" 
-    (Just (ServerMessage "welcome" "Hello from Haskell server!")) decoded
+  assertEqual
+    "Welcome response should decode correctly"
+    (Just (ServerMessage "welcome" "Hello from Haskell server!"))
+    decoded
 
 testCreatePongResponse :: Test
 testCreatePongResponse = TestCase $ do
   let response = createResponse "pong" "Pong from Haskell!"
   let decoded = decode response :: Maybe ServerMessage
-  assertEqual "Pong response should decode correctly"
-    (Just (ServerMessage "pong" "Pong from Haskell!")) decoded
+  assertEqual
+    "Pong response should decode correctly"
+    (Just (ServerMessage "pong" "Pong from Haskell!"))
+    decoded
 
 testCreateEchoResponse :: Test
 testCreateEchoResponse = TestCase $ do
   let response = createResponse "echo_response" "Echo: test message"
   let decoded = decode response :: Maybe ServerMessage
-  assertEqual "Echo response should decode correctly"
-    (Just (ServerMessage "echo_response" "Echo: test message")) decoded
+  assertEqual
+    "Echo response should decode correctly"
+    (Just (ServerMessage "echo_response" "Echo: test message"))
+    decoded
 
 -- Calculator Tests
 testCalculatorAdditionWithSpaces :: Test
 testCalculatorAdditionWithSpaces = TestCase $ do
   assertEqual "Addition with spaces" "15.0" (calculateExpression "10 + 5")
 
-testCalculatorSubtractionWithSpaces :: Test  
+testCalculatorSubtractionWithSpaces :: Test
 testCalculatorSubtractionWithSpaces = TestCase $ do
   assertEqual "Subtraction with spaces" "7.0" (calculateExpression "10 - 3")
 
@@ -79,7 +84,8 @@ testCalculatorInvalidNumbers = TestCase $ do
 
 testCalculatorInvalidFormat :: Test
 testCalculatorInvalidFormat = TestCase $ do
-  assertEqual "Invalid expression format" 
+  assertEqual
+    "Invalid expression format"
     "Invalid expression format. Use: number operator number (e.g., '10 + 5' or '10+5')"
     (calculateExpression "just text")
 
@@ -141,46 +147,47 @@ testMessageHandlerUnknown = TestCase $ do
 
 -- Test suite assembly
 allTests :: Test
-allTests = TestList
-  [ TestLabel "Create Welcome Response" testCreateWelcomeResponse
-  , TestLabel "Create Pong Response" testCreatePongResponse
-  , TestLabel "Create Echo Response" testCreateEchoResponse  
-  , TestLabel "Calculator Addition With Spaces" testCalculatorAdditionWithSpaces
-  , TestLabel "Calculator Subtraction With Spaces" testCalculatorSubtractionWithSpaces
-  , TestLabel "Calculator Multiplication With Spaces" testCalculatorMultiplicationWithSpaces
-  , TestLabel "Calculator Division With Spaces" testCalculatorDivisionWithSpaces
-  , TestLabel "Calculator Addition Without Spaces" testCalculatorAdditionWithoutSpaces
-  , TestLabel "Calculator Subtraction Without Spaces" testCalculatorSubtractionWithoutSpaces
-  , TestLabel "Calculator Multiplication Without Spaces" testCalculatorMultiplicationWithoutSpaces
-  , TestLabel "Calculator Division Without Spaces" testCalculatorDivisionWithoutSpaces
-  , TestLabel "Calculator Division By Zero" testCalculatorDivisionByZero
-  , TestLabel "Calculator Invalid Numbers" testCalculatorInvalidNumbers
-  , TestLabel "Calculator Invalid Format" testCalculatorInvalidFormat
-  , TestLabel "Keyboard Handler Valid Input" testKeyboardHandlerValidInput
-  , TestLabel "Keyboard Handler Invalid Input" testKeyboardHandlerInvalidInput
-  , TestLabel "Keyboard Handler Missing Position" testKeyboardHandlerMissingPosition
-  , TestLabel "Message Handler Ping" testMessageHandlerPing
-  , TestLabel "Message Handler Echo" testMessageHandlerEcho
-  , TestLabel "Message Handler Calculate" testMessageHandlerCalculate
-  , TestLabel "Message Handler Help" testMessageHandlerHelp
-  , TestLabel "Message Handler Keyboard" testMessageHandlerKeyboard
-  , TestLabel "Message Handler Unknown" testMessageHandlerUnknown
-  ]
+allTests =
+  TestList
+    [ TestLabel "Create Welcome Response" testCreateWelcomeResponse,
+      TestLabel "Create Pong Response" testCreatePongResponse,
+      TestLabel "Create Echo Response" testCreateEchoResponse,
+      TestLabel "Calculator Addition With Spaces" testCalculatorAdditionWithSpaces,
+      TestLabel "Calculator Subtraction With Spaces" testCalculatorSubtractionWithSpaces,
+      TestLabel "Calculator Multiplication With Spaces" testCalculatorMultiplicationWithSpaces,
+      TestLabel "Calculator Division With Spaces" testCalculatorDivisionWithSpaces,
+      TestLabel "Calculator Addition Without Spaces" testCalculatorAdditionWithoutSpaces,
+      TestLabel "Calculator Subtraction Without Spaces" testCalculatorSubtractionWithoutSpaces,
+      TestLabel "Calculator Multiplication Without Spaces" testCalculatorMultiplicationWithoutSpaces,
+      TestLabel "Calculator Division Without Spaces" testCalculatorDivisionWithoutSpaces,
+      TestLabel "Calculator Division By Zero" testCalculatorDivisionByZero,
+      TestLabel "Calculator Invalid Numbers" testCalculatorInvalidNumbers,
+      TestLabel "Calculator Invalid Format" testCalculatorInvalidFormat,
+      TestLabel "Keyboard Handler Valid Input" testKeyboardHandlerValidInput,
+      TestLabel "Keyboard Handler Invalid Input" testKeyboardHandlerInvalidInput,
+      TestLabel "Keyboard Handler Missing Position" testKeyboardHandlerMissingPosition,
+      TestLabel "Message Handler Ping" testMessageHandlerPing,
+      TestLabel "Message Handler Echo" testMessageHandlerEcho,
+      TestLabel "Message Handler Calculate" testMessageHandlerCalculate,
+      TestLabel "Message Handler Help" testMessageHandlerHelp,
+      TestLabel "Message Handler Keyboard" testMessageHandlerKeyboard,
+      TestLabel "Message Handler Unknown" testMessageHandlerUnknown
+    ]
 
 main :: IO ()
 main = do
   putStrLn "Running WebSocket Server tests..."
   putStrLn "================================="
-  
+
   counts <- runTestTT allTests
-  
+
   putStrLn "================================="
   putStrLn $ "Test Summary:"
   putStrLn $ "  Cases: " ++ show (cases counts)
   putStrLn $ "  Tried: " ++ show (tried counts)
   putStrLn $ "  Errors: " ++ show (errors counts)
   putStrLn $ "  Failures: " ++ show (failures counts)
-  
+
   if failures counts > 0 || errors counts > 0
     then do
       putStrLn $ "ERROR: " ++ show (failures counts + errors counts) ++ " tests failed!"

@@ -1,9 +1,8 @@
 module Main where
 
 import qualified Network.WebSockets as WS
-import Prelude
-
 import WebSocketServer (application)
+import Prelude
 
 main :: IO ()
 main = do

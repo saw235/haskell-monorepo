@@ -2,7 +2,7 @@
 
 module Types where
 
-import Data.Aeson (FromJSON(..), ToJSON(..), object, (.=), (.:), withObject)
+import Data.Aeson (FromJSON (..), ToJSON (..), object, withObject, (.:), (.=))
 import Data.Text (Text)
 import GHC.Generics (Generic)
 
@@ -13,6 +13,7 @@ data ClientMessage = ClientMessage
   deriving (Generic, Show, Eq)
 
 instance FromJSON ClientMessage
+
 instance ToJSON ClientMessage
 
 data ServerMessage = ServerMessage
@@ -47,12 +48,14 @@ data ServerMessage = ServerMessage
 --
 -- This approach is concise and idiomatic for parsing multiple fields from a JSON object in Haskell.
 instance FromJSON ServerMessage where
-  parseJSON = withObject "ServerMessage" $ \o -> ServerMessage
-    <$> o .: "type"
-    <*> o .: "content"
+  parseJSON = withObject "ServerMessage" $ \o ->
+    ServerMessage
+      <$> o .: "type"
+      <*> o .: "content"
 
 instance ToJSON ServerMessage where
-  toJSON (ServerMessage msgType content) = object
-    [ "type" .= msgType
-    , "content" .= content
-    ]
+  toJSON (ServerMessage msgType content) =
+    object
+      [ "type" .= msgType,
+        "content" .= content
+      ]
