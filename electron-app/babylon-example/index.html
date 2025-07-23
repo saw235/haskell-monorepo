@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Babylon.js + Electron Example</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <canvas id="renderCanvas"></canvas>
+    <div id="overlay">
+        <div id="scene-info">
+            <span id="fps">FPS: --</span>
+            <span id="camera-info">Camera: --</span>
+        </div>
+        <div id="controls">
+            <button id="toggle-rotation">Toggle Cube Rotation</button>
+            <button id="switch-material">Switch Material</button>
+        </div>
+    </div>
+    <!-- Bundled renderer code -->
+    <script src="renderer.js"></script>
+</body>
+</html> 
