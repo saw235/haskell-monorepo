@@ -1,42 +1,37 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module MessageHandler 
-  ( createResponse
-  , handleClientMessage
-  , helpText
-  ) where
+module MessageHandler
+  ( createResponse,
+    handleClientMessage,
+    helpText,
+  )
+where
 
+import Calculator (calculateExpression)
 import Data.Aeson (encode, object, (.=))
 import qualified Data.ByteString.Lazy.Char8 as L8
 import Data.Semigroup ((<>))
 import Data.Text (Text)
 import qualified Data.Text as T
-
-import Calculator (calculateExpression)
 import KeyboardHandler (handleKeyboardInput)
-import Types (ClientMessage(..))
+import Types (ClientMessage (..))
 
 createResponse :: Text -> Text -> L8.ByteString
 createResponse msgType content = encode $ object ["type" .= msgType, "content" .= content]
 
 handleClientMessage :: ClientMessage -> L8.ByteString
-handleClientMessage (ClientMessage "ping" _) = 
+handleClientMessage (ClientMessage "ping" _) =
   createResponse "pong" "Pong from Haskell!"
-
-handleClientMessage (ClientMessage "echo" content) = 
+handleClientMessage (ClientMessage "echo" content) =
   createResponse "echo_response" ("Echo: " <> content)
-
-handleClientMessage (ClientMessage "calculate" expr) = 
+handleClientMessage (ClientMessage "calculate" expr) =
   let result = calculateExpression expr
-  in createResponse "calculation_result" result
-
-handleClientMessage (ClientMessage "help" _) = 
+   in createResponse "calculation_result" result
+handleClientMessage (ClientMessage "help" _) =
   createResponse "help_response" helpText
-
-handleClientMessage (ClientMessage "keyboard" keyData) = 
+handleClientMessage (ClientMessage "keyboard" keyData) =
   handleKeyboardInput keyData
-
-handleClientMessage _ = 
+handleClientMessage _ =
   createResponse "error" "Unknown message format. Try sending 'help' for available commands."
 
 helpText :: Text

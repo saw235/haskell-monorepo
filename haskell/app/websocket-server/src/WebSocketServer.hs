@@ -5,12 +5,11 @@ module WebSocketServer (application) where
 import Control.Monad (forever)
 import Data.Aeson (decode)
 import qualified Data.ByteString.Lazy.Char8 as L8
+import MessageHandler (createResponse, handleClientMessage)
 import qualified Network.WebSockets as WS
+import Types (ClientMessage (..))
 import Prelude hiding (putStrLn)
 import qualified Prelude
-
-import MessageHandler (createResponse, handleClientMessage)
-import Types (ClientMessage(..))
 
 application :: WS.ServerApp
 application pending = do
@@ -29,7 +28,7 @@ handleMessages :: WS.Connection -> IO ()
 handleMessages conn = forever $ do
   msg <- WS.receiveData conn
   logMessage $ "Received: " ++ L8.unpack msg
-  
+
   case decode msg of
     Just clientMsg -> do
       logClientMessage clientMsg
@@ -44,15 +43,15 @@ logMessage :: String -> IO ()
 logMessage = Prelude.putStrLn
 
 logClientMessage :: ClientMessage -> IO ()
-logClientMessage (ClientMessage "ping" _) = 
+logClientMessage (ClientMessage "ping" _) =
   logMessage "Received ping, sending pong"
-logClientMessage (ClientMessage "echo" content) = 
+logClientMessage (ClientMessage "echo" content) =
   logMessage $ "Echoing: " ++ show content
-logClientMessage (ClientMessage "calculate" expr) = 
+logClientMessage (ClientMessage "calculate" expr) =
   logMessage $ "Calculating: " ++ show expr
-logClientMessage (ClientMessage "help" _) = 
+logClientMessage (ClientMessage "help" _) =
   logMessage "Sending help information"
-logClientMessage (ClientMessage "keyboard" keyData) = 
+logClientMessage (ClientMessage "keyboard" keyData) =
   logMessage $ "Received keyboard input: " ++ show keyData
-logClientMessage _ = 
+logClientMessage _ =
   logMessage "Processing unknown message type"
