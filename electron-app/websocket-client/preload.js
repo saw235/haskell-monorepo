@@ -1,6 +1,6 @@
-const { contextBridge } = require('electron');
+const { contextBridge } = require("electron");
 
-contextBridge.exposeInMainWorld('electronAPI', {
+contextBridge.exposeInMainWorld("electronAPI", {
   // Expose any needed APIs here
-  log: (message) => console.log(message)
+  log: (message) => console.log(message),
 });

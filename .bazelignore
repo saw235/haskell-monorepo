@@ -2,6 +2,7 @@ tools/mcp-shrimp-task-manager/node_modules
 haskell/app/tic-tac-toe-electron/node_modules
 electron-app/node_modules
 electron-app/hello-world/node_modules
+electron-app/babylon-example/node_modules
 node_modules
 dist
 .bzlignore

@@ -55,7 +55,7 @@ cd electron-app/websocket-client && npm start
 1. **Connect**: Click "Connect" to establish WebSocket connection
 2. **Ping/Pong**: Use "Send Ping" to test connectivity
 3. **Echo**: Use "Send Echo" to test message echoing
-4. **Calculator**: Enter math expressions like "5 + 3" or "10*2"
+4. **Calculator**: Enter math expressions like "5 + 3" or "10\*2"
 5. **Help**: Send "help" message to see all available commands
 
 ### Real-time Keyboard Input
@@ -66,19 +66,20 @@ cd electron-app/websocket-client && npm start
 4. **Track Position**: Watch the coordinate display update in real-time
 
 The keyboard feature demonstrates streaming input where each arrow key press:
+
 - Updates a virtual position coordinate system
 - Immediately sends the key data to the Haskell backend
 - Receives acknowledgment with position information
 
 ## Supported Message Types
 
-| Message Type | Purpose | Example Content |
-|--------------|---------|-----------------|
-| `ping` | Test connectivity | any content |
-| `echo` | Echo messages back | "Hello World" |
-| `calculate` | Math operations | "10 + 5" or "10*5" |
-| `keyboard` | Arrow key input | Auto-generated JSON |
-| `help` | Show available commands | any content |
+| Message Type | Purpose                 | Example Content     |
+| ------------ | ----------------------- | ------------------- |
+| `ping`       | Test connectivity       | any content         |
+| `echo`       | Echo messages back      | "Hello World"       |
+| `calculate`  | Math operations         | "10 + 5" or "10\*5" |
+| `keyboard`   | Arrow key input         | Auto-generated JSON |
+| `help`       | Show available commands | any content         |
 
 ## Supported Calculator Operations
 
@@ -92,18 +93,21 @@ Both spaced and non-spaced formats are supported.
 ## Architecture
 
 ### Frontend (Electron)
+
 - **Technology**: Electron app with vanilla JavaScript
 - **UI**: Modern glassmorphism design with real-time updates
 - **Input Handling**: Mouse clicks, form inputs, and keyboard events
 - **Communication**: WebSocket client sending JSON messages
 
 ### Backend (Haskell)
+
 - **Technology**: Haskell WebSocket server using `websockets` library
 - **Message Processing**: JSON parsing and structured responses
 - **Capabilities**: Math computation, echo services, keyboard event handling
 - **Real-time**: Immediate response to all message types
 
 ### Communication Protocol
+
 - **Transport**: WebSocket over TCP (ws://127.0.0.1:9160)
 - **Format**: JSON messages with `msgType` and `content` fields
 - **Message Flow**: Request-response pattern with immediate acknowledgment
@@ -111,12 +115,14 @@ Both spaced and non-spaced formats are supported.
 ### Message Format Examples
 
 **Client to Server:**
+
 ```json
 {"msgType": "calculate", "content": "10 + 5"}
 {"msgType": "keyboard", "content": "{\"key\":\"up\",\"direction\":\"north\",\"position\":{\"x\":0,\"y\":1}}"}
 ```
 
 **Server to Client:**
+
 ```json
 {"type": "calculation_result", "content": "15.0"}
 {"type": "keyboard_ack", "content": "Key: up (north) at position (0,1)"}
@@ -125,6 +131,7 @@ Both spaced and non-spaced formats are supported.
 ## Development
 
 ### Project Structure
+
 ```
 electron-app/websocket-client/
 ├── BUILD.bazel           # Bazel build configuration
@@ -138,6 +145,7 @@ electron-app/websocket-client/
 ```
 
 ### Bazel Targets
+
 - `//electron-app/websocket-client:websocket-demo` - Run complete system
 - `//electron-app/websocket-client:websocket-demo-dev` - Development mode
 - `//electron-app/websocket-client:electron-websocket-client` - Client only
