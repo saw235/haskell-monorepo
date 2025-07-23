@@ -8,6 +8,7 @@ This repository is organized as a Bazel-based monorepo with the following struct
 
 - **Haskell Applications** (`haskell/app/`): Standalone executable applications
 - **Haskell Libraries** (`haskell/libs/`): Shared libraries and reusable components
+- **Electron Applications** (`electron-app/`): Cross-platform desktop applications with Haskell backends
 - **Task Manager** (`tools/mcp-shrimp-task-manager/`): TypeScript/NodeJS-based task management tool
 - **Build System**: Bazel with Stackage integration for Haskell dependency management
 
@@ -24,6 +25,8 @@ This repository is organized as a Bazel-based monorepo with the following struct
 ├── haskell/
 │   ├── app/           # Haskell applications (executables)
 │   └── libs/          # Haskell libraries (shared code)
+├── electron-app/      # Electron desktop applications
+│   └── aivika-population-viz/  # Population growth visualization
 ├── tools/
 │   └── mcp-shrimp-task-manager/  # TypeScript task manager
 ├── MODULE.bazel       # Bazel module configuration
@@ -137,6 +140,54 @@ To install the dependencies for the task manager, run the following command from
 ```bash
 bazel run -- @pnpm//:pnpm --dir $PWD/tools/mcp-shrimp-task-manager/ install
 ``` 
+
+## Aivika Population Growth Visualization
+
+This project includes an interactive Electron application for visualizing population growth simulations powered by the Aivika system dynamics library.
+
+### Features
+
+- **Real-time WebSocket Communication**: Haskell backend with Electron frontend
+- **Interactive Visualization**: Chart.js-powered population growth charts
+- **Customizable Parameters**: Adjustable initial population, growth rate, and simulation time
+- **Multiple Views**: Chart view, raw data table, and mathematical analysis
+- **Data Export**: CSV and JSON export functionality
+- **Mathematical Model**: Implements exponential growth (dP/dt = r × P)
+
+### Running the Demo
+
+To run the complete Aivika population growth visualization (both Haskell server and Electron frontend):
+
+```bash
+# Run the complete demo with both server and client
+bazel run //electron-app/aivika-population-viz:aivika-demo
+
+# Run in development mode with developer tools
+bazel run //electron-app/aivika-population-viz:aivika-demo-dev
+```
+
+### Running Components Separately
+
+You can also run the components individually:
+
+```bash
+# Run just the Haskell backend in CLI mode
+bazel run //haskell/app/aivika-population-growth:aivika-population-growth
+
+# Run the Haskell backend in WebSocket server mode
+bazel run //haskell/app/aivika-population-growth:aivika-population-growth -- --server --port 9161
+
+# Run just the Electron visualization app (requires running server separately)
+bazel run //electron-app/aivika-population-viz:aivika-population-viz
+```
+
+### Environment Variables for CLI Mode
+
+When running the Haskell backend in CLI mode, you can customize parameters:
+
+```bash
+INITIAL_POP=500 GROWTH_RATE=0.03 TIME_END=10 bazel run //haskell/app/aivika-population-growth:aivika-population-growth
+```
 
 ## Pin Stackage Dependencies
 

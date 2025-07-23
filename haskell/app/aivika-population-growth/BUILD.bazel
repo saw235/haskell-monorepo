@@ -12,5 +12,11 @@ haskell_binary(
         "//:base",
         "@stackage//:aivika",
         "@stackage//:mtl",
+        "@stackage//:optparse-applicative",
+        "@stackage//:websockets",
+        "@stackage//:aeson",
+        "@stackage//:bytestring",
+        "@stackage//:text",
     ],
+    visibility = ["//visibility:public"],
 )
