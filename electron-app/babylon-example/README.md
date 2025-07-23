@@ -33,6 +33,7 @@ electron-app/babylon-example/
 ## Quick Start
 
 ### Using Bazel:
+
 ```bash
 # Install dependencies (if not already done)
 bazel run -- @pnpm//:pnpm --dir $(pwd)/electron-app/babylon-example install
@@ -45,6 +46,7 @@ bazel run //electron-app/babylon-example:electron-babylon-example-dev
 ```
 
 ### Using npm directly:
+
 ```bash
 # Install dependencies
 cd electron-app/babylon-example
@@ -108,4 +110,4 @@ This example can be extended with:
 - Model loading (GLTF/GLB)
 - Particle systems and post-processing
 - Sound integration
-- Testing frameworks 
+- Testing frameworks
