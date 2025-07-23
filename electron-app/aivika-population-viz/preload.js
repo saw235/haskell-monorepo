@@ -1,5 +1,5 @@
-const { contextBridge, ipcRenderer } = require('electron');
+const { contextBridge, ipcRenderer } = require("electron");
 
-contextBridge.exposeInMainWorld('electronAPI', {
-  runSimulation: (params) => ipcRenderer.invoke('run-simulation', params)
+contextBridge.exposeInMainWorld("electronAPI", {
+  runSimulation: (params) => ipcRenderer.invoke("run-simulation", params),
 });
