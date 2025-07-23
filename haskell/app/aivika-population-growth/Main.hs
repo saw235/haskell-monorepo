@@ -11,7 +11,7 @@ module Main where
 
 import Control.Monad (forever)
 import Control.Monad.Trans
-import Data.Aeson (FromJSON(..), ToJSON(..), decode, encode, object, (.=), (.:), withObject)
+import Data.Aeson (FromJSON (..), ToJSON (..), decode, encode, object, withObject, (.:), (.=))
 import qualified Data.ByteString.Lazy.Char8 as L8
 import Data.Text (Text)
 import qualified Data.Text as T
@@ -24,81 +24,94 @@ import Text.Read (readMaybe)
 
 -- | Command line options
 data Options = Options
-  { optMode :: Mode
-  , optPort :: Int
-  } deriving Show
+  { optMode :: Mode,
+    optPort :: Int
+  }
+  deriving (Show)
 
-data Mode = CLI | Server deriving Show
+data Mode = CLI | Server deriving (Show)
 
 -- | Message types for WebSocket communication
 data ClientMessage = ClientMessage
-  { msgType :: Text
-  , content :: Text
-  } deriving Show
+  { msgType :: Text,
+    content :: Text
+  }
+  deriving (Show)
 
 data ServerMessage = ServerMessage
-  { serverMsgType :: Text
-  , serverContent :: Text
-  } deriving Show
+  { serverMsgType :: Text,
+    serverContent :: Text
+  }
+  deriving (Show)
 
 data SimulationParams = SimulationParams
-  { initialPop :: Double
-  , growthRate :: Double
-  , timeEnd :: Double
-  } deriving Show
+  { initialPop :: Double,
+    growthRate :: Double,
+    timeEnd :: Double
+  }
+  deriving (Show)
 
 data SimulationResult = SimulationResult
-  { time :: Double
-  , population :: Double
-  } deriving Show
+  { time :: Double,
+    population :: Double
+  }
+  deriving (Show)
 
 -- JSON instances
 instance FromJSON ClientMessage where
-  parseJSON = withObject "ClientMessage" $ \o -> ClientMessage
-    <$> o .: "msgType"
-    <*> o .: "content"
+  parseJSON = withObject "ClientMessage" $ \o ->
+    ClientMessage
+      <$> o .: "msgType"
+      <*> o .: "content"
 
 instance ToJSON ClientMessage where
-  toJSON (ClientMessage msgType content) = object
-    [ "msgType" .= msgType
-    , "content" .= content
-    ]
+  toJSON (ClientMessage msgType content) =
+    object
+      [ "msgType" .= msgType,
+        "content" .= content
+      ]
 
 instance FromJSON ServerMessage where
-  parseJSON = withObject "ServerMessage" $ \o -> ServerMessage
-    <$> o .: "type"
-    <*> o .: "content"
+  parseJSON = withObject "ServerMessage" $ \o ->
+    ServerMessage
+      <$> o .: "type"
+      <*> o .: "content"
 
 instance ToJSON ServerMessage where
-  toJSON (ServerMessage msgType content) = object
-    [ "type" .= msgType
-    , "content" .= content
-    ]
+  toJSON (ServerMessage msgType content) =
+    object
+      [ "type" .= msgType,
+        "content" .= content
+      ]
 
 instance FromJSON SimulationParams where
-  parseJSON = withObject "SimulationParams" $ \o -> SimulationParams
-    <$> o .: "initialPop"
-    <*> o .: "growthRate"
-    <*> o .: "timeEnd"
+  parseJSON = withObject "SimulationParams" $ \o ->
+    SimulationParams
+      <$> o .: "initialPop"
+      <*> o .: "growthRate"
+      <*> o .: "timeEnd"
 
 instance ToJSON SimulationParams where
-  toJSON (SimulationParams initPop rate endTime) = object
-    [ "initialPop" .= initPop
-    , "growthRate" .= rate
-    , "timeEnd" .= endTime
-    ]
+  toJSON (SimulationParams initPop rate endTime) =
+    object
+      [ "initialPop" .= initPop,
+        "growthRate" .= rate,
+        "timeEnd" .= endTime
+      ]
 
 instance ToJSON SimulationResult where
-  toJSON (SimulationResult t p) = object
-    [ "time" .= t
-    , "population" .= p
-    ]
+  toJSON (SimulationResult t p) =
+    object
+      [ "time" .= t,
+        "population" .= p
+      ]
 
 -- | Command line parser
 options :: Parser Options
-options = Options
-  <$> (flag CLI Server (long "server" <> short 's' <> help "Run in WebSocket server mode"))
-  <*> option auto (long "port" <> short 'p' <> value 9161 <> help "Port number (default: 9161)")
+options =
+  Options
+    <$> (flag CLI Server (long "server" <> short 's' <> help "Run in WebSocket server mode"))
+    <*> option auto (long "port" <> short 'p' <> value 9161 <> help "Port number (default: 9161)")
 
 -- | Get parameter from environment variable or use default
 getEnvDouble :: String -> Double -> IO Double
@@ -125,14 +138,15 @@ runPopulationSimulation :: SimulationParams -> IO [SimulationResult]
 runPopulationSimulation (SimulationParams initPop rate endTime) = do
   let startTime = 0.0
       dt = 0.1
-      specs = Specs
-        { spcStartTime = startTime,
-          spcStopTime = endTime,
-          spcDT = dt,
-          spcMethod = RungeKutta4,
-          spcGeneratorType = SimpleGenerator
-        }
-  
+      specs =
+        Specs
+          { spcStartTime = startTime,
+            spcStopTime = endTime,
+            spcDT = dt,
+            spcMethod = RungeKutta4,
+            spcGeneratorType = SimpleGenerator
+          }
+
   -- Generate time points for output (every 0.5 years for better resolution)
   let timePoints = [0, 0.5 .. endTime]
   return $ map (\t -> SimulationResult t (initPop * exp (rate * t))) timePoints
@@ -148,16 +162,13 @@ handleClientMessage (ClientMessage "simulate" content) = do
     Just params -> do
       results <- runPopulationSimulation params
       return $ encode $ object ["type" .= ("simulation_result" :: Text), "results" .= results]
-    Nothing -> 
+    Nothing ->
       return $ createResponse "error" "Invalid simulation parameters"
-
-handleClientMessage (ClientMessage "ping" _) = 
+handleClientMessage (ClientMessage "ping" _) =
   return $ createResponse "pong" "Pong from Aivika server!"
-
-handleClientMessage (ClientMessage "help" _) = 
+handleClientMessage (ClientMessage "help" _) =
   return $ createResponse "help_response" helpText
-
-handleClientMessage _ = 
+handleClientMessage _ =
   return $ createResponse "error" "Unknown message format. Try sending 'help' for available commands."
 
 helpText :: Text
@@ -181,7 +192,7 @@ handleMessages :: WS.Connection -> IO ()
 handleMessages conn = forever $ do
   msg <- WS.receiveData conn
   putStrLn $ "Received: " ++ L8.unpack msg
-  
+
   case decode msg of
     Just clientMsg -> do
       response <- handleClientMessage clientMsg
@@ -198,7 +209,7 @@ runCLI = do
   initialPop <- getEnvDouble "INITIAL_POP" 1000.0
   growthRate <- getEnvDouble "GROWTH_RATE" 0.05
   timeEnd <- getEnvDouble "TIME_END" 20.0
-  
+
   putStrLn "Aivika Population Growth Simulation"
   putStrLn "=================================="
   putStrLn "Model: dP/dt = r * P"
@@ -227,9 +238,12 @@ runServer port = do
 -- | Main function
 main :: IO ()
 main = do
-  opts <- execParser $ info (options <**> helper)
-    (fullDesc <> progDesc "Aivika Population Growth Simulation" <> header "aivika-population-growth - population dynamics simulation")
-  
+  opts <-
+    execParser $
+      info
+        (options <**> helper)
+        (fullDesc <> progDesc "Aivika Population Growth Simulation" <> header "aivika-population-growth - population dynamics simulation")
+
   case optMode opts of
     CLI -> runCLI
     Server -> runServer (optPort opts)
