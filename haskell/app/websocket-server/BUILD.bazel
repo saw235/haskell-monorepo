@@ -1,0 +1,14 @@
+load("@rules_haskell//haskell:defs.bzl", "haskell_binary")
+
+haskell_binary(
+    name = "websocket-server",
+    srcs = ["Main.hs"],
+    deps = [
+        "//:base",
+        "@stackage//:websockets",
+        "@stackage//:text",
+        "@stackage//:aeson",
+        "@stackage//:bytestring",
+    ],
+    visibility = ["//visibility:public"],
+)

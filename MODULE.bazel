@@ -61,6 +61,7 @@ SIMPLE_PACKAGES = [
     "aeson-pretty-0.8.10",
     "optparse-applicative",
     "QuickCheck",
+    "websockets",
 ]
 
 # Simple packages with no special configuration
