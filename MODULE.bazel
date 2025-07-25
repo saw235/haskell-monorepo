@@ -61,6 +61,7 @@ SIMPLE_PACKAGES = [
     "aeson-pretty-0.8.10",
     "optparse-applicative",
     "QuickCheck",
+    "websockets",
 ]
 
 # Simple packages with no special configuration
@@ -176,6 +177,18 @@ electron_hello_world.npm_translate_lock(
 
 use_repo(electron_hello_world, "npm_electron_hello_world")
 
+# npm workspace for electron-babylon-example
+# NOTE: If you add many Electron apps, consider refactoring this pattern with a macro to reduce boilerplate.
+electron_babylon_example = use_extension("@aspect_rules_js//npm:extensions.bzl", "npm", dev_dependency = True)
+
+electron_babylon_example.npm_translate_lock(
+    name = "npm_electron_babylon_example",
+    pnpm_lock = "//electron-app/babylon-example:pnpm-lock.yaml",
+    verify_node_modules_ignored = "//:.bazelignore",
+)
+
+use_repo(electron_babylon_example, "npm_electron_babylon_example")
+
 pnpm = use_extension("@aspect_rules_js//npm:extensions.bzl", "pnpm")
 
 # Allows developers to use the matching pnpm version, for example:
@@ -187,6 +200,8 @@ use_repo(pnpm, "pnpm")
 ################################################################################
 bazel_dep(name = "aspect_rules_swc", version = "2.4.3")
 bazel_dep(name = "aspect_rules_ts",  version = "3.6.0")
+bazel_dep(name = "aspect_rules_esbuild", version = "0.22.1")
+bazel_dep(name = "aspect_bazel_lib", version = "2.20.0")
 
 rules_ts_ext = use_extension(
     "@aspect_rules_ts//ts:extensions.bzl",

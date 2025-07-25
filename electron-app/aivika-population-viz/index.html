@@ -1,0 +1,161 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Aivika Population Growth Visualization</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script src="node_modules/chart.js/dist/chart.umd.js"></script>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>Aivika Population Growth Visualization</h1>
+        <p>
+          Interactive visualization of exponential population growth simulation
+        </p>
+      </header>
+
+      <div class="connection-status-section">
+        <div class="connection-indicator">
+          <div id="connection-status" class="status-indicator disconnected">
+            <span class="status-dot"></span>
+            <span id="connection-text">Connecting to server...</span>
+          </div>
+          <div id="server-info">
+            <small>Aivika Population Growth Server (WebSocket)</small>
+            <button id="test-connection-btn" class="test-connection-btn">
+              Test Connection
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="controls-section">
+        <h3>Simulation Parameters</h3>
+        <div class="parameter-grid">
+          <div class="parameter-group">
+            <label for="initial-pop">Initial Population:</label>
+            <input
+              type="number"
+              id="initial-pop"
+              value="1000"
+              min="1"
+              max="100000"
+              step="100"
+            />
+          </div>
+          <div class="parameter-group">
+            <label for="growth-rate">Growth Rate (% per year):</label>
+            <input
+              type="number"
+              id="growth-rate"
+              value="5"
+              min="0"
+              max="50"
+              step="0.1"
+            />
+          </div>
+          <div class="parameter-group">
+            <label for="time-end">Simulation Time (years):</label>
+            <input
+              type="number"
+              id="time-end"
+              value="20"
+              min="1"
+              max="100"
+              step="1"
+            />
+          </div>
+          <div class="parameter-group">
+            <button id="run-btn" class="primary-btn">Run Simulation</button>
+            <button id="reset-btn" class="secondary-btn">Reset</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="status-section">
+        <div id="status-display">Ready to run simulation</div>
+        <div id="progress-bar" class="progress-container">
+          <div id="progress-fill" class="progress-fill"></div>
+        </div>
+      </div>
+
+      <div class="results-section">
+        <div class="tabs">
+          <button id="chart-tab" class="tab-btn active">
+            Population Chart
+          </button>
+          <button id="data-tab" class="tab-btn">Raw Data</button>
+          <button id="analysis-tab" class="tab-btn">Analysis</button>
+        </div>
+
+        <div id="chart-panel" class="tab-panel active">
+          <div class="chart-container">
+            <canvas id="population-chart"></canvas>
+          </div>
+        </div>
+
+        <div id="data-panel" class="tab-panel">
+          <div class="data-container">
+            <div class="data-controls">
+              <button id="export-csv-btn" disabled>Export CSV</button>
+              <button id="export-json-btn" disabled>Export JSON</button>
+            </div>
+            <div id="data-table-container">
+              <table id="data-table">
+                <thead>
+                  <tr>
+                    <th>Time (years)</th>
+                    <th>Population</th>
+                    <th>Growth</th>
+                  </tr>
+                </thead>
+                <tbody id="data-table-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div id="analysis-panel" class="tab-panel">
+          <div class="analysis-container">
+            <div class="stats-grid">
+              <div class="stat-card">
+                <h4>Initial Population</h4>
+                <div id="stat-initial" class="stat-value">-</div>
+              </div>
+              <div class="stat-card">
+                <h4>Final Population</h4>
+                <div id="stat-final" class="stat-value">-</div>
+              </div>
+              <div class="stat-card">
+                <h4>Total Growth</h4>
+                <div id="stat-growth" class="stat-value">-</div>
+              </div>
+              <div class="stat-card">
+                <h4>Doubling Time</h4>
+                <div id="stat-doubling" class="stat-value">-</div>
+              </div>
+            </div>
+            <div class="equation-section">
+              <h4>Mathematical Model</h4>
+              <div class="equation">
+                <strong>dP/dt = r × P</strong>
+              </div>
+              <div class="equation-explanation">
+                <p>Where:</p>
+                <ul>
+                  <li><strong>P</strong> = Population at time t</li>
+                  <li><strong>r</strong> = Growth rate (decimal)</li>
+                  <li><strong>t</strong> = Time in years</li>
+                </ul>
+                <p>Solution: <strong>P(t) = P₀ × e^(rt)</strong></p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="renderer.js"></script>
+  </body>
+</html>

@@ -1,0 +1,82 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>WebSocket Client - Haskell Backend</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>WebSocket Client</h1>
+      <p>Communicating with Haskell Backend</p>
+
+      <div class="connection-status">
+        <span id="status">Disconnected</span>
+        <button id="connect-btn">Connect</button>
+        <button id="disconnect-btn" disabled>Disconnect</button>
+      </div>
+
+      <div class="section">
+        <h3>Quick Actions</h3>
+        <button id="ping-btn" disabled>Send Ping</button>
+        <button id="echo-btn" disabled>Send Echo</button>
+      </div>
+
+      <div class="section">
+        <h3>Calculator</h3>
+        <input type="text" id="calc-input" placeholder="e.g., 5 + 3" disabled />
+        <button id="calc-btn" disabled>Calculate</button>
+      </div>
+
+      <div class="section">
+        <h3>Real-time Keyboard Input</h3>
+        <div class="help-text">
+          <strong>Arrow Key Controls:</strong><br />
+          Click in the area below and use arrow keys (↑ ↓ ← →) to send real-time
+          input to the Haskell backend.
+        </div>
+        <div id="keyboard-area" class="keyboard-input-area" tabindex="0">
+          <div id="keyboard-status">Click here and use arrow keys...</div>
+          <div id="position-display">Position: (0, 0)</div>
+        </div>
+        <label>
+          <input type="checkbox" id="keyboard-enabled" disabled /> Enable
+          Keyboard Input
+        </label>
+      </div>
+
+      <div class="section">
+        <h3>Custom Message</h3>
+        <div class="help-text">
+          <strong>Supported message types:</strong><br />
+          • <code>ping</code> - Test connectivity<br />
+          • <code>echo</code> - Echo your message back<br />
+          • <code>calculate</code> - Math operations (e.g., "10 + 5")<br />
+          • <code>help</code> - Show available commands<br />
+          • <code>keyboard</code> - Arrow key presses (sent automatically)
+        </div>
+        <input
+          type="text"
+          id="msg-type"
+          placeholder="ping, echo, calculate, help"
+          disabled
+        />
+        <input
+          type="text"
+          id="msg-content"
+          placeholder="Message content"
+          disabled
+        />
+        <button id="send-btn" disabled>Send</button>
+      </div>
+
+      <div class="section">
+        <h3>Messages</h3>
+        <div id="messages"></div>
+        <button id="clear-btn">Clear Messages</button>
+      </div>
+    </div>
+
+    <script src="renderer.js"></script>
+  </body>
+</html>
