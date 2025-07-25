@@ -3,14 +3,15 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>2D Sprite Animation Demo</title>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline';" />
+    <title>2D Pixel Art Side Scroller</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
     <div class="container">
       <header>
-        <h1>2D Sprite Animation Demo</h1>
-        <p>Programmatic sprite generation and animation using Babylon.js</p>
+        <h1>2D Pixel Art Side Scroller</h1>
+        <p>Animated pixel art sprites with side-scrolling background using Babylon.js</p>
       </header>
 
       <div class="main-content">
@@ -26,8 +27,8 @@
           </div>
 
           <div class="control-section">
-            <h3>Speed Control</h3>
-            <label for="speed-slider">Animation Speed:</label>
+            <h3>Scroll Speed</h3>
+            <label for="speed-slider">Scroll Speed:</label>
             <input
               type="range"
               id="speed-slider"
@@ -40,28 +41,22 @@
           </div>
 
           <div class="control-section">
-            <h3>Sprite Types</h3>
-            <button id="add-square-btn" class="control-btn">Add Square</button>
-            <button id="add-circle-btn" class="control-btn">Add Circle</button>
-            <button id="add-triangle-btn" class="control-btn">
-              Add Triangle
-            </button>
+            <h3>Add Sprites</h3>
+            <button id="add-square-btn" class="control-btn">Add Character</button>
+            <button id="add-circle-btn" class="control-btn">Add Coin</button>
+            <button id="add-triangle-btn" class="control-btn">Add Enemy</button>
             <button id="clear-sprites-btn" class="control-btn danger">
               Clear All
             </button>
           </div>
 
           <div class="control-section">
-            <h3>Animation Types</h3>
-            <label>
-              <input type="checkbox" id="rotation-enabled" checked /> Rotation
-            </label>
-            <label>
-              <input type="checkbox" id="movement-enabled" checked /> Movement
-            </label>
-            <label>
-              <input type="checkbox" id="scaling-enabled" checked /> Scaling
-            </label>
+            <h3>Controls</h3>
+            <p style="font-size: 12px; color: #aaa; margin: 5px 0;">
+              <strong>Arrow Keys:</strong> Move character<br>
+              <strong>Space/Up:</strong> Jump<br>
+              <strong>Left/Right:</strong> Walk
+            </p>
           </div>
         </div>
       </div>
