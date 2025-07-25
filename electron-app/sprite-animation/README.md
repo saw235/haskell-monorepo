@@ -13,6 +13,7 @@ A demonstration of 2D sprite animation using Babylon.js and Electron, featuring 
 ## Building and Running
 
 ### Prerequisites
+
 - Bazel 7.4.0+
 - PNPM (for dependency management)
 
@@ -30,6 +31,7 @@ bazel run //electron-app/sprite-animation:sprite-animation-dev
 ```
 
 ### Install Dependencies
+
 ```bash
 bazel run -- @pnpm//:pnpm --dir $PWD/electron-app/sprite-animation/ install
 ```
@@ -48,7 +50,7 @@ bazel run -- @pnpm//:pnpm --dir $PWD/electron-app/sprite-animation/ install
 ### Sprite Types
 
 1. **Squares**: Rotate around their Z-axis with solid colors
-2. **Circles**: Scale up and down with smooth transitions  
+2. **Circles**: Scale up and down with smooth transitions
 3. **Triangles**: Rotate around their Y-axis as 3-sided cylinders
 
 ### Animation System
