@@ -1,13 +1,15 @@
-# 2D Sprite Animation Demo
+# 2D Pixel Art Side Scroller
 
-A demonstration of 2D sprite animation using Babylon.js and Electron, featuring programmatically generated sprites and interactive animation controls.
+A demonstration of 2D pixel art animation and side-scrolling using Babylon.js and Electron, featuring hand-crafted pixel art sprites with frame-based animation.
 
 ## Features
 
-- **Programmatic Sprite Generation**: Creates sprites using basic geometric shapes (squares, circles, triangles)
-- **Multiple Animation Types**: Rotation, movement, and scaling animations
-- **Interactive Controls**: Play/pause, speed adjustment, and sprite management
-- **Real-time Feedback**: FPS counter and sprite count display
+- **Pixel Art Animation**: Hand-crafted 8x8 and 6x6 pixel art sprites with multiple animation frames
+- **Side-Scrolling Gameplay**: True 2D orthographic view with scrolling background
+- **Interactive Character**: Keyboard controls for jumping and movement with gravity physics
+- **Multiple Sprite Types**: Animated character, spinning coins, and enemy sprites
+- **Dynamic Spawning**: Add new sprites during runtime
+- **Real-time Controls**: Play/pause, scroll speed adjustment, and sprite management
 - **Cross-platform**: Runs on Windows, macOS, and Linux
 
 ## Building and Running
@@ -40,25 +42,44 @@ bazel run -- @pnpm//:pnpm --dir $PWD/electron-app/sprite-animation/ install
 
 ### Controls
 
-- **Play/Pause**: Toggle animation playback
-- **Reset**: Reset all sprites to their initial positions
-- **Speed Slider**: Adjust animation speed from 0.1x to 3.0x
-- **Add Sprites**: Create new squares, circles, or triangles
+#### UI Controls
+- **Play/Pause**: Toggle animation playback and movement
+- **Reset**: Reset all sprite animations to first frame
+- **Scroll Speed Slider**: Adjust background and sprite scroll speed from 0.1x to 3.0x
+- **Add Character**: Spawn a new player character
+- **Add Coin**: Spawn a spinning collectible coin
+- **Add Enemy**: Spawn an animated enemy sprite  
 - **Clear All**: Remove all sprites from the scene
-- **Animation Toggles**: Enable/disable rotation, movement, and scaling
+
+#### Keyboard Controls
+- **Arrow Keys**: Move the character left and right
+- **Space Bar / Up Arrow**: Make the character jump
+- **Left/Right Arrows**: Walk left and right
 
 ### Sprite Types
 
-1. **Squares**: Rotate around their Z-axis with solid colors
-2. **Circles**: Scale up and down with smooth transitions
-3. **Triangles**: Rotate around their Y-axis as 3-sided cylinders
+1. **Character**: 8x8 pixel art character with standing and walking animation frames
+   - Skin tone head, brown hair, red shirt with yellow belt, blue pants, brown shoes
+   - 2-frame walking animation at 2 FPS
+   - Responds to keyboard input and gravity
+
+2. **Coin**: 6x6 pixel art spinning coin with gold/yellow colors
+   - 2-frame spinning animation at 4 FPS  
+   - Scrolls from right to left automatically
+   - Simulates collectible game items
+
+3. **Enemy**: 8x8 pixel art enemy with purple/magenta colors
+   - 2-frame animation showing normal and angry states at 3 FPS
+   - Scrolls from right to left at 80% of scroll speed
+   - Red eyes and intimidating appearance
 
 ### Animation System
 
-- **Built-in Animations**: Each sprite type has its own animation pattern using Babylon.js AnimationGroups
-- **Movement System**: Sinusoidal movement patterns applied to all sprites independently
-- **Speed Control**: Global speed multiplier affects all animations simultaneously
-- **Individual Phases**: Each sprite starts with a random phase to create variety
+- **Frame-Based Animation**: Each sprite type has hand-crafted pixel art frames
+- **Dynamic Texture Generation**: Pixel data is converted to Babylon.js DynamicTextures in real-time
+- **Individual Timing**: Each sprite animates at its own frame rate (2-4 FPS for pixel art feel)
+- **Automatic Cleanup**: Sprites that scroll off-screen are automatically disposed
+- **Physics Integration**: Character has gravity, jumping, and ground collision
 
 ## Technical Details
 
@@ -71,10 +92,12 @@ bazel run -- @pnpm//:pnpm --dir $PWD/electron-app/sprite-animation/ install
 
 ### Key Components
 
-- `SpriteAnimationDemo`: Main application class managing the 3D scene
-- `Sprite Interface`: Type definition for sprite objects with mesh and animation data
-- `Animation System`: Babylon.js AnimationGroups for frame-based animations
-- `Control System`: DOM event handlers for interactive controls
+- `SpriteAnimationDemo`: Main application class managing the 2D orthographic scene
+- `PixelArtFrame`: Interface defining pixel art frame data as 2D color arrays
+- `AnimatedSprite`: Interface for sprites with frame-based animation and physics
+- `Dynamic Texture System`: Real-time conversion of pixel data to Babylon.js textures
+- `Physics System`: Gravity, jumping, and collision detection for character
+- `Keyboard Controls`: Event handlers for character movement and jumping
 
 ### Performance
 
