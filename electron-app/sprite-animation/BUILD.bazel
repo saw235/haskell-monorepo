@@ -1,0 +1,87 @@
+load("@aspect_rules_js//js:defs.bzl", "js_binary")
+load("@aspect_rules_js//npm:defs.bzl", "npm_package")
+load("@npm_electron_sprite_animation//:defs.bzl", "npm_link_all_packages")
+load("@aspect_rules_esbuild//esbuild:defs.bzl", "esbuild")
+load("@aspect_bazel_lib//lib:output_files.bzl", "output_files")
+load("@aspect_bazel_lib//lib:copy_file.bzl", "copy_file")
+
+package(default_visibility = ["//visibility:public"])
+
+npm_link_all_packages(name = "node_modules")
+
+# Bundle the renderer with esbuild (rules_esbuild, low-level rule)
+esbuild(
+    name = "renderer_lib",
+    srcs = ["renderer.ts"],
+    bazel_sandbox_plugin = True,
+    entry_point = "renderer.ts",
+    esbuild_log_level = "verbose",
+    js_log_level = "debug",
+    metafile = True,
+    platform = "browser",
+    sourcemap = "external",
+    deps = [
+        ":node_modules",
+    ],
+)
+
+# Copy the esbuild output to a predictable filename
+genrule(
+    name = "renderer_js",
+    srcs = [":renderer_lib"],
+    outs = ["renderer.js"],
+    cmd = "cp $$(echo '$(locations :renderer_lib)' | tr ' ' '\\n' | grep '\\.js$$' | head -1) $@",
+)
+
+# All app files in a single filegroup to avoid duplication
+filegroup(
+    name = "app-files",
+    srcs = [
+        ":package.json",
+        ":main.js",
+        ":preload.js",
+        ":index.html",
+        ":styles.css",
+        ":renderer_js",
+        ":node_modules",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+# Package for distribution (without node_modules)
+npm_package(
+    name = "electron-sprite-animation-package",
+    srcs = [
+        ":package.json",
+        ":main.js",
+        ":preload.js",
+        ":index.html",
+        ":styles.css",
+        ":renderer_js",
+    ],
+)
+
+# Generic shell script for running electron
+genrule(
+    name = "electron_script",
+    outs = ["run_electron.sh"],
+    cmd = "echo '#!/bin/bash\ncd \"$$1\"\nshift\npnpm dlx electron \"$$@\"' > $@ && chmod +x $@",
+)
+
+# Run target for normal mode
+sh_binary(
+    name = "sprite-animation",
+    srcs = [":electron_script"],
+    args = ["electron-app/sprite-animation", "."],
+    data = [":app-files"],
+    visibility = ["//visibility:public"],
+)
+
+# Run target for development mode
+sh_binary(
+    name = "sprite-animation-dev", 
+    srcs = [":electron_script"],
+    args = ["electron-app/sprite-animation", ".", "--dev"],
+    data = [":app-files"],
+    visibility = ["//visibility:public"],
+)

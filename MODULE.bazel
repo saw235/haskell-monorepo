@@ -189,6 +189,17 @@ electron_babylon_example.npm_translate_lock(
 
 use_repo(electron_babylon_example, "npm_electron_babylon_example")
 
+# npm workspace for electron-sprite-animation
+electron_sprite_animation = use_extension("@aspect_rules_js//npm:extensions.bzl", "npm", dev_dependency = True)
+
+electron_sprite_animation.npm_translate_lock(
+    name = "npm_electron_sprite_animation",
+    pnpm_lock = "//electron-app/sprite-animation:pnpm-lock.yaml",
+    verify_node_modules_ignored = "//:.bazelignore",
+)
+
+use_repo(electron_sprite_animation, "npm_electron_sprite_animation")
+
 pnpm = use_extension("@aspect_rules_js//npm:extensions.bzl", "pnpm")
 
 # Allows developers to use the matching pnpm version, for example:
