@@ -3,6 +3,7 @@ haskell/app/tic-tac-toe-electron/node_modules
 electron-app/node_modules
 electron-app/hello-world/node_modules
 electron-app/babylon-example/node_modules
+electron-app/sprite-animation/node_modules
 node_modules
 dist
 .bzlignore
