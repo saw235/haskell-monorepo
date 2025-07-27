@@ -137,7 +137,7 @@ getEnvDouble envVar defaultVal = do
 -- | Pendulum model
 model :: Double -> Double -> Double -> Double -> Simulation Results
 model pendulumLen dampingC initAngle initVel = mdo
-  let g = 9.81  -- gravitational acceleration (m/s²)
+  let g = 9.81 -- gravitational acceleration (m/s²)
 
   -- Angular velocity differential equation: dω/dt = -(g/L)sin(θ) - c*ω
   let dOmega = do
@@ -158,11 +158,10 @@ model pendulumLen dampingC initAngle initVel = mdo
   let xPos = do
         theta' <- theta
         return $ pendulumLen * sin theta'
-  
+
   let yPos = do
         theta' <- theta
-        return $ -pendulumLen * cos theta'  -- Negative because y=0 is at the top
-
+        return $ -pendulumLen * cos theta' -- Negative because y=0 is at the top
   return $
     results
       [ resultSource "t" "Time (seconds)" Simulation.Aivika.time,
@@ -175,35 +174,38 @@ model pendulumLen dampingC initAngle initVel = mdo
 -- | Run simulation and return data points using analytical approximation
 runPendulumSimulation :: SimulationParams -> IO [SimulationResult]
 runPendulumSimulation (SimulationParams len damp initAngle initVel endTime) = do
-  let dt = 0.05  -- Time step for output
+  let dt = 0.05 -- Time step for output
       timePoints = [0, dt .. endTime]
-      
+
   return $ map (calculatePendulumState len damp initAngle initVel) timePoints
   where
     calculatePendulumState l c theta0 omega0 t =
       -- For small angles, approximate with harmonic oscillator with damping
-      let omega_n = sqrt (9.81 / l)  -- Natural frequency
-          zeta = c / (2 * sqrt (9.81 / l))  -- Damping ratio
-          omega_d = omega_n * sqrt (1 - zeta^2)  -- Damped frequency
-          
+      let omega_n = sqrt (9.81 / l) -- Natural frequency
+          zeta = c / (2 * sqrt (9.81 / l)) -- Damping ratio
+          omega_d = omega_n * sqrt (1 - zeta ^ 2) -- Damped frequency
+
           -- Damped oscillation solution
-          theta = if zeta < 1
-                 then exp (-zeta * omega_n * t) * 
-                      (theta0 * cos (omega_d * t) + 
-                       ((omega0 + zeta * omega_n * theta0) / omega_d) * sin (omega_d * t))
-                 else theta0 * exp (-omega_n * t)  -- Overdamped case simplified
-          
-          omega = if zeta < 1
-                 then exp (-zeta * omega_n * t) * 
-                      (-theta0 * omega_d * sin (omega_d * t) + 
-                       (omega0 + zeta * omega_n * theta0) * cos (omega_d * t)) -
-                      zeta * omega_n * theta
-                 else -omega_n * theta  -- Overdamped case simplified
-          
+          theta =
+            if zeta < 1
+              then
+                exp (-zeta * omega_n * t)
+                  * ( theta0 * cos (omega_d * t)
+                        + ((omega0 + zeta * omega_n * theta0) / omega_d) * sin (omega_d * t)
+                    )
+              else theta0 * exp (-omega_n * t) -- Overdamped case simplified
+          omega =
+            if zeta < 1
+              then
+                exp (-zeta * omega_n * t)
+                  * ( -theta0 * omega_d * sin (omega_d * t)
+                        + (omega0 + zeta * omega_n * theta0) * cos (omega_d * t)
+                    )
+                  - zeta * omega_n * theta
+              else -omega_n * theta -- Overdamped case simplified
           x = l * sin theta
           y = -l * cos theta
-          
-      in SimulationResult t theta omega x y
+       in SimulationResult t theta omega x y
 
 -- | Create response message
 createResponse :: Text -> Text -> L8.ByteString
@@ -262,7 +264,7 @@ runCLI = do
   -- Get parameters from environment variables or use defaults
   pendulumLength <- getEnvDouble "PENDULUM_LENGTH" 1.0
   dampingCoeff <- getEnvDouble "DAMPING_COEFF" 0.1
-  initialAngle <- getEnvDouble "INITIAL_ANGLE" 0.785  -- 45 degrees in radians
+  initialAngle <- getEnvDouble "INITIAL_ANGLE" 0.785 -- 45 degrees in radians
   initialVelocity <- getEnvDouble "INITIAL_VELOCITY" 0.0
   timeEnd <- getEnvDouble "TIME_END" 10.0
 
@@ -281,22 +283,28 @@ runCLI = do
 
   let params = SimulationParams pendulumLength dampingCoeff initialAngle initialVelocity timeEnd
   results <- runPendulumSimulation params
-  
+
   -- Sample every 10th point to avoid too much output
-  let sampledResults = [r | (i, r) <- zip [0..] results, i `mod` 20 == 0]
-  
+  let sampledResults = [r | (i, r) <- zip [0 ..] results, i `mod` 20 == 0]
+
   mapM_ printResult sampledResults
 
   putStrLn ""
   putStrLn "Simulation complete!"
   where
     printResult (SimulationResult t theta omega x y) =
-      putStrLn $ show t ++ " | " ++ 
-                 show theta ++ " | " ++
-                 show (theta * 180 / pi) ++ " | " ++
-                 show omega ++ " | " ++
-                 show x ++ " | " ++
-                 show y
+      putStrLn $
+        show t
+          ++ " | "
+          ++ show theta
+          ++ " | "
+          ++ show (theta * 180 / pi)
+          ++ " | "
+          ++ show omega
+          ++ " | "
+          ++ show x
+          ++ " | "
+          ++ show y
 
 -- | Server mode execution
 runServer :: Int -> IO ()
