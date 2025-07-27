@@ -1,0 +1,25 @@
+# Load rules_haskell rules.
+load(
+    "@rules_haskell//haskell:defs.bzl",
+    "haskell_binary",
+)
+load("//tools/bnfc:bnfc.bzl", "bnfc_grammar")
+
+# Generate parser files from grammar
+bnfc_grammar(
+    name = "calc_grammar",
+    grammar = "Calc.cf",
+)
+
+# Main application binary
+haskell_binary(
+    name = "bnfc-example",
+    srcs = [
+        "Main.hs",
+        ":calc_grammar",
+    ],
+    deps = [
+        "//:base",
+        "@stackage//:array",
+    ],
+)

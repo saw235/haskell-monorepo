@@ -186,6 +186,38 @@
         ]
       }
     },
+    "//tools/bnfc:bnfc_deps.bzl%bnfc_deps": {
+      "general": {
+        "bzlTransitiveDigest": "R4dXQj6b1ay3AGHsR6HGIrZ1eRb5g67GHNOZfTlVELk=",
+        "usagesDigest": "uu6nC8r4g8ATG2hCgR4HpnK4nFu93wj5ddoeRkno3nY=",
+        "recordedFileInputs": {},
+        "recordedDirentsInputs": {},
+        "envVariables": {},
+        "generatedRepoSpecs": {
+          "bnfc_linux": {
+            "bzlFile": "@@//tools/bnfc:bnfc_deps.bzl",
+            "ruleClassName": "_bnfc_binary_repo",
+            "attributes": {
+              "platform": "linux"
+            }
+          },
+          "bnfc_windows": {
+            "bzlFile": "@@//tools/bnfc:bnfc_deps.bzl",
+            "ruleClassName": "_bnfc_binary_repo",
+            "attributes": {
+              "platform": "windows"
+            }
+          }
+        },
+        "recordedRepoMappingEntries": [
+          [
+            "",
+            "bazel_tools",
+            "bazel_tools"
+          ]
+        ]
+      }
+    },
     "@@apple_support~//crosstool:setup.bzl%apple_cc_configure_extension": {
       "general": {
         "bzlTransitiveDigest": "PjIds3feoYE8SGbbIq2SFTZy3zmxeO2tQevJZNDo7iY=",
@@ -1029,7 +1061,7 @@
     "@@rules_haskell~//extensions:stack_snapshot.bzl%stack_snapshot": {
       "general": {
         "bzlTransitiveDigest": "I9dE/IPkeO/mkCmDvxjs6J9WP1Tf8kV6hE6XhXWYcuw=",
-        "usagesDigest": "V+D4T87ip4r5EwNCnCmzPA54q37O+HcF0mEll4+t1kE=",
+        "usagesDigest": "j3obRaXgqO6jhkYK3U2zrbQloUAV3GA/LNTQp7X3Ijo=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},
         "envVariables": {},
@@ -1078,6 +1110,7 @@
                 "optparse-applicative",
                 "QuickCheck",
                 "websockets",
+                "array",
                 "containers",
                 "stm",
                 "zlib",
@@ -1136,6 +1169,7 @@
                 "optparse-applicative",
                 "QuickCheck",
                 "websockets",
+                "array",
                 "containers",
                 "stm",
                 "zlib",
