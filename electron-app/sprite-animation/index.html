@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline';"
+    />
+    <title>2D Pixel Art Side Scroller</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>2D Pixel Art Side Scroller</h1>
+        <p>
+          Animated pixel art sprites with side-scrolling background using
+          Babylon.js
+        </p>
+      </header>
+
+      <div class="main-content">
+        <div class="canvas-container">
+          <canvas id="renderCanvas"></canvas>
+        </div>
+
+        <div class="controls-panel">
+          <div class="control-section">
+            <h3>Animation Controls</h3>
+            <button id="play-pause-btn" class="control-btn">Pause</button>
+            <button id="reset-btn" class="control-btn">Reset</button>
+          </div>
+
+          <div class="control-section">
+            <h3>Scroll Speed</h3>
+            <label for="speed-slider">Scroll Speed:</label>
+            <input
+              type="range"
+              id="speed-slider"
+              min="0.1"
+              max="3"
+              step="0.1"
+              value="1"
+            />
+            <span id="speed-value">1.0x</span>
+          </div>
+
+          <div class="control-section">
+            <h3>Add Sprites</h3>
+            <button id="add-square-btn" class="control-btn">
+              Add Character
+            </button>
+            <button id="add-circle-btn" class="control-btn">Add Coin</button>
+            <button id="add-triangle-btn" class="control-btn">Add Enemy</button>
+            <button id="clear-sprites-btn" class="control-btn danger">
+              Clear All
+            </button>
+          </div>
+
+          <div class="control-section">
+            <h3>Controls</h3>
+            <p style="font-size: 12px; color: #aaa; margin: 5px 0">
+              <strong>Arrow Keys:</strong> Move character<br />
+              <strong>Space/Up:</strong> Jump<br />
+              <strong>Left/Right:</strong> Walk
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="info-panel">
+        <div class="info-item">
+          <span id="fps">FPS: 0</span>
+        </div>
+        <div class="info-item">
+          <span id="sprite-count">Sprites: 0</span>
+        </div>
+        <div class="info-item">
+          <span id="camera-info">Camera: 0, 0</span>
+        </div>
+      </div>
+    </div>
+
+    <script src="renderer.js"></script>
+  </body>
+</html>
