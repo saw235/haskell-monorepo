@@ -43,15 +43,17 @@ bazel run -- @pnpm//:pnpm --dir $PWD/electron-app/sprite-animation/ install
 ### Controls
 
 #### UI Controls
+
 - **Play/Pause**: Toggle animation playback and movement
 - **Reset**: Reset all sprite animations to first frame
 - **Scroll Speed Slider**: Adjust background and sprite scroll speed from 0.1x to 3.0x
 - **Add Character**: Spawn a new player character
 - **Add Coin**: Spawn a spinning collectible coin
-- **Add Enemy**: Spawn an animated enemy sprite  
+- **Add Enemy**: Spawn an animated enemy sprite
 - **Clear All**: Remove all sprites from the scene
 
 #### Keyboard Controls
+
 - **Arrow Keys**: Move the character left and right
 - **Space Bar / Up Arrow**: Make the character jump
 - **Left/Right Arrows**: Walk left and right
@@ -64,7 +66,7 @@ bazel run -- @pnpm//:pnpm --dir $PWD/electron-app/sprite-animation/ install
    - Responds to keyboard input and gravity
 
 2. **Coin**: 6x6 pixel art spinning coin with gold/yellow colors
-   - 2-frame spinning animation at 4 FPS  
+   - 2-frame spinning animation at 4 FPS
    - Scrolls from right to left automatically
    - Simulates collectible game items
 
@@ -91,9 +93,9 @@ Each sprite is defined as a 2D array of hex color strings representing individua
 
 ```typescript
 interface PixelArtFrame {
-  width: number;        // Width in pixels (e.g., 8)
-  height: number;       // Height in pixels (e.g., 8) 
-  pixels: string[][];   // 2D array of hex colors like "#FF0000"
+  width: number; // Width in pixels (e.g., 8)
+  height: number; // Height in pixels (e.g., 8)
+  pixels: string[][]; // 2D array of hex colors like "#FF0000"
 }
 ```
 
@@ -146,10 +148,10 @@ The demo uses a carefully chosen retro pixel art color palette:
 private createPixelTexture(frame: PixelArtFrame): DynamicTexture {
   const textureSize = Math.max(frame.width, frame.height) * 8; // 8x scale
   const texture = new DynamicTexture("pixelTexture", textureSize, this.scene, false);
-  
+
   const ctx = texture.getContext();
   const pixelSize = textureSize / Math.max(frame.width, frame.height);
-  
+
   // Draw each pixel as a colored square
   for (let y = 0; y < frame.height; y++) {
     for (let x = 0; x < frame.width; x++) {
@@ -160,7 +162,7 @@ private createPixelTexture(frame: PixelArtFrame): DynamicTexture {
       }
     }
   }
-  
+
   texture.update();
   return texture;
 }
@@ -193,7 +195,7 @@ private createCharacterFrames(): PixelArtFrame[] {
   return [
     // Frame 1 - Standing pose
     { width: 8, height: 8, pixels: [...] },
-    // Frame 2 - Walking pose  
+    // Frame 2 - Walking pose
     { width: 8, height: 8, pixels: [...] }
   ];
 }
@@ -227,14 +229,14 @@ The `createPixelTexture` method converts pixel arrays into Babylon.js textures:
 private createPixelTexture(frame: PixelArtFrame): DynamicTexture {
   const textureSize = Math.max(frame.width, frame.height) * 8; // 8x upscale
   const texture = new DynamicTexture("pixelTexture", textureSize, this.scene, false);
-  
+
   const ctx = texture.getContext();
   const pixelSize = textureSize / Math.max(frame.width, frame.height);
-  
+
   // Clear canvas with transparent background
   ctx.fillStyle = "transparent";
   ctx.fillRect(0, 0, textureSize, textureSize);
-  
+
   // Render each pixel as a colored rectangle
   for (let y = 0; y < frame.height; y++) {
     for (let x = 0; x < frame.width; x++) {
@@ -245,7 +247,7 @@ private createPixelTexture(frame: PixelArtFrame): DynamicTexture {
       }
     }
   }
-  
+
   texture.update();
   return texture;
 }
@@ -263,7 +265,7 @@ private createAnimatedSprite(
   let frames: PixelArtFrame[];
   let animationSpeed: number;
   let velocity: Vector3;
-  
+
   // Select appropriate frames and properties based on sprite type
   switch (type) {
     case "character":
@@ -282,18 +284,18 @@ private createAnimatedSprite(
       velocity = new Vector3(-this.scrollSpeed * 0.8, 0, 0); // Slower scroll
       break;
   }
-  
+
   // Create 3D plane mesh for the sprite
   const sprite = MeshBuilder.CreatePlane(`${type}_sprite`, { size: 1 }, this.scene);
   sprite.position = position.clone();
-  
+
   // Create material with the first frame texture
   const material = new StandardMaterial(`${type}_material`, this.scene);
   const texture = this.createPixelTexture(frames[0]);
   material.diffuseTexture = texture;
   material.hasAlpha = true; // Enable transparency
   sprite.material = material;
-  
+
   return { mesh: sprite, material, texture, frames, currentFrame: 0, /* ... */ };
 }
 ```
@@ -305,23 +307,23 @@ The animation system updates textures in real-time:
 ```typescript
 private updateSprites(deltaTime: number): void {
   // ... other update logic ...
-  
+
   this.sprites.forEach((sprite, index) => {
     // Update animation timer
     sprite.animationTimer += deltaSeconds;
     const frameTime = 1 / sprite.animationSpeed;
-    
+
     // Check if it's time for next frame
     if (sprite.animationTimer >= frameTime) {
       sprite.animationTimer = 0;
       sprite.currentFrame = (sprite.currentFrame + 1) % sprite.frames.length;
-      
+
       // Dispose old texture and create new one
       sprite.texture.dispose();
       sprite.texture = this.createPixelTexture(sprite.frames[sprite.currentFrame]);
       sprite.material.diffuseTexture = sprite.texture;
     }
-    
+
     // ... position updates and cleanup ...
   });
 }
@@ -335,11 +337,11 @@ Sprites are initially created and positioned:
 private createInitialSprites(): void {
   // Create player character at left side
   const character = this.createAnimatedSprite(
-    "character", 
+    "character",
     new Vector3(-5, this.groundLevel + 1, 0)
   );
   this.sprites.push(character);
-  
+
   // Create coins at regular intervals
   for (let i = 0; i < 5; i++) {
     const coin = this.createAnimatedSprite(
@@ -348,7 +350,7 @@ private createInitialSprites(): void {
     );
     this.sprites.push(coin);
   }
-  
+
   // Create enemies spread across the level
   for (let i = 0; i < 3; i++) {
     const enemy = this.createAnimatedSprite(
