@@ -7,14 +7,17 @@ def _bnfc_binary_repo_impl(repository_ctx):
     if repository_ctx.attr.platform == "windows":
         url = "https://bnfc.digitalgrammars.com/download/bnfc-2.9.5-win.exe"
         filename = "bnfc.exe"
+        sha256 = "dfc08bfe0a84bc50ef7a424d039790fcb9a0226f2c992f9d2a340775b37d6bac"
     else:
         url = "https://bnfc.digitalgrammars.com/download/bnfc-2.9.5-linux-x86_64.binary"
         filename = "bnfc"
+        sha256 = "c250c3310a6d0345830236e3fa37254901ce725560a9e829b61315f1a901ade5"
     
     repository_ctx.download(
         url = url,
         output = filename,
         executable = True,
+        sha256 = sha256,
     )
     
     repository_ctx.file("BUILD.bazel", """

@@ -123,8 +123,11 @@ The `bnfc_grammar` rule:
 
 ## Dependencies
 
-- BNFC binary (automatically downloaded by the rule)
-- Alex (Haskell lexer generator)
-- Happy (Haskell parser generator)
+- **BNFC binary** (automatically downloaded by the rule with SHA256 checksum verification)
+- **Alex** (Haskell lexer generator) - system-installed via apt
+- **Happy** (Haskell parser generator) - system-installed via apt
 
-Both Alex and Happy are available through the Stackage snapshot defined in the project's MODULE.bazel.
+### Security
+- BNFC binaries are downloaded with SHA256 checksum verification for security
+- Linux binary: `c250c3310a6d0345830236e3fa37254901ce725560a9e829b61315f1a901ade5`
+- Windows binary: `dfc08bfe0a84bc50ef7a424d039790fcb9a0226f2c992f9d2a340775b37d6bac`

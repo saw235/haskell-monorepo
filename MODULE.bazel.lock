@@ -188,7 +188,7 @@
     },
     "//tools/bnfc:bnfc_deps.bzl%bnfc_deps": {
       "general": {
-        "bzlTransitiveDigest": "R4dXQj6b1ay3AGHsR6HGIrZ1eRb5g67GHNOZfTlVELk=",
+        "bzlTransitiveDigest": "pjoaDkMnTc49+oFq2m8hPFYq6pqxqbO65EipogZ7QT8=",
         "usagesDigest": "uu6nC8r4g8ATG2hCgR4HpnK4nFu93wj5ddoeRkno3nY=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},
