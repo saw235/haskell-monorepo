@@ -28,7 +28,13 @@ const createWindow = () => {
 ipcMain.handle("run-simulation", async (event, params) => {
   console.log("IPC handler called with params:", params);
   return new Promise((resolve, reject) => {
-    const { pendulumLength, dampingCoeff, initialAngle, initialVelocity, timeEnd } = params;
+    const {
+      pendulumLength,
+      dampingCoeff,
+      initialAngle,
+      initialVelocity,
+      timeEnd,
+    } = params;
 
     // Connect to the running WebSocket server
     const WebSocket = require("ws");
@@ -43,7 +49,7 @@ ipcMain.handle("run-simulation", async (event, params) => {
         content: JSON.stringify({
           pendulumLength: pendulumLength,
           dampingCoeff: dampingCoeff,
-          initialAngle: initialAngle * Math.PI / 180, // Convert degrees to radians
+          initialAngle: (initialAngle * Math.PI) / 180, // Convert degrees to radians
           initialVelocity: initialVelocity,
           timeEnd: timeEnd,
         }),

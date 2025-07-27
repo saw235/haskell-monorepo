@@ -11,7 +11,8 @@
       <header>
         <h1>Aivika Pendulum Simulation</h1>
         <p>
-          Interactive visualization of pendulum motion with real-time animation and charts
+          Interactive visualization of pendulum motion with real-time animation
+          and charts
         </p>
       </header>
 
@@ -67,7 +68,9 @@
             />
           </div>
           <div class="parameter-group">
-            <label for="initial-velocity">Initial Angular Velocity (rad/s):</label>
+            <label for="initial-velocity"
+              >Initial Angular Velocity (rad/s):</label
+            >
             <input
               type="number"
               id="initial-velocity"
@@ -91,7 +94,9 @@
           <div class="parameter-group buttons">
             <button id="run-btn" class="primary-btn">Run Simulation</button>
             <button id="reset-btn" class="secondary-btn">Reset</button>
-            <button id="play-pause-btn" class="secondary-btn" disabled>▶ Play</button>
+            <button id="play-pause-btn" class="secondary-btn" disabled>
+              ▶ Play
+            </button>
           </div>
         </div>
       </div>
@@ -110,34 +115,88 @@
             <svg id="pendulum-svg" viewBox="0 0 400 300">
               <!-- Pendulum pivot point -->
               <circle cx="200" cy="50" r="3" fill="#333" />
-              
+
               <!-- Pendulum rod -->
-              <line id="pendulum-rod" x1="200" y1="50" x2="200" y2="150" 
-                    stroke="#666" stroke-width="2" />
-              
+              <line
+                id="pendulum-rod"
+                x1="200"
+                y1="50"
+                x2="200"
+                y2="150"
+                stroke="#666"
+                stroke-width="2"
+              />
+
               <!-- Pendulum bob -->
-              <circle id="pendulum-bob" cx="200" cy="150" r="8" 
-                      fill="#667eea" stroke="#4c51bf" stroke-width="2" />
-              
+              <circle
+                id="pendulum-bob"
+                cx="200"
+                cy="150"
+                r="8"
+                fill="#667eea"
+                stroke="#4c51bf"
+                stroke-width="2"
+              />
+
               <!-- Trail path for bob -->
-              <path id="pendulum-trail" stroke="#667eea" stroke-width="1" 
-                    fill="none" opacity="0.5" />
-              
+              <path
+                id="pendulum-trail"
+                stroke="#667eea"
+                stroke-width="1"
+                fill="none"
+                opacity="0.5"
+              />
+
               <!-- Reference grid lines -->
               <g id="grid-lines" opacity="0.2">
-                <line x1="0" y1="50" x2="400" y2="50" stroke="#ccc" stroke-width="1" />
-                <line x1="200" y1="0" x2="200" y2="300" stroke="#ccc" stroke-width="1" />
-                <circle cx="200" cy="50" r="100" stroke="#ccc" stroke-width="1" fill="none" />
-                <circle cx="200" cy="50" r="150" stroke="#ccc" stroke-width="1" fill="none" />
+                <line
+                  x1="0"
+                  y1="50"
+                  x2="400"
+                  y2="50"
+                  stroke="#ccc"
+                  stroke-width="1"
+                />
+                <line
+                  x1="200"
+                  y1="0"
+                  x2="200"
+                  y2="300"
+                  stroke="#ccc"
+                  stroke-width="1"
+                />
+                <circle
+                  cx="200"
+                  cy="50"
+                  r="100"
+                  stroke="#ccc"
+                  stroke-width="1"
+                  fill="none"
+                />
+                <circle
+                  cx="200"
+                  cy="50"
+                  r="150"
+                  stroke="#ccc"
+                  stroke-width="1"
+                  fill="none"
+                />
               </g>
             </svg>
-            
+
             <div class="animation-controls">
               <div class="time-display">
                 <span>Time: <span id="current-time">0.00</span>s</span>
               </div>
               <div class="animation-slider">
-                <input type="range" id="time-slider" min="0" max="100" value="0" disabled />
+                <input
+                  type="range"
+                  id="time-slider"
+                  min="0"
+                  max="100"
+                  value="0"
+                  disabled
+                />
               </div>
             </div>
           </div>
