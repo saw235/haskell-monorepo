@@ -1,4 +1,4 @@
-load("@aspect_rules_js//js:defs.bzl", "js_binary")
+load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_test")
 load("@aspect_rules_js//npm:defs.bzl", "npm_package")
 load("@npm_electron_sprite_animation//:defs.bzl", "npm_link_all_packages")
 load("@aspect_rules_esbuild//esbuild:defs.bzl", "esbuild")
@@ -84,4 +84,78 @@ sh_binary(
     args = ["electron-app/sprite-animation", ".", "--dev"],
     data = [":app-files"],
     visibility = ["//visibility:public"],
+)
+
+# Test files
+filegroup(
+    name = "test_files",
+    srcs = glob([
+        "tests/**/*.ts",
+        "jest.config.js",
+    ]),
+)
+
+# Jest test runner script
+js_test(
+    name = "unit_tests",
+    entry_point = ":node_modules/jest/bin/jest.js",
+    args = [
+        "--config", 
+        "$(rootpath :jest.config.js)",
+        "--testPathPattern=unit",
+        "--passWithNoTests",
+    ],
+    data = [
+        ":test_files",
+        ":node_modules",
+        "renderer.ts",
+        ":jest.config.js",
+    ],
+    env = {
+        "NODE_OPTIONS": "--experimental-vm-modules --no-warnings",
+    },
+    chdir = package_name(),
+)
+
+# Integration tests  
+js_test(
+    name = "integration_tests",
+    entry_point = ":node_modules/jest/bin/jest.js",
+    args = [
+        "--config", 
+        "$(rootpath :jest.config.js)",
+        "--testPathPattern=integration",
+        "--passWithNoTests",
+    ],
+    data = [
+        ":test_files", 
+        ":node_modules",
+        "renderer.ts",
+        ":jest.config.js",
+    ],
+    env = {
+        "NODE_OPTIONS": "--experimental-vm-modules --no-warnings",
+    },
+    chdir = package_name(),
+)
+
+# All tests
+js_test(
+    name = "all_tests",
+    entry_point = ":node_modules/jest/bin/jest.js",
+    args = [
+        "--config", 
+        "$(rootpath :jest.config.js)",
+        "--passWithNoTests",
+    ],
+    data = [
+        ":test_files",
+        ":node_modules", 
+        "renderer.ts",
+        ":jest.config.js",
+    ],
+    env = {
+        "NODE_OPTIONS": "--experimental-vm-modules --no-warnings",
+    },
+    chdir = package_name(),
 )
