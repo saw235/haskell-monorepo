@@ -9,12 +9,13 @@ def _bnfc_grammar_impl(ctx):
     grammar_name = grammar_file.basename.replace(".cf", "")
     
     # Define expected output files (excluding Test file to avoid main module conflict)
+    # Make ErrM unique per grammar to avoid conflicts when using multiple grammars
     outputs = [
         ctx.actions.declare_file("Abs{}.hs".format(grammar_name)),
         ctx.actions.declare_file("Lex{}.hs".format(grammar_name)),
         ctx.actions.declare_file("Par{}.hs".format(grammar_name)),
         ctx.actions.declare_file("Print{}.hs".format(grammar_name)),
-        ctx.actions.declare_file("ErrM.hs"),
+        ctx.actions.declare_file("ErrM{}.hs".format(grammar_name)),
     ]
     
     # Create command to generate files
@@ -41,7 +42,9 @@ def _bnfc_grammar_impl(ctx):
         cp Lex{grammar_name}.hs {lex_output}
         cp Par{grammar_name}.hs {par_output}
         cp Print{grammar_name}.hs {print_output}
-        cp ErrM.hs {errm_output}
+        
+        # Rename ErrM to be grammar-specific and update module name
+        sed 's/module ErrM/module ErrM{grammar_name}/' ErrM.hs > {errm_output}
         
         """.format(
             bnfc = bnfc_tool.path,

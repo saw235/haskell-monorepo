@@ -1,0 +1,57 @@
+-- Statement grammar for a simple programming language
+-- Handles control flow, assignments, and function definitions
+
+-- Import expression grammar (conceptually - BNFC doesn't support imports)
+-- In practice, we'll need to include common types
+
+-- Programs and statement blocks
+Prog.     Program ::= [Stmt] ;
+Block.    Stmt    ::= "{" [Stmt] "}" ;
+
+-- Variable declarations and assignments
+VarDecl.  Stmt ::= "var" Ident "=" Expr ";" ;
+Assign.   Stmt ::= Ident "=" Expr ";" ;
+
+-- Control flow statements
+IfStmt.   Stmt ::= "if" "(" Expr ")" Stmt ;
+IfElse.   Stmt ::= "if" "(" Expr ")" Stmt "else" Stmt ;
+While.    Stmt ::= "while" "(" Expr ")" Stmt ;
+For.      Stmt ::= "for" "(" Stmt Expr ";" Expr ")" Stmt ;
+
+-- Function definitions
+FunDef.   Stmt ::= "function" Ident "(" [Param] ")" Stmt ;
+Param.    Param ::= Ident ;
+
+-- Expression statements and return
+ExprStmt. Stmt ::= Expr ";" ;
+Return.   Stmt ::= "return" Expr ";" ;
+ReturnVoid. Stmt ::= "return" ";" ;
+
+-- Print statement for testing
+Print.    Stmt ::= "print" "(" Expr ")" ";" ;
+
+-- Lists
+separator Stmt "" ;
+separator Param "," ;
+
+-- Basic expressions (subset needed for statements)
+-- Note: In a real multi-grammar setup, these would be shared
+EAdd.     Expr   ::= Expr "+" Expr1 ;
+ESub.     Expr   ::= Expr "-" Expr1 ;
+EMul.     Expr1  ::= Expr1 "*" Expr2 ;
+EDiv.     Expr1  ::= Expr1 "/" Expr2 ;
+EInt.     Expr2  ::= Integer ;
+EVar.     Expr2  ::= Ident ;
+EParen.   Expr2  ::= "(" Expr ")" ;
+
+-- Comparison operators for conditions
+ELt.      Expr   ::= Expr "<" Expr1 ;
+EGt.      Expr   ::= Expr ">" Expr1 ;
+EEq.      Expr   ::= Expr "==" Expr1 ;
+ENe.      Expr   ::= Expr "!=" Expr1 ;
+
+coercions Expr 2 ;
+
+-- Comments
+comment "//" ;
+comment "/*" "*/" ;
