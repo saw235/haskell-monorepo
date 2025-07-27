@@ -1,9 +1,9 @@
 module Main where
 
-import LexCalc
-import ParCalc
 import AbsCalc
 import ErrM
+import LexCalc
+import ParCalc
 
 -- Simple evaluation function for the calculator expressions
 eval :: Exp -> Integer
