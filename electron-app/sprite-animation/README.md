@@ -371,6 +371,219 @@ To create new sprite types:
 
 The system automatically handles texture creation, animation cycling, and cleanup for any sprite type you define!
 
+## Using External Sprite Images
+
+While this demo uses programmatic pixel art, you can easily modify it to support external sprite images (PNG, JPG, etc.). Here are the approaches:
+
+### Option 1: Modify `createPixelTexture` for External Images
+
+Replace or extend the `createPixelTexture` method to load external images:
+
+```typescript
+// Add to imports
+import { Texture } from "@babylonjs/core";
+
+// New method for external sprites
+private createExternalTexture(imageUrl: string): Promise<Texture> {
+  return new Promise((resolve, reject) => {
+    const texture = new Texture(imageUrl, this.scene, false, false, undefined, 
+      () => resolve(texture),  // onLoad
+      () => reject(new Error(`Failed to load ${imageUrl}`)) // onError
+    );
+    texture.hasAlpha = true; // Enable transparency
+    texture.wrapU = Texture.CLAMP_ADDRESSMODE;
+    texture.wrapV = Texture.CLAMP_ADDRESSMODE;
+  });
+}
+
+// Modified sprite creation for external images
+private async createExternalSprite(
+  imageUrls: string[], // Array of frame images
+  type: string,
+  position: Vector3
+): Promise<AnimatedSprite> {
+  const textures: Texture[] = [];
+  
+  // Load all frame textures
+  for (const url of imageUrls) {
+    const texture = await this.createExternalTexture(url);
+    textures.push(texture);
+  }
+  
+  // Create sprite mesh
+  const sprite = MeshBuilder.CreatePlane(`${type}_sprite`, { size: 1 }, this.scene);
+  sprite.position = position.clone();
+  
+  // Create material with first frame
+  const material = new StandardMaterial(`${type}_material`, this.scene);
+  material.diffuseTexture = textures[0];
+  material.hasAlpha = true;
+  sprite.material = material;
+  
+  return {
+    mesh: sprite,
+    material,
+    textures, // Store all textures instead of generating them
+    currentFrame: 0,
+    animationTimer: 0,
+    animationSpeed: 4,
+    position: position.clone(),
+    velocity: new Vector3(-this.scrollSpeed, 0, 0),
+    type
+  };
+}
+```
+
+### Option 2: Sprite Sheet Support
+
+For sprite sheets (multiple frames in one image), add sprite sheet functionality:
+
+```typescript
+interface SpriteSheetFrame {
+  x: number;      // X position in sprite sheet
+  y: number;      // Y position in sprite sheet  
+  width: number;  // Frame width
+  height: number; // Frame height
+}
+
+interface SpriteSheetData {
+  imageUrl: string;
+  frameWidth: number;
+  frameHeight: number;
+  frames: SpriteSheetFrame[];
+}
+
+private createSpriteSheetTexture(
+  spriteSheetData: SpriteSheetData, 
+  frameIndex: number
+): Promise<Texture> {
+  return new Promise((resolve, reject) => {
+    const baseTexture = new Texture(spriteSheetData.imageUrl, this.scene, false, false);
+    
+    baseTexture.onLoadObservable.add(() => {
+      const frame = spriteSheetData.frames[frameIndex];
+      
+      // Create dynamic texture for the specific frame
+      const frameTexture = new DynamicTexture(
+        `frame_${frameIndex}`, 
+        { width: frame.width, height: frame.height }, 
+        this.scene
+      );
+      
+      const ctx = frameTexture.getContext();
+      const img = baseTexture.getInternalTexture()?.getWebGLTexture();
+      
+      // Draw the specific frame from the sprite sheet
+      ctx.drawImage(
+        img as any, 
+        frame.x, frame.y, frame.width, frame.height,  // Source
+        0, 0, frame.width, frame.height               // Destination
+      );
+      
+      frameTexture.update();
+      resolve(frameTexture);
+    });
+  });
+}
+```
+
+### Option 3: Asset Management Setup
+
+For a production setup, organize your external sprites:
+
+```
+electron-app/sprite-animation/
+├── assets/
+│   ├── sprites/
+│   │   ├── character/
+│   │   │   ├── walk_01.png
+│   │   │   ├── walk_02.png
+│   │   │   └── idle.png
+│   │   ├── enemies/
+│   │   │   ├── goblin_01.png
+│   │   │   └── goblin_02.png
+│   │   └── items/
+│   │       ├── coin_spin_01.png
+│   │       └── coin_spin_02.png
+│   └── spritesheets/
+│       ├── character_sheet.png
+│       └── character_data.json
+├── renderer.ts
+└── index.html
+```
+
+### Option 4: Hybrid Approach
+
+Combine both approaches in your sprite creation:
+
+```typescript
+// Updated AnimatedSprite interface
+interface AnimatedSprite {
+  mesh: Mesh;
+  material: StandardMaterial;
+  textures?: Texture[];        // For external images
+  frames?: PixelArtFrame[];    // For programmatic sprites
+  currentFrame: number;
+  animationTimer: number;
+  animationSpeed: number;
+  position: Vector3;
+  velocity: Vector3;
+  type: string;
+  isExternal: boolean;         // Flag to determine rendering method
+}
+
+// Updated animation method
+private updateSprites(deltaTime: number): void {
+  this.sprites.forEach((sprite, index) => {
+    if (sprite.animationTimer >= frameTime) {
+      sprite.animationTimer = 0;
+      sprite.currentFrame = (sprite.currentFrame + 1) % 
+        (sprite.isExternal ? sprite.textures!.length : sprite.frames!.length);
+      
+      if (sprite.isExternal) {
+        // Use pre-loaded texture
+        sprite.material.diffuseTexture = sprite.textures![sprite.currentFrame];
+      } else {
+        // Generate texture from pixel data
+        sprite.texture?.dispose();
+        sprite.texture = this.createPixelTexture(sprite.frames![sprite.currentFrame]);
+        sprite.material.diffuseTexture = sprite.texture;
+      }
+    }
+  });
+}
+```
+
+### Performance Considerations
+
+- **Pre-load textures**: Load all external images at startup to avoid runtime delays
+- **Texture atlasing**: Combine multiple sprites into texture atlases for better performance
+- **Image optimization**: Use compressed formats (WebP) and appropriate sizes
+- **Memory management**: Dispose of unused textures properly
+
+### Example Usage
+
+```typescript
+// Add external sprite to your game
+async addExternalSprite() {
+  const dragonFrames = [
+    '/assets/sprites/dragon/fly_01.png',
+    '/assets/sprites/dragon/fly_02.png',
+    '/assets/sprites/dragon/fly_03.png'
+  ];
+  
+  const dragon = await this.createExternalSprite(
+    dragonFrames, 
+    'dragon', 
+    new Vector3(8, this.groundLevel + 3, 0)
+  );
+  
+  this.sprites.push(dragon);
+}
+```
+
+This approach gives you the flexibility to use both programmatic pixel art (for simple sprites) and external artwork (for complex sprites) in the same application!
+
 ## Technical Details
 
 ### Architecture
