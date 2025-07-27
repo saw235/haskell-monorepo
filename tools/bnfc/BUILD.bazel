@@ -21,3 +21,10 @@ sh_binary(
     srcs = ["happy_wrapper.sh"],
     visibility = ["//visibility:public"],
 )
+
+# Grammar combining script
+sh_binary(
+    name = "combine_grammar_script",
+    srcs = ["combine_grammar.sh"],
+    visibility = ["//visibility:public"],
+)

@@ -1,0 +1,23 @@
+# Load rules_haskell rules.
+load(
+    "@rules_haskell//haskell:defs.bzl",
+    "haskell_test",
+)
+
+# HUnit test for minimal SystemVerilog parser
+haskell_test(
+    name = "minimal_parser_test",
+    srcs = [
+        "Main.hs",
+        "//haskell/app/bnfc-systemverilog-parser:systemverilog_grammar",
+    ],
+    data = [
+        "test_input.sv",
+    ],
+    deps = [
+        "//:base",
+        "@stackage//:array",
+        "@stackage//:HUnit",
+    ],
+    visibility = ["//visibility:public"],
+) 

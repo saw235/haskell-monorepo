@@ -1,0 +1,106 @@
+-- A.9 General - SystemVerilog General Constructs
+-- Based on IEEE 1800 SystemVerilog Standard Annex A.9
+
+-- A.9.1 Attributes
+AttrInstance.    AttributeInstance ::= "(*" [AttrSpec] ")" ;
+AttrSpecItem.    AttrSpec ::= AttrName ;
+AttrSpecAssign.  AttrSpec ::= AttrName "=" ConstantExpression ;
+AttrNameId.      AttrName ::= Identifier ;
+
+-- A.9.2 Comments  
+comment "//" ;
+comment "/*" "*/" ;
+
+-- A.9.3 Identifiers
+SimpleId.        Identifier ::= SimpleIdentifier ;
+EscapedId.       Identifier ::= EscapedIdentifier ;
+
+-- Simple identifier - starts with alpha or underscore, at least one character
+SimpleIdent.     SimpleIdentifier ::= Ident ;
+
+-- Escaped identifier - backslash followed by printable chars, ended by whitespace
+EscapedIdent.    EscapedIdentifier ::= "\\" String ;
+
+-- Hierarchical identifiers
+HierarchicalId.  HierarchicalIdentifier ::= [HierarchicalIdPart] Identifier ;
+HierIdRoot.      HierarchicalIdPart ::= "$root" "." ;
+HierIdPath.      HierarchicalIdPart ::= Identifier [ConstantBitSelect] "." ;
+
+-- Package scope
+PackageScope.    PackageScope ::= PackageIdentifier "::" ;
+UnitScope.       PackageScope ::= "$unit" "::" ;
+
+-- Class scope
+ClassScope.      ClassScope ::= ClassType "::" ;
+
+-- Specific identifier types (all reduce to Identifier)
+ArrayId.         ArrayIdentifier ::= Identifier ;
+BlockId.         BlockIdentifier ::= Identifier ;
+BinId.           BinIdentifier ::= Identifier ;
+CellId.          CellIdentifier ::= Identifier ;
+CheckerId.       CheckerIdentifier ::= Identifier ;
+ClassId.         ClassIdentifier ::= Identifier ;
+ClockingId.      ClockingIdentifier ::= Identifier ;
+ConfigId.        ConfigIdentifier ::= Identifier ;
+ConstId.         ConstIdentifier ::= Identifier ;
+ConstraintId.    ConstraintIdentifier ::= Identifier ;
+CovergroupId.    CovergroupIdentifier ::= Identifier ;
+CoverpointId.    CoverpointIdentifier ::= Identifier ;
+CrossId.         CrossIdentifier ::= Identifier ;
+EnumId.          EnumIdentifier ::= Identifier ;
+FormalId.        FormalIdentifier ::= Identifier ;
+FunctionId.      FunctionIdentifier ::= Identifier ;
+GenerateBlockId. GenerateBlockIdentifier ::= Identifier ;
+GenvarId.        GenvarIdentifier ::= Identifier ;
+InterfaceId.     InterfaceIdentifier ::= Identifier ;
+InstanceId.      InstanceIdentifier ::= Identifier ;
+LibraryId.       LibraryIdentifier ::= Identifier ;
+MemberId.        MemberIdentifier ::= Identifier ;
+MethodId.        MethodIdentifier ::= Identifier ;
+ModportId.       ModportIdentifier ::= Identifier ;
+ModuleId.        ModuleIdentifier ::= Identifier ;
+NetId.           NetIdentifier ::= Identifier ;
+NetTypeId.       NetTypeIdentifier ::= Identifier ;
+PackageId.       PackageIdentifier ::= Identifier ;
+ParameterId.     ParameterIdentifier ::= Identifier ;
+PortId.          PortIdentifier ::= Identifier ;
+ProductionId.    ProductionIdentifier ::= Identifier ;
+ProgramId.       ProgramIdentifier ::= Identifier ;
+PropertyId.      PropertyIdentifier ::= Identifier ;
+SequenceId.      SequenceIdentifier ::= Identifier ;
+SignalId.        SignalIdentifier ::= Identifier ;
+SpecparamId.     SpecparamIdentifier ::= Identifier ;
+TaskId.          TaskIdentifier ::= Identifier ;
+TfId.            TfIdentifier ::= Identifier ;
+TerminalId.      TerminalIdentifier ::= Identifier ;
+TopmoduleId.     TopmoduleIdentifier ::= Identifier ;
+TypeId.          TypeIdentifier ::= Identifier ;
+UdpId.           UdpIdentifier ::= Identifier ;
+VariableId.      VariableIdentifier ::= Identifier ;
+
+-- Package-scoped identifiers
+PsClassId.       PsClassIdentifier ::= PackageScope ClassIdentifier ;
+PsClassIdSimple. PsClassIdentifier ::= ClassIdentifier ;
+PsCovergroupId.  PsCovergroupIdentifier ::= PackageScope CovergroupIdentifier ;
+PsCovergroupIdSimple. PsCovergroupIdentifier ::= CovergroupIdentifier ;
+PsCheckerId.     PsCheckerIdentifier ::= PackageScope CheckerIdentifier ;
+PsCheckerIdSimple. PsCheckerIdentifier ::= CheckerIdentifier ;
+PsId.            PsIdentifier ::= PackageScope Identifier ;
+PsIdSimple.      PsIdentifier ::= Identifier ;
+
+-- System task/function identifier
+SystemTfId.      SystemTfIdentifier ::= "$" Ident ;
+
+-- White space (handled by BNFC automatically)
+
+-- Lists  
+separator AttrSpec "," ;
+separator nonempty HierarchicalIdPart "" ;
+
+-- Forward declarations for types defined elsewhere
+ConstantExpressionForward. ConstantExpression ::= Identifier ; -- Forward declaration
+ConstantBitSelectForward. ConstantBitSelect ::= "[" ConstantExpression "]" ; -- Forward declaration  
+ClassTypeForward. ClassType ::= PsClassIdentifier ; -- Forward declaration
+
+-- Basic token definition
+token Ident (letter (letter | digit | '_' | '$')*) ; 

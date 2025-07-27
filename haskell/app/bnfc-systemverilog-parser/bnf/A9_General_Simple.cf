@@ -1,0 +1,60 @@
+-- A.9 General - SystemVerilog General Constructs (Simplified)
+-- Based on IEEE 1800 SystemVerilog Standard Annex A.9
+
+-- A.9.1 Attributes
+AttrInstance.    AttributeInstance ::= "(*" [AttrSpec] ")" ;
+AttrSpecItem.    AttrSpec ::= AttrName ;
+AttrSpecAssign.  AttrSpec ::= AttrName "=" ConstantExpression ;
+AttrNameId.      AttrName ::= Identifier ;
+
+-- A.9.2 Comments  
+comment "//" ;
+comment "/*" "*/" ;
+
+-- A.9.3 Identifiers
+SimpleId.        Identifier ::= Ident ;
+EscapedId.       Identifier ::= "\\" String ;
+
+-- Hierarchical identifiers (simplified)
+HierarchicalIdSimple. HierarchicalIdentifier ::= Identifier ;
+HierarchicalIdDotted. HierarchicalIdentifier ::= Identifier "." Identifier ;
+
+-- Package scope
+PackageScopeId.  PackageScope ::= PackageIdentifier "::" ;
+UnitScope.       PackageScope ::= "$unit" "::" ;
+
+-- Basic identifier types
+ModuleId.        ModuleIdentifier ::= Identifier ;
+InterfaceId.     InterfaceIdentifier ::= Identifier ;
+ProgramId.       ProgramIdentifier ::= Identifier ;
+PackageId.       PackageIdentifier ::= Identifier ;
+PortId.          PortIdentifier ::= Identifier ;
+VariableId.      VariableIdentifier ::= Identifier ;
+ParameterId.     ParameterIdentifier ::= Identifier ;
+TypeId.          TypeIdentifier ::= Identifier ;
+CheckerId.       CheckerIdentifier ::= Identifier ;
+ClassId.         ClassIdentifier ::= Identifier ;
+FunctionId.      FunctionIdentifier ::= Identifier ;
+TaskId.          TaskIdentifier ::= Identifier ;
+
+-- System task/function identifier
+SystemTfId.      SystemTfIdentifier ::= "$" Ident ;
+
+-- Time literals
+TimeLitInteger.  TimeLiteral ::= Integer TimeUnit ;
+TimeUnitS.       TimeUnit ::= "s" ;
+TimeUnitMs.      TimeUnit ::= "ms" ;
+TimeUnitUs.      TimeUnit ::= "us" ;
+TimeUnitNs.      TimeUnit ::= "ns" ;
+TimeUnitPs.      TimeUnit ::= "ps" ;
+TimeUnitFs.      TimeUnit ::= "fs" ;
+
+-- Basic expressions (simplified)
+ConstExprId.     ConstantExpression ::= Identifier ;
+ConstExprInt.    ConstantExpression ::= Integer ;
+
+-- Lists  
+separator AttrSpec "," ;
+
+-- Basic token definition
+token Ident (letter (letter | digit | '_' | '$')*) ; 
