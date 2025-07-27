@@ -52,11 +52,11 @@ main = do
   putStrLn "SystemVerilog BNFC Parser Demo"
   putStrLn "==============================="
   putStrLn ""
-  
+
   putStrLn "This is a scaffolded SystemVerilog parser."
   putStrLn "The actual grammar files will be generated from the BNF you provide."
   putStrLn ""
-  
+
   -- TODO: Add example parsing once BNF is provided
   putStrLn "Example usage (after BNF implementation):"
   putStrLn "- Parse SystemVerilog modules"
@@ -65,7 +65,7 @@ main = do
   putStrLn "- Count wire/reg declarations"
   putStrLn "- Analyze always blocks"
   putStrLn ""
-  
+
   putStrLn "Interactive Mode:"
   putStrLn "Type 'source: <systemverilog>' to parse complete source text"
   putStrLn "Type 'module: <module>' to parse module declarations"
@@ -94,4 +94,4 @@ interactiveLoop = do
       interactiveLoop
     _ -> do
       putStrLn "Unknown command. Use 'source: <code>', 'module: <module>', or 'quit'"
-      interactiveLoop 
+      interactiveLoop

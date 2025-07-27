@@ -1,16 +1,15 @@
 module Main where
 
-import System.Exit (exitFailure, exitSuccess)
-import System.IO (readFile)
-import Test.HUnit
-import Test.HUnit.Text (runTestTT)
-
 -- Import the generated parser modules
 import qualified AbsSystemVerilogTest as Abs
 import ErrMSystemVerilogTest (Err (..))
 import qualified ErrMSystemVerilogTest as ErrM
 import qualified LexSystemVerilogTest as Lex
 import qualified ParSystemVerilogTest as Par
+import System.Exit (exitFailure, exitSuccess)
+import System.IO (readFile)
+import Test.HUnit
+import Test.HUnit.Text (runTestTT)
 
 -- =============================================================================
 -- HELPER FUNCTIONS
@@ -110,15 +109,16 @@ testLexer = TestCase $ do
 
 -- All HUnit tests
 hunitTests :: Test
-hunitTests = TestList
-  [ TestLabel "Single Module" testSingleModule,
-    TestLabel "Multiple Modules" testMultipleModules,
-    TestLabel "Module with Comments" testModuleWithComments,
-    TestLabel "Empty Input" testEmptyInput,
-    TestLabel "Invalid Input" testInvalidInput,
-    TestLabel "Test File Content" testFileContent,
-    TestLabel "Lexer" testLexer
-  ]
+hunitTests =
+  TestList
+    [ TestLabel "Single Module" testSingleModule,
+      TestLabel "Multiple Modules" testMultipleModules,
+      TestLabel "Module with Comments" testModuleWithComments,
+      TestLabel "Empty Input" testEmptyInput,
+      TestLabel "Invalid Input" testInvalidInput,
+      TestLabel "Test File Content" testFileContent,
+      TestLabel "Lexer" testLexer
+    ]
 
 -- =============================================================================
 -- MAIN TEST RUNNER
@@ -129,11 +129,11 @@ main = do
   putStrLn "Running SystemVerilog Minimal Parser Tests"
   putStrLn "==========================================="
   putStrLn ""
-  
+
   -- Run HUnit tests
   putStrLn "=== Running HUnit Tests ==="
   hunitCounts <- runTestTT hunitTests
-  
+
   putStrLn ""
   putStrLn "==========================================="
   putStrLn "Test Summary:"
@@ -142,7 +142,7 @@ main = do
   putStrLn $ "  Errors: " ++ show (errors hunitCounts)
   putStrLn $ "  Failures: " ++ show (failures hunitCounts)
   putStrLn ""
-  
+
   -- Exit with appropriate status
   if failures hunitCounts > 0 || errors hunitCounts > 0
     then do
@@ -150,4 +150,4 @@ main = do
       exitFailure
     else do
       putStrLn "All tests passed!"
-      exitSuccess 
+      exitSuccess

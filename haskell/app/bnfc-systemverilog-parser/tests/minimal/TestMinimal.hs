@@ -1,14 +1,13 @@
 module Main where
 
-import System.Exit (exitFailure, exitSuccess)
-import System.IO (readFile)
-
 -- Import the generated parser modules
 import qualified AbsSystemVerilogTest as Abs
 import ErrMSystemVerilogTest (Err (..))
 import qualified ErrMSystemVerilogTest as ErrM
 import qualified LexSystemVerilogTest as Lex
 import qualified ParSystemVerilogTest as Par
+import System.Exit (exitFailure, exitSuccess)
+import System.IO (readFile)
 
 -- Test data structure
 data TestResult = TestResult
@@ -55,9 +54,16 @@ runTest name input expectedCount = do
       let moduleNames = extractModuleNames sourceText
       let actualCount = length moduleNames
       let success = actualCount == expectedCount
-      putStrLn $ "Test '" ++ name ++ "': " ++ 
-                 "Expected " ++ show expectedCount ++ " modules, " ++
-                 "got " ++ show actualCount ++ " modules"
+      putStrLn $
+        "Test '"
+          ++ name
+          ++ "': "
+          ++ "Expected "
+          ++ show expectedCount
+          ++ " modules, "
+          ++ "got "
+          ++ show actualCount
+          ++ " modules"
       when success $ putStrLn $ "  Module names: " ++ show moduleNames
       return $ TestResult name input success success
   where
@@ -85,29 +91,31 @@ main :: IO ()
 main = do
   putStrLn "Running SystemVerilog Minimal Parser Tests"
   putStrLn "=========================================="
-  
+
   -- Run basic test cases
-  results <- sequence $ zipWith3 
-    (\i input expected -> runTest ("test_" ++ show i) input expected)
-    [1..]
-    testCases
-    expectedModuleCounts
-  
+  results <-
+    sequence $
+      zipWith3
+        (\i input expected -> runTest ("test_" ++ show i) input expected)
+        [1 ..]
+        testCases
+        expectedModuleCounts
+
   -- Test with file content
   fileResult <- testFileContent
-  
+
   let allResults = results ++ [fileResult]
   let passedTests = filter actual allResults
   let totalTests = length allResults
   let passedCount = length passedTests
-  
+
   putStrLn ""
   putStrLn $ "Test Results: " ++ show passedCount ++ "/" ++ show totalTests ++ " passed"
-  
+
   if passedCount == totalTests
     then do
       putStrLn "All tests passed!"
       exitSuccess
     else do
       putStrLn "Some tests failed!"
-      exitFailure 
+      exitFailure
