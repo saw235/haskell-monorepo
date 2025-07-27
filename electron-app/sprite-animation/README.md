@@ -388,7 +388,7 @@ import { Texture } from "@babylonjs/core";
 // New method for external sprites
 private createExternalTexture(imageUrl: string): Promise<Texture> {
   return new Promise((resolve, reject) => {
-    const texture = new Texture(imageUrl, this.scene, false, false, undefined, 
+    const texture = new Texture(imageUrl, this.scene, false, false, undefined,
       () => resolve(texture),  // onLoad
       () => reject(new Error(`Failed to load ${imageUrl}`)) // onError
     );
@@ -405,23 +405,23 @@ private async createExternalSprite(
   position: Vector3
 ): Promise<AnimatedSprite> {
   const textures: Texture[] = [];
-  
+
   // Load all frame textures
   for (const url of imageUrls) {
     const texture = await this.createExternalTexture(url);
     textures.push(texture);
   }
-  
+
   // Create sprite mesh
   const sprite = MeshBuilder.CreatePlane(`${type}_sprite`, { size: 1 }, this.scene);
   sprite.position = position.clone();
-  
+
   // Create material with first frame
   const material = new StandardMaterial(`${type}_material`, this.scene);
   material.diffuseTexture = textures[0];
   material.hasAlpha = true;
   sprite.material = material;
-  
+
   return {
     mesh: sprite,
     material,
@@ -443,7 +443,7 @@ For sprite sheets (multiple frames in one image), add sprite sheet functionality
 ```typescript
 interface SpriteSheetFrame {
   x: number;      // X position in sprite sheet
-  y: number;      // Y position in sprite sheet  
+  y: number;      // Y position in sprite sheet
   width: number;  // Frame width
   height: number; // Frame height
 }
@@ -456,32 +456,32 @@ interface SpriteSheetData {
 }
 
 private createSpriteSheetTexture(
-  spriteSheetData: SpriteSheetData, 
+  spriteSheetData: SpriteSheetData,
   frameIndex: number
 ): Promise<Texture> {
   return new Promise((resolve, reject) => {
     const baseTexture = new Texture(spriteSheetData.imageUrl, this.scene, false, false);
-    
+
     baseTexture.onLoadObservable.add(() => {
       const frame = spriteSheetData.frames[frameIndex];
-      
+
       // Create dynamic texture for the specific frame
       const frameTexture = new DynamicTexture(
-        `frame_${frameIndex}`, 
-        { width: frame.width, height: frame.height }, 
+        `frame_${frameIndex}`,
+        { width: frame.width, height: frame.height },
         this.scene
       );
-      
+
       const ctx = frameTexture.getContext();
       const img = baseTexture.getInternalTexture()?.getWebGLTexture();
-      
+
       // Draw the specific frame from the sprite sheet
       ctx.drawImage(
-        img as any, 
+        img as any,
         frame.x, frame.y, frame.width, frame.height,  // Source
         0, 0, frame.width, frame.height               // Destination
       );
-      
+
       frameTexture.update();
       resolve(frameTexture);
     });
@@ -539,9 +539,9 @@ private updateSprites(deltaTime: number): void {
   this.sprites.forEach((sprite, index) => {
     if (sprite.animationTimer >= frameTime) {
       sprite.animationTimer = 0;
-      sprite.currentFrame = (sprite.currentFrame + 1) % 
+      sprite.currentFrame = (sprite.currentFrame + 1) %
         (sprite.isExternal ? sprite.textures!.length : sprite.frames!.length);
-      
+
       if (sprite.isExternal) {
         // Use pre-loaded texture
         sprite.material.diffuseTexture = sprite.textures![sprite.currentFrame];
@@ -573,13 +573,13 @@ async addExternalSprite() {
     '/assets/sprites/dragon/fly_02.png',
     '/assets/sprites/dragon/fly_03.png'
   ];
-  
+
   const dragon = await this.createExternalSprite(
-    dragonFrames, 
-    'dragon', 
+    dragonFrames,
+    'dragon',
     new Vector3(8, this.groundLevel + 3, 0)
   );
-  
+
   this.sprites.push(dragon);
 }
 ```
