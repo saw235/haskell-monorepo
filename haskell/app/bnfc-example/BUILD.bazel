@@ -2,6 +2,7 @@
 load(
     "@rules_haskell//haskell:defs.bzl",
     "haskell_binary",
+    "haskell_test",
 )
 load("//tools/bnfc:bnfc.bzl", "bnfc_grammar")
 
@@ -21,5 +22,20 @@ haskell_binary(
     deps = [
         "//:base",
         "@stackage//:array",
+    ],
+)
+
+# QuickCheck tests for the calculator parser
+haskell_test(
+    name = "quickcheck-tests",
+    srcs = [
+        "QuickCheckTests.hs",
+        ":calc_grammar",
+    ],
+    main_file = "QuickCheckTests.hs",
+    deps = [
+        "//:base",
+        "@stackage//:array",
+        "@stackage//:QuickCheck",
     ],
 )

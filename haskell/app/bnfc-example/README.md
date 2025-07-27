@@ -19,7 +19,7 @@ The calculator grammar supports:
 - **Parentheses**: For grouping expressions
 - **Comments**: Both line comments (//) and block comments (/* */)
 
-## Building
+## Building and Testing
 
 ```bash
 # Build the calculator
@@ -27,6 +27,12 @@ bazel build //haskell/app/bnfc-example:bnfc-example
 
 # Run the calculator
 bazel run //haskell/app/bnfc-example:bnfc-example
+
+# Run QuickCheck property-based tests
+bazel test //haskell/app/bnfc-example:quickcheck-tests
+
+# Run QuickCheck tests with output
+bazel run //haskell/app/bnfc-example:quickcheck-tests
 ```
 
 ## Usage Examples
@@ -89,3 +95,31 @@ Example - adding exponentiation:
 ```bnf
 EPow.  Exp3 ::= Exp3 "^" Exp2 ;
 ```
+
+## QuickCheck Property-Based Testing
+
+The project includes comprehensive QuickCheck tests that verify:
+
+### Parser Properties
+- **Round-trip parsing**: `parse(print(expr)) == expr` for valid expressions
+- **Basic expression parsing**: Correct parsing of literals and operators
+- **Operator precedence**: Multiplication binds tighter than addition
+
+### Evaluator Properties  
+- **Arithmetic laws**: Commutativity, associativity, distributivity
+- **Identity elements**: Adding 0, multiplying by 1
+- **Inverse operations**: Division undoes multiplication
+- **Consistency**: Generated expressions evaluate without crashing
+
+### Test Coverage
+```
++++ OK, passed 100 tests.           # Evaluator produces finite results
++++ OK, passed 100 tests.           # Addition commutativity  
++++ OK, passed 100 tests.           # Addition associativity
++++ OK, passed 100 tests.           # Multiplication commutativity
++++ OK, passed 100 tests.           # Multiplication associativity
++++ OK, passed 100 tests.           # Multiplication distributivity
++++ OK, passed 100 tests; 765 discarded. # Parser round-trip (non-negative only)
+```
+
+The QuickCheck tests use custom `Arbitrary` instances to generate valid AST expressions, automatically testing hundreds of cases to ensure the parser and evaluator work correctly across a wide range of inputs.
