@@ -1,7 +1,7 @@
 module Main where
 
 import AbsCalc
-import ErrM
+import ErrMCalc
 import LexCalc
 import ParCalc
 
