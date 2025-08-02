@@ -17,6 +17,8 @@ RUN apt-get update && apt-get install -y \
     libgmp-dev \
     libffi-dev \
     zlib1g-dev \
+    alex \
+    happy \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Bazelisk globally using npm

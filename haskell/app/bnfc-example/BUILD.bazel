@@ -1,0 +1,41 @@
+# Load rules_haskell rules.
+load(
+    "@rules_haskell//haskell:defs.bzl",
+    "haskell_binary",
+    "haskell_test",
+)
+load("//tools/bnfc:bnfc.bzl", "bnfc_grammar")
+
+# Generate parser files from grammar
+bnfc_grammar(
+    name = "calc_grammar",
+    grammar = "Calc.cf",
+)
+
+# Main application binary
+haskell_binary(
+    name = "bnfc-example",
+    srcs = [
+        "Main.hs",
+        ":calc_grammar",
+    ],
+    deps = [
+        "//:base",
+        "@stackage//:array",
+    ],
+)
+
+# QuickCheck tests for the calculator parser
+haskell_test(
+    name = "quickcheck-tests",
+    srcs = [
+        "QuickCheckTests.hs",
+        ":calc_grammar",
+    ],
+    main_file = "QuickCheckTests.hs",
+    deps = [
+        "//:base",
+        "@stackage//:array",
+        "@stackage//:QuickCheck",
+    ],
+)

@@ -1,0 +1,35 @@
+-- A.1 Source text - SystemVerilog Top-level Constructs (Simplified)
+-- Based on IEEE 1800 SystemVerilog Standard Annex A.1
+
+-- A.1.2 SystemVerilog source text (simplified)
+SourceTextSimple.     SourceText ::= [Description] ;
+
+-- Description types (simplified)
+DescModule.           Description ::= ModuleDeclaration ;
+
+-- Simple module declaration
+ModuleDeclSimple.     ModuleDeclaration ::= "module" ModuleIdentifier "(" [Port] ")" ";" [ModuleItem] "endmodule" ;
+
+-- A.1.3 Module parameters and ports (simplified)
+PortSimple.           Port ::= PortIdentifier ;
+PortDir.              Port ::= PortDirection PortIdentifier ;
+
+-- Port direction
+PortDirInput.         PortDirection ::= "input" ;
+PortDirOutput.        PortDirection ::= "output" ;
+PortDirInout.         PortDirection ::= "inout" ;
+
+-- A.1.4 Module items (simplified)
+ModuleItemAssign.     ModuleItem ::= "assign" PortIdentifier "=" Expression ";" ;
+ModuleItemWire.       ModuleItem ::= "wire" PortIdentifier ";" ;
+ModuleItemReg.        ModuleItem ::= "reg" PortIdentifier ";" ;
+
+-- Lists and separators
+separator Description "" ;
+separator Port "," ;
+separator ModuleItem "" ;
+
+-- Simple assignment pattern for variables
+VariableAssign.       VariableAssignment ::= PortIdentifier "=" Expression ;
+
+-- Note: Token Ident is defined in A9_General_Simple.cf 

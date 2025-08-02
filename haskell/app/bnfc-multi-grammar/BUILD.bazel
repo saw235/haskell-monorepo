@@ -1,0 +1,32 @@
+# Load rules_haskell rules.
+load(
+    "@rules_haskell//haskell:defs.bzl",
+    "haskell_binary",
+)
+load("//tools/bnfc:bnfc.bzl", "bnfc_grammar")
+
+# Generate parser files from expression grammar
+bnfc_grammar(
+    name = "expression_grammar",
+    grammar = "Expression.cf",
+)
+
+# Generate parser files from statement grammar  
+bnfc_grammar(
+    name = "statement_grammar",
+    grammar = "Statement.cf",
+)
+
+# Main application binary using both grammars
+haskell_binary(
+    name = "bnfc-multi-grammar",
+    srcs = [
+        "Main.hs",
+        ":expression_grammar",
+        ":statement_grammar",
+    ],
+    deps = [
+        "//:base",
+        "@stackage//:array",
+    ],
+)

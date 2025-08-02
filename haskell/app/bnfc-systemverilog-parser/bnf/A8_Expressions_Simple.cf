@@ -1,0 +1,87 @@
+-- A.8 Expressions - SystemVerilog Expression Grammar (Simplified)
+-- Based on IEEE 1800 SystemVerilog Standard Annex A.8
+
+-- A.8.3 Expressions with proper precedence
+
+-- Conditional expression (ternary operator) - lowest precedence
+ConditionalExpr.      Expression ::= Expression1 "?" Expression ":" Expression ;
+ExpSimple.            Expression ::= Expression1 ;
+
+-- Logical OR
+LogicalOr.            Expression1 ::= Expression1 "||" Expression2 ;
+Exp1Simple.           Expression1 ::= Expression2 ;
+
+-- Logical AND  
+LogicalAnd.           Expression2 ::= Expression2 "&&" Expression3 ;
+Exp2Simple.           Expression2 ::= Expression3 ;
+
+-- Bitwise OR
+BitwiseOr.            Expression3 ::= Expression3 "|" Expression4 ;
+Exp3Simple.           Expression3 ::= Expression4 ;
+
+-- Bitwise XOR
+BitwiseXor.           Expression4 ::= Expression4 "^" Expression5 ;
+Exp4Simple.           Expression4 ::= Expression5 ;
+
+-- Bitwise AND
+BitwiseAnd.           Expression5 ::= Expression5 "&" Expression6 ;
+Exp5Simple.           Expression5 ::= Expression6 ;
+
+-- Equality operators
+Equal.                Expression6 ::= Expression6 "==" Expression7 ;
+NotEqual.             Expression6 ::= Expression6 "!=" Expression7 ;
+Exp6Simple.           Expression6 ::= Expression7 ;
+
+-- Relational operators
+LessThan.             Expression7 ::= Expression7 "<" Expression8 ;
+LessEqual.            Expression7 ::= Expression7 "<=" Expression8 ;
+GreaterThan.          Expression7 ::= Expression7 ">" Expression8 ;
+GreaterEqual.         Expression7 ::= Expression7 ">=" Expression8 ;
+Exp7Simple.           Expression7 ::= Expression8 ;
+
+-- Shift operators
+ShiftLeft.            Expression8 ::= Expression8 "<<" Expression9 ;
+ShiftRight.           Expression8 ::= Expression8 ">>" Expression9 ;
+Exp8Simple.           Expression8 ::= Expression9 ;
+
+-- Addition and subtraction
+Addition.             Expression9 ::= Expression9 "+" Expression10 ;
+Subtraction.          Expression9 ::= Expression9 "-" Expression10 ;
+Exp9Simple.           Expression9 ::= Expression10 ;
+
+-- Multiplication, division, modulo
+Multiplication.       Expression10 ::= Expression10 "*" Expression11 ;
+Division.             Expression10 ::= Expression10 "/" Expression11 ;
+Modulo.               Expression10 ::= Expression10 "%" Expression11 ;
+Exp10Simple.          Expression10 ::= Expression11 ;
+
+-- Power operator (right associative)
+Power.                Expression11 ::= Expression12 "**" Expression11 ;
+Exp11Simple.          Expression11 ::= Expression12 ;
+
+-- Unary operators
+UnaryPlus.            Expression12 ::= "+" Expression12 ;
+UnaryMinus.           Expression12 ::= "-" Expression12 ;
+UnaryNot.             Expression12 ::= "!" Expression12 ;
+UnaryBitNot.          Expression12 ::= "~" Expression12 ;
+Exp12Simple.          Expression12 ::= Expression13 ;
+
+-- Primary expressions
+PrimaryExpr.          Expression13 ::= Primary ;
+
+-- A.8.4 Primaries (simplified)
+PrimaryId.            Primary ::= Identifier ;
+PrimaryInt.           Primary ::= Integer ;
+PrimaryString.        Primary ::= String ;
+PrimaryParen.         Primary ::= "(" Expression ")" ;
+
+-- A.8.1 Concatenations (simplified)
+ConcatExpr.           Concatenation ::= "{" [Expression] "}" ;
+
+-- Lists and separators
+separator Expression "," ;
+
+-- Coercions for precedence
+coercions Expression 13 ;
+
+-- Note: Token Ident is defined in A9_General_Simple.cf 

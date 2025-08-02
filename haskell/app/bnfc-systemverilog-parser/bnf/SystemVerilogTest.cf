@@ -1,0 +1,15 @@
+-- SystemVerilog Test Grammar - Absolute minimal to test toolchain
+
+-- Comments
+comment "//" ;
+
+-- Just a simple module list
+SourceTextModules.    SourceText ::= [ModuleDeclaration] ;
+
+-- Module: just module name endmodule (using built-in Ident)
+ModuleDeclTest.       ModuleDeclaration ::= "module" Ident ";" "endmodule" ;
+
+-- Lists
+separator ModuleDeclaration "" ;
+
+-- Note: Using BNFC's built-in Ident token instead of defining our own 

@@ -1,0 +1,278 @@
+-- A.1 Source text - SystemVerilog Top-level Constructs
+-- Based on IEEE 1800 SystemVerilog Standard Annex A.1
+
+-- A.1.1 Library source text
+LibraryText.          LibraryText ::= [LibraryDescription] ;
+LibDecl.              LibraryDescription ::= LibraryDeclaration ;
+LibInclude.           LibraryDescription ::= IncludeStatement ;
+LibConfig.            LibraryDescription ::= ConfigDeclaration ;
+LibEmpty.             LibraryDescription ::= ";" ;
+
+LibraryDeclSimple.    LibraryDeclaration ::= "library" LibraryIdentifier FilePathSpec ";" ;
+LibraryDeclMulti.     LibraryDeclaration ::= "library" LibraryIdentifier [FilePathSpec] ";" ;
+LibraryDeclIncdir.    LibraryDeclaration ::= "library" LibraryIdentifier [FilePathSpec] "-incdir" [FilePathSpec] ";" ;
+
+IncludeStmt.          IncludeStatement ::= "include" FilePathSpec ";" ;
+
+-- A.1.2 SystemVerilog source text
+SourceText.           SourceText ::= [TimeunitsDeclaration] [Description] ;
+
+-- Description types
+DescModule.           Description ::= ModuleDeclaration ;
+DescUdp.              Description ::= UdpDeclaration ;
+DescInterface.        Description ::= InterfaceDeclaration ;
+DescProgram.          Description ::= ProgramDeclaration ;
+DescPackage.          Description ::= PackageDeclaration ;
+DescPackageItem.      Description ::= [AttributeInstance] PackageItem ;
+DescBindDirective.    Description ::= [AttributeInstance] BindDirective ;
+DescConfig.           Description ::= ConfigDeclaration ;
+
+-- Module declarations
+ModuleDeclNonAnsi.    ModuleDeclaration ::= ModuleNonansiHeader [TimeunitsDeclaration] [ModuleItem] "endmodule" [ModuleEndLabel] ;
+ModuleDeclAnsi.       ModuleDeclaration ::= ModuleAnsiHeader [TimeunitsDeclaration] [NonPortModuleItem] "endmodule" [ModuleEndLabel] ;
+ModuleDeclWildcard.   ModuleDeclaration ::= [AttributeInstance] ModuleKeyword [Lifetime] ModuleIdentifier "(" ".*" ")" ";" [TimeunitsDeclaration] [ModuleItem] "endmodule" [ModuleEndLabel] ;
+ModuleDeclExternNonAnsi. ModuleDeclaration ::= "extern" ModuleNonansiHeader ;
+ModuleDeclExternAnsi. ModuleDeclaration ::= "extern" ModuleAnsiHeader ;
+
+-- Module headers
+ModuleNonansiHead.    ModuleNonansiHeader ::= [AttributeInstance] ModuleKeyword [Lifetime] ModuleIdentifier [PackageImportDeclaration] [ParameterPortList] ListOfPorts ";" ;
+ModuleAnsiHead.       ModuleAnsiHeader ::= [AttributeInstance] ModuleKeyword [Lifetime] ModuleIdentifier [PackageImportDeclaration] [ParameterPortList] [ListOfPortDeclarations] ";" ;
+
+-- Module keywords
+ModKeyword.           ModuleKeyword ::= "module" ;
+MacroModKeyword.      ModuleKeyword ::= "macromodule" ;
+
+-- Module end label
+ModEndLabel.          ModuleEndLabel ::= ":" ModuleIdentifier ;
+
+-- Interface declarations
+InterfaceDeclNonAnsi. InterfaceDeclaration ::= InterfaceNonansiHeader [TimeunitsDeclaration] [InterfaceItem] "endinterface" [InterfaceEndLabel] ;
+InterfaceDeclAnsi.    InterfaceDeclaration ::= InterfaceAnsiHeader [TimeunitsDeclaration] [NonPortInterfaceItem] "endinterface" [InterfaceEndLabel] ;
+InterfaceDeclWildcard. InterfaceDeclaration ::= [AttributeInstance] "interface" InterfaceIdentifier "(" ".*" ")" ";" [TimeunitsDeclaration] [InterfaceItem] "endinterface" [InterfaceEndLabel] ;
+InterfaceDeclExternNonAnsi. InterfaceDeclaration ::= "extern" InterfaceNonansiHeader ;
+InterfaceDeclExternAnsi. InterfaceDeclaration ::= "extern" InterfaceAnsiHeader ;
+
+-- Interface headers
+InterfaceNonansiHead. InterfaceNonansiHeader ::= [AttributeInstance] "interface" [Lifetime] InterfaceIdentifier [PackageImportDeclaration] [ParameterPortList] ListOfPorts ";" ;
+InterfaceAnsiHead.    InterfaceAnsiHeader ::= [AttributeInstance] "interface" [Lifetime] InterfaceIdentifier [PackageImportDeclaration] [ParameterPortList] [ListOfPortDeclarations] ";" ;
+
+-- Interface end label
+InterfaceEndLabel.    InterfaceEndLabel ::= ":" InterfaceIdentifier ;
+
+-- Program declarations
+ProgramDeclNonAnsi.   ProgramDeclaration ::= ProgramNonansiHeader [TimeunitsDeclaration] [ProgramItem] "endprogram" [ProgramEndLabel] ;
+ProgramDeclAnsi.      ProgramDeclaration ::= ProgramAnsiHeader [TimeunitsDeclaration] [NonPortProgramItem] "endprogram" [ProgramEndLabel] ;
+ProgramDeclWildcard.  ProgramDeclaration ::= [AttributeInstance] "program" ProgramIdentifier "(" ".*" ")" ";" [TimeunitsDeclaration] [ProgramItem] "endprogram" [ProgramEndLabel] ;
+ProgramDeclExternNonAnsi. ProgramDeclaration ::= "extern" ProgramNonansiHeader ;
+ProgramDeclExternAnsi. ProgramDeclaration ::= "extern" ProgramAnsiHeader ;
+
+-- Program headers
+ProgramNonansiHead.   ProgramNonansiHeader ::= [AttributeInstance] "program" [Lifetime] ProgramIdentifier [PackageImportDeclaration] [ParameterPortList] ListOfPorts ";" ;
+ProgramAnsiHead.      ProgramAnsiHeader ::= [AttributeInstance] "program" [Lifetime] ProgramIdentifier [PackageImportDeclaration] [ParameterPortList] [ListOfPortDeclarations] ";" ;
+
+-- Program end label
+ProgramEndLabel.      ProgramEndLabel ::= ":" ProgramIdentifier ;
+
+-- Checker declarations
+CheckerDecl.          CheckerDeclaration ::= "checker" CheckerIdentifier [CheckerPortList] ";" [CheckerOrGenerateItem] "endchecker" [CheckerEndLabel] ;
+CheckerPortListSimple. CheckerPortList ::= "(" [CheckerPortItem] ")" ;
+CheckerEndLabel.      CheckerEndLabel ::= ":" CheckerIdentifier ;
+
+-- Class declarations
+ClassDecl.            ClassDeclaration ::= [ClassVirtual] "class" [Lifetime] ClassIdentifier [ParameterPortList] [ClassExtends] [ClassImplements] ";" [ClassItem] "endclass" [ClassEndLabel] ;
+ClassVirtual.         ClassVirtual ::= "virtual" ;
+ClassExtends.         ClassExtends ::= "extends" ClassType [ClassExtendsArgs] ;
+ClassExtendsArgs.     ClassExtendsArgs ::= "(" ListOfArguments ")" ;
+ClassImplements.      ClassImplements ::= "implements" [InterfaceClassType] ;
+ClassEndLabel.        ClassEndLabel ::= ":" ClassIdentifier ;
+
+-- Interface class declarations
+InterfaceClassDecl.   InterfaceClassDeclaration ::= "interface" "class" ClassIdentifier [ParameterPortList] [InterfaceClassExtends] ";" [InterfaceClassItem] "endclass" [ClassEndLabel] ;
+InterfaceClassExtends. InterfaceClassExtends ::= "extends" [InterfaceClassType] ;
+
+-- Package declarations
+PackageDecl.          PackageDeclaration ::= [AttributeInstance] "package" [Lifetime] PackageIdentifier ";" [TimeunitsDeclaration] [PackageItemAttr] "endpackage" [PackageEndLabel] ;
+PackageItemAttr.      PackageItemAttr ::= [AttributeInstance] PackageItem ;
+PackageEndLabel.      PackageEndLabel ::= ":" PackageIdentifier ;
+
+-- Timeunits declarations
+TimeunitsTimeunit.    TimeunitsDeclaration ::= "timeunit" TimeLiteral ";" ;
+TimeunitsTimeprecision. TimeunitsDeclaration ::= "timeprecision" TimeLiteral ";" ;
+TimeunitsTimeunitDiv. TimeunitsDeclaration ::= "timeunit" TimeLiteral "/" TimeLiteral ";" ;
+TimeunitsTimeunitTimeprecision. TimeunitsDeclaration ::= "timeunit" TimeLiteral ";" "timeprecision" TimeLiteral ";" ;
+TimeunitsTimeprecisionTimeunit. TimeunitsDeclaration ::= "timeprecision" TimeLiteral ";" "timeunit" TimeLiteral ";" ;
+
+-- A.1.3 Module parameters and ports
+ParamPortListAssign.  ParameterPortList ::= "#" "(" ListOfParamAssignments [ParameterPortDeclaration] ")" ;
+ParamPortListDecl.    ParameterPortList ::= "#" "(" [ParameterPortDeclaration] ")" ;
+ParamPortListEmpty.   ParameterPortList ::= "#" "(" ")" ;
+
+ParamPortDeclParam.   ParameterPortDeclaration ::= ParameterDeclaration ;
+ParamPortDeclLocal.   ParameterPortDeclaration ::= LocalParameterDeclaration ;
+ParamPortDeclData.    ParameterPortDeclaration ::= DataType ListOfParamAssignments ;
+ParamPortDeclType.    ParameterPortDeclaration ::= "type" ListOfTypeAssignments ;
+
+ListOfPortsSimple.    ListOfPorts ::= "(" [Port] ")" ;
+
+ListOfPortDeclsSimple. ListOfPortDeclarations ::= "(" [AnsiPortDeclaration] ")" ;
+
+-- Port declarations
+PortDeclInout.        PortDeclaration ::= [AttributeInstance] InoutDeclaration ;
+PortDeclInput.        PortDeclaration ::= [AttributeInstance] InputDeclaration ;
+PortDeclOutput.       PortDeclaration ::= [AttributeInstance] OutputDeclaration ;
+PortDeclRef.          PortDeclaration ::= [AttributeInstance] RefDeclaration ;
+PortDeclInterface.    PortDeclaration ::= [AttributeInstance] InterfacePortDeclaration ;
+
+-- Port
+PortExpr.             Port ::= [PortExpression] ;
+PortNamed.            Port ::= "." PortIdentifier "(" [PortExpression] ")" ;
+
+-- Port expression
+PortExprRef.          PortExpression ::= PortReference ;
+PortExprConcat.       PortExpression ::= "{" [PortReference] "}" ;
+
+-- Port reference
+PortRefSimple.        PortReference ::= PortIdentifier ConstantSelect ;
+
+-- Port direction
+PortDirInput.         PortDirection ::= "input" ;
+PortDirOutput.        PortDirection ::= "output" ;
+PortDirInout.         PortDirection ::= "inout" ;
+PortDirRef.           PortDirection ::= "ref" ;
+
+-- ANSI port declaration
+AnsiPortDeclNet.      AnsiPortDeclaration ::= [NetPortHeader] PortIdentifier [UnpackedDimension] [AssignmentOp] ;
+AnsiPortDeclVar.      AnsiPortDeclaration ::= [VariablePortHeader] PortIdentifier [VariableDimension] [AssignmentOp] ;
+AnsiPortDeclNamed.    AnsiPortDeclaration ::= [PortDirection] "." PortIdentifier "(" [Expression] ")" ;
+AssignmentOpConstExpr. AssignmentOp ::= "=" ConstantExpression ;
+
+-- A.1.4 Module items
+ElaborationSystemTaskFatal. ElaborationSystemTask ::= "$fatal" [FinishNumberArgs] ";" ;
+ElaborationSystemTaskError. ElaborationSystemTask ::= "$error" [ListOfArgumentsParen] ";" ;
+ElaborationSystemTaskWarning. ElaborationSystemTask ::= "$warning" [ListOfArgumentsParen] ";" ;
+ElaborationSystemTaskInfo. ElaborationSystemTask ::= "$info" [ListOfArgumentsParen] ";" ;
+
+FinishNumberArgs0.    FinishNumberArgs ::= "(" FinishNumber [ListOfArgumentsComma] ")" ;
+FinishNumber0.        FinishNumber ::= "0" ;
+FinishNumber1.        FinishNumber ::= "1" ;
+FinishNumber2.        FinishNumber ::= "2" ;
+ListOfArgumentsComma. ListOfArgumentsComma ::= "," ListOfArguments ;
+ListOfArgumentsParen. ListOfArgumentsParen ::= "(" [ListOfArguments] ")" ;
+
+-- Module common item
+ModuleCommonItemDecl. ModuleCommonItem ::= ModuleOrGenerateItemDeclaration ;
+ModuleCommonItemInterface. ModuleCommonItem ::= InterfaceInstantiation ;
+ModuleCommonItemProgram. ModuleCommonItem ::= ProgramInstantiation ;
+ModuleCommonItemAssertion. ModuleCommonItem ::= AssertionItem ;
+ModuleCommonItemBind. ModuleCommonItem ::= BindDirective ;
+ModuleCommonItemAssign. ModuleCommonItem ::= ContinuousAssign ;
+ModuleCommonItemAlias. ModuleCommonItem ::= NetAlias ;
+ModuleCommonItemInitial. ModuleCommonItem ::= InitialConstruct ;
+ModuleCommonItemFinal. ModuleCommonItem ::= FinalConstruct ;
+ModuleCommonItemAlways. ModuleCommonItem ::= AlwaysConstruct ;
+ModuleCommonItemLoopGen. ModuleCommonItem ::= LoopGenerateConstruct ;
+ModuleCommonItemCondGen. ModuleCommonItem ::= ConditionalGenerateConstruct ;
+ModuleCommonItemElab. ModuleCommonItem ::= ElaborationSystemTask ;
+
+-- Module item
+ModuleItemPort.       ModuleItem ::= PortDeclaration ";" ;
+ModuleItemNonPort.    ModuleItem ::= NonPortModuleItem ;
+
+-- Non-port module item
+NonPortModuleItemGenerate. NonPortModuleItem ::= GenerateRegion ;
+NonPortModuleItemOrGen. NonPortModuleItem ::= ModuleOrGenerateItem ;
+NonPortModuleItemSpecify. NonPortModuleItem ::= SpecifyBlock ;
+NonPortModuleItemSpecparam. NonPortModuleItem ::= [AttributeInstance] SpecparamDeclaration ;
+NonPortModuleItemProgram. NonPortModuleItem ::= ProgramDeclaration ;
+NonPortModuleItemModule. NonPortModuleItem ::= ModuleDeclaration ;
+NonPortModuleItemInterface. NonPortModuleItem ::= InterfaceDeclaration ;
+NonPortModuleItemTimeunits. NonPortModuleItem ::= TimeunitsDeclaration ;
+
+-- Module or generate item
+ModOrGenItemParamOverride. ModuleOrGenerateItem ::= [AttributeInstance] ParameterOverride ;
+ModOrGenItemGate.     ModuleOrGenerateItem ::= [AttributeInstance] GateInstantiation ;
+ModOrGenItemUdp.      ModuleOrGenerateItem ::= [AttributeInstance] UdpInstantiation ;
+ModOrGenItemModule.   ModuleOrGenerateItem ::= [AttributeInstance] ModuleInstantiation ;
+ModOrGenItemCommon.   ModuleOrGenerateItem ::= [AttributeInstance] ModuleCommonItem ;
+
+-- Lists and separators
+separator LibraryDescription "" ;
+separator FilePathSpec "," ;
+separator Description "" ;
+separator AttributeInstance "" ;
+separator PackageImportDeclaration "" ;
+separator ModuleItem "" ;
+separator NonPortModuleItem "" ;
+separator InterfaceItem "" ;
+separator NonPortInterfaceItem "" ;
+separator ProgramItem "" ;
+separator NonPortProgramItem "" ;
+separator CheckerOrGenerateItem "" ;
+separator CheckerPortItem "," ;
+separator ClassItem "" ;
+separator InterfaceClassItem "" ;
+separator PackageItemAttr "" ;
+separator TimeunitsDeclaration "" ;
+separator ListOfParamAssignments "," ;
+separator ParameterPortDeclaration "," ;
+separator InterfaceClassType "," ;
+separator Port "," ;
+separator AnsiPortDeclaration "," ;
+separator PortReference "," ;
+separator UnpackedDimension "" ;
+separator VariableDimension "" ;
+
+-- Forward declarations for types defined in other sections
+FilePathSpecForward.  FilePathSpec ::= String ;
+ConfigDeclarationForward. ConfigDeclaration ::= Identifier ;
+UdpDeclarationForward. UdpDeclaration ::= Identifier ;
+BindDirectiveForward. BindDirective ::= Identifier ;
+PackageItemForward.   PackageItem ::= Identifier ;
+LifetimeForward.      Lifetime ::= "static" ;
+LifetimeAuto.         Lifetime ::= "automatic" ;
+PackageImportDeclarationForward. PackageImportDeclaration ::= Identifier ;
+ListOfParamAssignmentsForward. ListOfParamAssignments ::= Identifier ;
+ListOfTypeAssignmentsForward. ListOfTypeAssignments ::= Identifier ;
+ModuleItemForward.    ModuleItem ::= Identifier ;
+NonPortModuleItemForward. NonPortModuleItem ::= Identifier ;
+InterfaceItemForward. InterfaceItem ::= Identifier ;
+NonPortInterfaceItemForward. NonPortInterfaceItem ::= Identifier ;
+ProgramItemForward.   ProgramItem ::= Identifier ;
+NonPortProgramItemForward. NonPortProgramItem ::= Identifier ;
+CheckerOrGenerateItemForward. CheckerOrGenerateItem ::= Identifier ;
+CheckerPortItemForward. CheckerPortItem ::= Identifier ;
+ClassItemForward.     ClassItem ::= Identifier ;
+InterfaceClassItemForward. InterfaceClassItem ::= Identifier ;
+InterfaceClassTypeForward. InterfaceClassType ::= Identifier ;
+ParameterDeclarationForward. ParameterDeclaration ::= Identifier ;
+LocalParameterDeclarationForward. LocalParameterDeclaration ::= Identifier ;
+InoutDeclarationForward. InoutDeclaration ::= Identifier ;
+InputDeclarationForward. InputDeclaration ::= Identifier ;
+OutputDeclarationForward. OutputDeclaration ::= Identifier ;
+RefDeclarationForward. RefDeclaration ::= Identifier ;
+InterfacePortDeclarationForward. InterfacePortDeclaration ::= Identifier ;
+NetPortHeaderForward. NetPortHeader ::= [PortDirection] NetPortType ;
+VariablePortHeaderForward. VariablePortHeader ::= [PortDirection] VariablePortType ;
+NetPortTypeForward.   NetPortType ::= NetType DataTypeOrImplicit ;
+VariablePortTypeForward. VariablePortType ::= VarDataType ;
+NetTypeForward.       NetType ::= "wire" ;
+DataTypeOrImplicitForward. DataTypeOrImplicit ::= DataType ;
+VarDataTypeForward.   VarDataType ::= DataType ;
+ModuleOrGenerateItemDeclarationForward. ModuleOrGenerateItemDeclaration ::= Identifier ;
+InterfaceInstantiationForward. InterfaceInstantiation ::= Identifier ;
+ProgramInstantiationForward. ProgramInstantiation ::= Identifier ;
+AssertionItemForward. AssertionItem ::= Identifier ;
+ContinuousAssignForward. ContinuousAssign ::= Identifier ;
+NetAliasForward.      NetAlias ::= Identifier ;
+InitialConstructForward. InitialConstruct ::= Identifier ;
+FinalConstructForward. FinalConstruct ::= Identifier ;
+AlwaysConstructForward. AlwaysConstruct ::= Identifier ;
+LoopGenerateConstructForward. LoopGenerateConstruct ::= Identifier ;
+ConditionalGenerateConstructForward. ConditionalGenerateConstruct ::= Identifier ;
+GenerateRegionForward. GenerateRegion ::= Identifier ;
+SpecifyBlockForward.  SpecifyBlock ::= Identifier ;
+SpecparamDeclarationForward. SpecparamDeclaration ::= Identifier ;
+ParameterOverrideForward. ParameterOverride ::= Identifier ;
+GateInstantiationForward. GateInstantiation ::= Identifier ;
+UdpInstantiationForward. UdpInstantiation ::= Identifier ;
+ModuleInstantiationForward. ModuleInstantiation ::= Identifier ; 
