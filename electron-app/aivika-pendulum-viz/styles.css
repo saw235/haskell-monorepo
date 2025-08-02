@@ -6,8 +6,9 @@
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
-    Ubuntu, Cantarell, sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu,
+    Cantarell, sans-serif;
   background-color: #f7fafc;
   color: #2d3748;
   line-height: 1.6;
@@ -74,8 +75,13 @@ header p {
 }
 
 @keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
 }
 
 .test-connection-btn {
@@ -427,29 +433,29 @@ header p {
   .container {
     padding: 15px;
   }
-  
+
   header h1 {
     font-size: 2rem;
   }
-  
+
   .parameter-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .parameter-group.buttons {
     flex-direction: column;
   }
-  
+
   .connection-indicator {
     flex-direction: column;
     gap: 15px;
     align-items: flex-start;
   }
-  
+
   .tabs {
     flex-wrap: wrap;
   }
-  
+
   .tab-btn {
     flex: 1;
     min-width: 120px;

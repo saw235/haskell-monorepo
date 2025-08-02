@@ -1,0 +1,21 @@
+-- SystemVerilog Minimal Grammar - Ultra-simple version to avoid all conflicts
+
+-- Comments
+comment "//" ;
+comment "/*" "*/" ;
+
+-- Top-level: just a list of modules
+SourceTextModules.    SourceText ::= [ModuleDeclaration] ;
+
+-- Module: just module name endmodule
+ModuleDeclMinimal.    ModuleDeclaration ::= "module" Ident ";" "endmodule" ;
+
+-- Expressions: just identifiers and integers for now
+ExprId.               Expression ::= Ident ;
+ExprInt.              Expression ::= Integer ;
+
+-- Lists
+separator ModuleDeclaration "" ;
+
+-- Token
+token Ident (letter (letter | digit | '_' | '$')*) ; 

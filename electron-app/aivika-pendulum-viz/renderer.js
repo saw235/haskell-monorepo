@@ -53,7 +53,9 @@ function updateConnectionStatus(status, message) {
     runBtn.disabled = false;
     validateInputs();
   } else if (status === "disconnected") {
-    console.log("Server disconnected, simulations will use JavaScript fallback");
+    console.log(
+      "Server disconnected, simulations will use JavaScript fallback",
+    );
   }
 }
 
@@ -81,7 +83,7 @@ async function testServerConnection() {
     console.warn("Server connection test failed:", error.message);
     updateConnectionStatus(
       "disconnected",
-      "Server offline (using fallback simulation)"
+      "Server offline (using fallback simulation)",
     );
     return false;
   } finally {
@@ -127,14 +129,22 @@ function setupEventListeners() {
   exportJsonBtn.addEventListener("click", exportToJson);
 
   // Input validation
-  [pendulumLengthInput, dampingCoeffInput, initialAngleInput, initialVelocityInput, timeEndInput].forEach((input) => {
+  [
+    pendulumLengthInput,
+    dampingCoeffInput,
+    initialAngleInput,
+    initialVelocityInput,
+    timeEndInput,
+  ].forEach((input) => {
     input.addEventListener("input", validateInputs);
   });
 
   // Time slider
   timeSlider.addEventListener("input", (e) => {
     if (simulationData.length > 0) {
-      currentTimeIndex = Math.floor((e.target.value / 100) * (simulationData.length - 1));
+      currentTimeIndex = Math.floor(
+        (e.target.value / 100) * (simulationData.length - 1),
+      );
       updatePendulumPosition(currentTimeIndex);
       updateCurrentTimeDisplay();
     }
@@ -157,17 +167,19 @@ function initializeCharts() {
     type: "line",
     data: {
       labels: [],
-      datasets: [{
-        label: "Angle (degrees)",
-        data: [],
-        borderColor: "#667eea",
-        backgroundColor: "rgba(102, 126, 234, 0.1)",
-        borderWidth: 2,
-        fill: true,
-        tension: 0.4,
-      }]
+      datasets: [
+        {
+          label: "Angle (degrees)",
+          data: [],
+          borderColor: "#667eea",
+          backgroundColor: "rgba(102, 126, 234, 0.1)",
+          borderWidth: 2,
+          fill: true,
+          tension: 0.4,
+        },
+      ],
     },
-    options: createChartOptions("Angle vs Time", "Time (s)", "Angle (degrees)")
+    options: createChartOptions("Angle vs Time", "Time (s)", "Angle (degrees)"),
   });
 
   // Angular Velocity chart
@@ -175,35 +187,47 @@ function initializeCharts() {
     type: "line",
     data: {
       labels: [],
-      datasets: [{
-        label: "Angular Velocity (rad/s)",
-        data: [],
-        borderColor: "#48bb78",
-        backgroundColor: "rgba(72, 187, 120, 0.1)",
-        borderWidth: 2,
-        fill: true,
-        tension: 0.4,
-      }]
+      datasets: [
+        {
+          label: "Angular Velocity (rad/s)",
+          data: [],
+          borderColor: "#48bb78",
+          backgroundColor: "rgba(72, 187, 120, 0.1)",
+          borderWidth: 2,
+          fill: true,
+          tension: 0.4,
+        },
+      ],
     },
-    options: createChartOptions("Angular Velocity vs Time", "Time (s)", "Angular Velocity (rad/s)")
+    options: createChartOptions(
+      "Angular Velocity vs Time",
+      "Time (s)",
+      "Angular Velocity (rad/s)",
+    ),
   });
 
   // Phase Portrait chart
   charts.phase = new Chart(phaseChart.getContext("2d"), {
     type: "scatter",
     data: {
-      datasets: [{
-        label: "Phase Portrait",
-        data: [],
-        borderColor: "#ed64a6",
-        backgroundColor: "#ed64a6",
-        pointRadius: 2,
-        showLine: true,
-        fill: false,
-        tension: 0,
-      }]
+      datasets: [
+        {
+          label: "Phase Portrait",
+          data: [],
+          borderColor: "#ed64a6",
+          backgroundColor: "#ed64a6",
+          pointRadius: 2,
+          showLine: true,
+          fill: false,
+          tension: 0,
+        },
+      ],
     },
-    options: createChartOptions("Phase Portrait", "Angle (degrees)", "Angular Velocity (rad/s)")
+    options: createChartOptions(
+      "Phase Portrait",
+      "Angle (degrees)",
+      "Angular Velocity (rad/s)",
+    ),
   });
 
   // Energy chart
@@ -238,10 +262,10 @@ function initializeCharts() {
           borderWidth: 2,
           fill: false,
           tension: 0.4,
-        }
-      ]
+        },
+      ],
     },
-    options: createChartOptions("Energy vs Time", "Time (s)", "Energy (J)")
+    options: createChartOptions("Energy vs Time", "Time (s)", "Energy (J)"),
   });
 }
 
@@ -320,11 +344,13 @@ function validateInputs() {
   const velocity = parseFloat(initialVelocityInput.value);
   const timeEnd = parseFloat(timeEndInput.value);
 
-  const isValid = length > 0 && damping >= 0 && 
-                  Math.abs(angle) <= 90 && 
-                  Math.abs(velocity) <= 10 && 
-                  timeEnd > 0;
-  
+  const isValid =
+    length > 0 &&
+    damping >= 0 &&
+    Math.abs(angle) <= 90 &&
+    Math.abs(velocity) <= 10 &&
+    timeEnd > 0;
+
   runBtn.disabled = !isValid;
 
   if (!isValid) {
@@ -416,7 +442,7 @@ async function generateSimulationData(params) {
 
     updateConnectionStatus(
       "disconnected",
-      "Server offline (using fallback simulation)"
+      "Server offline (using fallback simulation)",
     );
 
     // Fallback to JavaScript simulation
@@ -426,18 +452,25 @@ async function generateSimulationData(params) {
 
 // JavaScript fallback simulation
 function generateFallbackSimulation(params) {
-  const { pendulumLength, dampingCoeff, initialAngle, initialVelocity, timeEnd } = params;
+  const {
+    pendulumLength,
+    dampingCoeff,
+    initialAngle,
+    initialVelocity,
+    timeEnd,
+  } = params;
   const dataPoints = [];
   const dt = 0.05; // Time step
   const g = 9.81; // Gravity
 
-  let theta = initialAngle * Math.PI / 180; // Convert to radians
+  let theta = (initialAngle * Math.PI) / 180; // Convert to radians
   let omega = initialVelocity;
 
   for (let t = 0; t <= timeEnd; t += dt) {
     // Simple Euler integration for pendulum equation
-    const alpha = -(g / pendulumLength) * Math.sin(theta) - dampingCoeff * omega;
-    
+    const alpha =
+      -(g / pendulumLength) * Math.sin(theta) - dampingCoeff * omega;
+
     // Calculate positions
     const x = pendulumLength * Math.sin(theta);
     const y = -pendulumLength * Math.cos(theta);
@@ -455,15 +488,21 @@ function generateFallbackSimulation(params) {
     theta += omega * dt;
   }
 
-  console.log("JavaScript fallback generated:", dataPoints.length, "data points");
+  console.log(
+    "JavaScript fallback generated:",
+    dataPoints.length,
+    "data points",
+  );
   return dataPoints;
 }
 
 // Setup pendulum animation
 function setupPendulumAnimation(data, params) {
-  const svgRect = document.getElementById("pendulum-svg").getBoundingClientRect();
+  const svgRect = document
+    .getElementById("pendulum-svg")
+    .getBoundingClientRect();
   const centerX = 200; // SVG center X
-  const centerY = 50;  // SVG pivot Y
+  const centerY = 50; // SVG pivot Y
   const scale = 100 / params.pendulumLength; // Scale factor for visualization
 
   // Update pendulum position
@@ -509,7 +548,7 @@ function updateTrail(currentIndex) {
   const centerX = 200;
   const centerY = 50;
   const scale = 100;
-  
+
   let pathData = "";
   const trailLength = Math.min(50, currentIndex); // Show last 50 points
 
@@ -572,7 +611,7 @@ function startAnimation() {
 function stopAnimation() {
   isPlaying = false;
   playPauseBtn.textContent = "▶ Play";
-  
+
   if (animationFrameId) {
     cancelAnimationFrame(animationFrameId);
     animationFrameId = null;
@@ -581,9 +620,9 @@ function stopAnimation() {
 
 // Update charts with simulation data
 function updateCharts(data, params) {
-  const times = data.map(d => d.time);
-  const angles = data.map(d => d.angle * 180 / Math.PI); // Convert to degrees
-  const velocities = data.map(d => d.angularVelocity);
+  const times = data.map((d) => d.time);
+  const angles = data.map((d) => (d.angle * 180) / Math.PI); // Convert to degrees
+  const velocities = data.map((d) => d.angularVelocity);
 
   // Update angle chart
   charts.angle.data.labels = times;
@@ -596,9 +635,9 @@ function updateCharts(data, params) {
   charts.velocity.update();
 
   // Update phase portrait
-  const phaseData = data.map(d => ({
-    x: d.angle * 180 / Math.PI,
-    y: d.angularVelocity
+  const phaseData = data.map((d) => ({
+    x: (d.angle * 180) / Math.PI,
+    y: d.angularVelocity,
   }));
   charts.phase.data.datasets[0].data = phaseData;
   charts.phase.update();
@@ -618,8 +657,10 @@ function calculateEnergy(data, params) {
   const m = 1; // Assume unit mass
   const L = params.pendulumLength;
 
-  const kinetic = data.map(d => 0.5 * m * L * L * d.angularVelocity * d.angularVelocity);
-  const potential = data.map(d => m * g * L * (1 - Math.cos(d.angle)));
+  const kinetic = data.map(
+    (d) => 0.5 * m * L * L * d.angularVelocity * d.angularVelocity,
+  );
+  const potential = data.map((d) => m * g * L * (1 - Math.cos(d.angle)));
   const total = kinetic.map((k, i) => k + potential[i]);
 
   return { kinetic, potential, total };
@@ -636,7 +677,7 @@ function updateDataTable(data) {
     const row = document.createElement("tr");
     row.innerHTML = `
       <td>${point.time.toFixed(2)}</td>
-      <td>${(point.angle * 180 / Math.PI).toFixed(2)}</td>
+      <td>${((point.angle * 180) / Math.PI).toFixed(2)}</td>
       <td>${point.angularVelocity.toFixed(3)}</td>
       <td>${point.xPosition.toFixed(3)}</td>
       <td>${point.yPosition.toFixed(3)}</td>
@@ -649,9 +690,10 @@ function updateDataTable(data) {
 function exportToCsv() {
   if (simulationData.length === 0) return;
 
-  let csv = "Time (s),Angle (degrees),Angular Velocity (rad/s),X Position (m),Y Position (m)\n";
+  let csv =
+    "Time (s),Angle (degrees),Angular Velocity (rad/s),X Position (m),Y Position (m)\n";
   simulationData.forEach((point) => {
-    csv += `${point.time},${point.angle * 180 / Math.PI},${point.angularVelocity},${point.xPosition},${point.yPosition}\n`;
+    csv += `${point.time},${(point.angle * 180) / Math.PI},${point.angularVelocity},${point.xPosition},${point.yPosition}\n`;
   });
 
   downloadFile(csv, "pendulum_simulation.csv", "text/csv");
@@ -696,14 +738,14 @@ function resetToDefaults() {
 
   // Clear data
   simulationData = [];
-  
+
   // Reset pendulum to initial position
   pendulumRod.setAttribute("x2", "200");
   pendulumRod.setAttribute("y2", "150");
   pendulumBob.setAttribute("cx", "200");
   pendulumBob.setAttribute("cy", "150");
   pendulumTrail.setAttribute("d", "");
-  
+
   currentTimeDisplay.textContent = "0.00";
   timeSlider.value = "0";
   timeSlider.disabled = true;
@@ -711,10 +753,10 @@ function resetToDefaults() {
   playPauseBtn.textContent = "▶ Play";
 
   // Clear charts
-  Object.values(charts).forEach(chart => {
+  Object.values(charts).forEach((chart) => {
     if (chart) {
       chart.data.labels = [];
-      chart.data.datasets.forEach(dataset => {
+      chart.data.datasets.forEach((dataset) => {
         dataset.data = [];
       });
       chart.update();

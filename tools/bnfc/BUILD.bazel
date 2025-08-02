@@ -1,0 +1,30 @@
+# Make the BNFC binary visible to other targets
+alias(
+    name = "bnfc_tool", 
+    actual = select({
+        "@platforms//os:windows": "@@_main~bnfc_deps~bnfc_windows//:bnfc_tool",
+        "//conditions:default": "@@_main~bnfc_deps~bnfc_linux//:bnfc_tool",
+    }),
+    visibility = ["//visibility:public"],
+)
+
+# System-installed Alex lexer generator
+sh_binary(
+    name = "alex_system",
+    srcs = ["alex_wrapper.sh"],
+    visibility = ["//visibility:public"],
+)
+
+# System-installed Happy parser generator  
+sh_binary(
+    name = "happy_system",
+    srcs = ["happy_wrapper.sh"],
+    visibility = ["//visibility:public"],
+)
+
+# Grammar combining script
+sh_binary(
+    name = "combine_grammar_script",
+    srcs = ["combine_grammar.sh"],
+    visibility = ["//visibility:public"],
+)

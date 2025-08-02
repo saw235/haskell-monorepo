@@ -1,0 +1,26 @@
+# Load rules_haskell rules.
+load(
+    "@rules_haskell//haskell:defs.bzl",
+    "haskell_binary",
+)
+load("//tools/bnfc:bnfc.bzl", "bnfc_grammar", "combine_grammar")
+
+# Generate parser files directly from the test SystemVerilog grammar
+bnfc_grammar(
+    name = "systemverilog_grammar",
+    grammar = "bnf/SystemVerilogTest.cf",
+    visibility = ["//haskell/app/bnfc-systemverilog-parser/tests:__subpackages__"],
+)
+
+# Main SystemVerilog parser binary
+haskell_binary(
+    name = "bnfc-systemverilog-parser",
+    srcs = [
+        "Main.hs",
+        ":systemverilog_grammar",
+    ],
+    deps = [
+        "//:base",
+        "@stackage//:array",
+    ],
+) 

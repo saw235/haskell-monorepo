@@ -12,6 +12,15 @@ package(default_visibility = ["//visibility:public"])
 # can be referenced as dependencies.
 haskell_toolchain_library(name = "base")
 
+# BNFC tool - selects the appropriate binary for the current platform
+alias(
+    name = "bnfc",
+    actual = select({
+        "@platforms//os:windows": "@bnfc_windows//:bnfc_tool",
+        "//conditions:default": "@bnfc_linux//:bnfc_tool",
+    }),
+)
+
 # You can add your own libraries with haskell_library.
 # haskell_library(
 #     name = "MY_LIBRARY_NAME",
