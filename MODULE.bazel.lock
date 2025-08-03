@@ -1061,7 +1061,7 @@
     "@@rules_haskell~//extensions:stack_snapshot.bzl%stack_snapshot": {
       "general": {
         "bzlTransitiveDigest": "I9dE/IPkeO/mkCmDvxjs6J9WP1Tf8kV6hE6XhXWYcuw=",
-        "usagesDigest": "j3obRaXgqO6jhkYK3U2zrbQloUAV3GA/LNTQp7X3Ijo=",
+        "usagesDigest": "pADtXH6ie7mFSutvNTUrS4S1/Q0+25KnhxxwRW6zxTI=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},
         "envVariables": {},
@@ -1111,6 +1111,7 @@
                 "QuickCheck",
                 "websockets",
                 "array",
+                "lens",
                 "containers",
                 "stm",
                 "zlib",
@@ -1170,6 +1171,7 @@
                 "QuickCheck",
                 "websockets",
                 "array",
+                "lens",
                 "containers",
                 "stm",
                 "zlib",

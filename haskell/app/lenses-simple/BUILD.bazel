@@ -1,0 +1,11 @@
+load("@rules_haskell//haskell:defs.bzl", "haskell_binary")
+
+haskell_binary(
+    name = "lenses-simple",
+    srcs = ["Main.hs"],
+    deps = [
+        "//:base",
+        "@stackage//:lens",
+    ],
+    visibility = ["//visibility:public"],
+) 

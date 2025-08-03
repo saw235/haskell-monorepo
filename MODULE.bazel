@@ -67,6 +67,7 @@ SIMPLE_PACKAGES = [
     "QuickCheck",
     "websockets",
     "array",
+    "lens"
 ]
 
 # Simple packages with no special configuration

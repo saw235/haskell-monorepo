@@ -1,0 +1,12 @@
+load("@rules_haskell//haskell:defs.bzl", "haskell_binary")
+
+haskell_binary(
+    name = "monad-transformer-simple",
+    srcs = ["Main.hs"],
+    deps = [
+        "//:base",
+        "@stackage//:mtl",
+        "@stackage//:transformers",
+    ],
+    visibility = ["//visibility:public"],
+) 
