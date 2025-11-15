@@ -1,0 +1,15 @@
+load("@rules_haskell//haskell:defs.bzl", "haskell_library")
+
+haskell_library(
+    name = "neural-network",
+    srcs = glob(["src/**/*.hs"]),
+    src_strip_prefix = "src",
+    ghcopts = ["-XRecordWildCards"],
+    deps = [
+        "//:base",
+        "@stackage//:vector",
+        "@stackage//:random",
+        "@stackage//:mtl",
+    ],
+    visibility = ["//visibility:public"],
+)

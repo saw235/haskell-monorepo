@@ -1,0 +1,33 @@
+# Load rules_haskell rules.
+load(
+    "@rules_haskell//haskell:defs.bzl",
+    "haskell_binary",
+    "haskell_test",
+)
+
+# Neural network from scratch application
+haskell_binary(
+    name = "neural-network",
+    srcs = [":Main.hs"],
+    deps = [
+        "//:base",
+        "//haskell/libs/neural-network",
+        "@stackage//:mtl",
+        "@stackage//:random",
+    ],
+)
+
+# Neural network property-based tests
+haskell_test(
+    name = "neural-network-tests",
+    srcs = ["NeuralNetworkTests.hs"],
+    deps = [
+        "//:base",
+        "//haskell/libs/neural-network",
+        "@stackage//:mtl",
+        "@stackage//:QuickCheck",
+        "@stackage//:random",
+        "@stackage//:vector",
+    ],
+    visibility = ["//visibility:public"],
+)

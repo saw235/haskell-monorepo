@@ -12,6 +12,18 @@ package(default_visibility = ["//visibility:public"])
 # can be referenced as dependencies.
 haskell_toolchain_library(name = "base")
 
+haskell_toolchain_library(name = "bytestring")
+
+haskell_toolchain_library(name = "containers")
+
+haskell_toolchain_library(name = "directory")
+
+haskell_toolchain_library(name = "filepath")
+
+haskell_toolchain_library(name = "text")
+
+haskell_toolchain_library(name = "time")
+
 # BNFC tool - selects the appropriate binary for the current platform
 alias(
     name = "bnfc",

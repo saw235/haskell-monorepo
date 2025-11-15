@@ -19,7 +19,7 @@ haskell_binary(
         "@stackage//:text",
         "@stackage//:aeson",
         "@stackage//:optparse-applicative",
-        "@stackage//:bytestring",
+        "//:bytestring",
         "@stackage//:aeson-pretty",
         "@stackage//:containers",
     ],

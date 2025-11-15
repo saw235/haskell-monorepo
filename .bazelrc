@@ -6,6 +6,10 @@ test:ci --test_output=errors
 
 common --enable_bzlmod=true
 
+# Enable isolated extension usages (experimental)
+# Allows multiple isolated instances of the same module extension
+common --experimental_isolated_extension_usages
+
 # Should become the default in bazel 7
 build --incompatible_enable_cc_toolchain_resolution
 

@@ -14,7 +14,7 @@ haskell_library(
         "@stackage//:websockets",
         "@stackage//:text",
         "@stackage//:aeson",
-        "@stackage//:bytestring",
+        "//:bytestring",
     ],
     visibility = ["//visibility:public"],
 )
@@ -38,7 +38,7 @@ haskell_test(
         "//:base",
         "@stackage//:HUnit",
         "@stackage//:aeson",
-        "@stackage//:bytestring",
+        "//:bytestring",
         "@stackage//:text",
     ],
     visibility = ["//visibility:public"],

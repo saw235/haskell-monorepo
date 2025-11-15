@@ -1,0 +1,17 @@
+load("@rules_haskell//haskell:defs.bzl", "haskell_test")
+
+haskell_test(
+    name = "hackage-doc-cli-test",
+    srcs = glob(["**/*.hs"]),
+    data = glob(["Fixtures/**/*"]),
+    deps = [
+        "//:base",
+        "//:bytestring",
+        "//:text",
+        "//:time",
+        "@stackage//:HUnit",
+        "@stackage//:QuickCheck",
+        "@stackage//:aeson",
+        "//haskell/libs/hackage-client",
+    ],
+)

@@ -15,7 +15,7 @@ haskell_binary(
         "@stackage//:optparse-applicative",
         "@stackage//:websockets",
         "@stackage//:aeson",
-        "@stackage//:bytestring",
+        "//:bytestring",
         "@stackage//:text",
     ],
     visibility = ["//visibility:public"],
