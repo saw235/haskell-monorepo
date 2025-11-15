@@ -201,3 +201,10 @@ bazel run @selenium//file:selenium-server-standalone-3.141.59.jar
 
 ### Dependency Installation
 - Always run ```bazel run -- @pnpm//:pnpm --dir $PWD/path to target dir/ install``` to install npm packages
+
+## Active Technologies
+- Haskell with GHC 9.10.1 (project uses Stackage LTS-24.19) + http-conduit (2.3.9.1), aeson (2.2.3.0), optparse-applicative (already in project), containers (core), directory (core) (001-hackage-doc-cli)
+- File-based JSON cache in ~/.cache/hackage-cli/ with TTL-based invalidation (24h metadata, 7d versions, 30d immutable) (001-hackage-doc-cli)
+
+## Recent Changes
+- 001-hackage-doc-cli: Added Haskell with GHC 9.10.1 (project uses Stackage LTS-24.19) + http-conduit (2.3.9.1), aeson (2.2.3.0), optparse-applicative (already in project), containers (core), directory (core)

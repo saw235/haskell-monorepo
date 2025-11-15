@@ -1,0 +1,12 @@
+load("@rules_haskell//haskell:defs.bzl", "haskell_binary")
+
+haskell_binary(
+    name = "hackage-doc-cli",
+    srcs = glob(["**/*.hs"]),
+    deps = [
+        "//:base",
+        "//:text",
+        "@stackage//:optparse-applicative",
+        "//haskell/libs/hackage-client",
+    ],
+)

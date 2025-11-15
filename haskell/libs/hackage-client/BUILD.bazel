@@ -1,0 +1,19 @@
+load("@rules_haskell//haskell:defs.bzl", "haskell_library")
+
+haskell_library(
+    name = "hackage-client",
+    srcs = glob(["**/*.hs"]),
+    visibility = ["//visibility:public"],
+    deps = [
+        "//:base",
+        "//:bytestring",
+        "//:containers",
+        "//:directory",
+        "//:filepath",
+        "//:text",
+        "//:time",
+        "@stackage//:aeson",
+        "@stackage//:http-conduit",
+        "@stackage//:scalpel",
+    ],
+)
