@@ -3,6 +3,8 @@
 module CLI.Options
   ( Options (..),
     Command (..),
+    FilterOpts (..),
+    DisplayOpts (..),
     parseOptions,
   )
 where
@@ -11,10 +13,24 @@ import Data.Text (Text)
 import qualified Data.Text as T
 import Options.Applicative
 
+-- | Filter options for controlling output
+data FilterOpts = FilterOpts
+  { optFilterFunctions :: Bool,
+    optFilterTypes :: Bool,
+    optFilterClasses :: Bool
+  }
+  deriving (Show, Eq)
+
+-- | Display options for controlling verbosity
+data DisplayOpts = DisplayOpts
+  { optWithComments :: Bool
+  }
+  deriving (Show, Eq)
+
 -- | CLI Commands
 data Command
-  = QueryPackage Text (Maybe Text) Bool (Maybe Text) -- Query a package (packageName, maybeVersion, listVersions, maybeModule)
-  | QueryModule Text (Maybe Text) Text -- Query a specific module (packageName, maybeVersion, moduleName)
+  = QueryPackage Text (Maybe Text) Bool (Maybe Text) FilterOpts DisplayOpts -- Query a package (packageName, maybeVersion, listVersions, maybeModule, filterOpts, displayOpts)
+  | QueryModule Text (Maybe Text) Text FilterOpts DisplayOpts -- Query a specific module (packageName, maybeVersion, moduleName, filterOpts, displayOpts)
   deriving (Show, Eq)
 
 -- | CLI Options
@@ -43,7 +59,33 @@ optionsParser = Options <$> commandParser
 commandParser :: Parser Command
 commandParser = queryPackageCommand
 
--- | Query package command with optional --version, --list-versions, and --module flags (T042, T050, T062)
+-- | Parse filter options (T075)
+filterOptsParser :: Parser FilterOpts
+filterOptsParser =
+  FilterOpts
+    <$> switch
+      ( long "filter-functions"
+          <> help "Show only exported functions"
+      )
+    <*> switch
+      ( long "filter-types"
+          <> help "Show only exported types"
+      )
+    <*> switch
+      ( long "filter-classes"
+          <> help "Show only exported type classes"
+      )
+
+-- | Parse display options (T076)
+displayOptsParser :: Parser DisplayOpts
+displayOptsParser =
+  DisplayOpts
+    <$> switch
+      ( long "with-comments"
+          <> help "Include Haddock documentation text alongside signatures"
+      )
+
+-- | Query package command with optional flags (T042, T050, T062, T075, T076)
 queryPackageCommand :: Parser Command
 queryPackageCommand =
   QueryPackage
@@ -71,3 +113,5 @@ queryPackageCommand =
                 <> help "Query specific module (e.g., Data.Aeson)"
             )
       )
+    <*> filterOptsParser
+    <*> displayOptsParser

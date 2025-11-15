@@ -5,28 +5,28 @@ module CLI.Commands
   )
 where
 
-import CLI.Options (Command (..))
+import CLI.Options (Command (..), FilterOpts (..), DisplayOpts (..))
 import Control.Exception (catch, SomeException)
 import Data.Text (Text)
 import qualified Data.Text as T
 import HackageClient (QueryResult (..), queryPackageWithCache)
 import HackageClient.API (fetchModuleDetails)
 import HackageClient.Parser (validateVersion, parseModuleHTML)
-import HackageClient.TreeDisplay (displayPackageTree, displayVersionList, displayModule)
-import HackageClient.Types (Package (..), Version (..))
+import HackageClient.TreeDisplay (displayPackageTree, displayVersionList, displayModule, displayModuleWithOptions)
+import HackageClient.Types (Package (..), Version (..), FilterOptions (..), DisplayOptions (..))
 import System.Exit (exitFailure, exitWith, ExitCode(..))
 import System.IO (hPutStrLn, stderr)
 
--- | Handle CLI command execution (T031, T043, T051, T063)
+-- | Handle CLI command execution (T031, T043, T051, T063, T079)
 handleCommand :: Command -> IO ()
-handleCommand (QueryPackage pkgName maybeVersion listVersions maybeModule) = do
+handleCommand (QueryPackage pkgName maybeVersion listVersions maybeModule filterOpts displayOpts) = do
   -- Check if module query is requested
   case maybeModule of
-    Just moduleName -> handleModuleQuery pkgName maybeVersion moduleName
+    Just moduleName -> handleModuleQuery pkgName maybeVersion moduleName filterOpts displayOpts
     Nothing -> handlePackageQuery pkgName maybeVersion listVersions
 
-handleCommand (QueryModule pkgName maybeVersion moduleName) =
-  handleModuleQuery pkgName maybeVersion moduleName
+handleCommand (QueryModule pkgName maybeVersion moduleName filterOpts displayOpts) =
+  handleModuleQuery pkgName maybeVersion moduleName filterOpts displayOpts
 
 -- | Handle package query (without module)
 handlePackageQuery :: Text -> Maybe Text -> Bool -> IO ()
@@ -54,9 +54,23 @@ handlePackageQuery pkgName maybeVersion listVersions = do
               putStrLn $ displayPackageTree queryResult
               exitWith ExitSuccess
 
--- | Handle module query (T063)
-handleModuleQuery :: Text -> Maybe Text -> Text -> IO ()
-handleModuleQuery pkgName maybeVersion moduleName = do
+-- | Convert CLI filter options to library FilterOptions
+toFilterOptions :: FilterOpts -> FilterOptions
+toFilterOptions opts =
+  -- If no filters are specified (all False), show all (all True)
+  -- Otherwise, show only what's explicitly requested
+  let hasAnyFilter = optFilterFunctions opts || optFilterTypes opts || optFilterClasses opts
+   in if hasAnyFilter
+        then FilterOptions (optFilterFunctions opts) (optFilterTypes opts) (optFilterClasses opts)
+        else FilterOptions True True True -- Default: show all
+
+-- | Convert CLI display options to library DisplayOptions
+toDisplayOptions :: DisplayOpts -> DisplayOptions
+toDisplayOptions opts = DisplayOptions (optWithComments opts)
+
+-- | Handle module query (T063, T079)
+handleModuleQuery :: Text -> Maybe Text -> Text -> FilterOpts -> DisplayOpts -> IO ()
+handleModuleQuery pkgName maybeVersion moduleName filterOpts displayOpts = do
   -- Validate version if provided
   case maybeVersion of
     Just v ->
@@ -88,8 +102,11 @@ handleModuleQuery pkgName maybeVersion moduleName = do
               hPutStrLn stderr $ "Error: Failed to parse module documentation for " ++ T.unpack moduleName
               exitWith (ExitFailure 1)
             Just modInfo -> do
-              -- Display the module tree
-              putStrLn $ displayModule modInfo
+              -- Convert CLI options to library options
+              let filterOptions = toFilterOptions filterOpts
+                  displayOptions = toDisplayOptions displayOpts
+              -- Display the module tree with options
+              putStrLn $ displayModuleWithOptions filterOptions displayOptions modInfo
               exitWith ExitSuccess
 
 -- | Handle network failures with clear messages (T033)

@@ -5,6 +5,7 @@ module HackageClient.TreeDisplay
     displayVersionList,
     formatCacheStatus,
     displayModule,
+    displayModuleWithOptions,
   )
 where
 
@@ -13,6 +14,7 @@ import Data.Text (Text)
 import qualified Data.Text as T
 import Data.Time (NominalDiffTime)
 import Data.Tree (Tree (..), drawTree)
+import HackageClient.Filter (applyFilters)
 import HackageClient.Types
   ( Module (..),
     Package (..),
@@ -22,6 +24,10 @@ import HackageClient.Types
     Function (..),
     Type (..),
     TypeClass (..),
+    FilterOptions (..),
+    DisplayOptions (..),
+    defaultFilterOptions,
+    defaultDisplayOptions,
   )
 
 -- | Display package as a tree structure (T028)
@@ -110,37 +116,60 @@ formatVersionLine v =
    in "  " ++ vNum ++ tags
 
 -- | Display module details as a tree structure (T059)
+-- Uses default options (show all, no comments)
 displayModule :: Module -> String
-displayModule mod =
-  let tree = moduleToTree mod
+displayModule = displayModuleWithOptions defaultFilterOptions defaultDisplayOptions
+
+-- | Display module with custom filter and display options (T077, T078)
+displayModuleWithOptions :: FilterOptions -> DisplayOptions -> Module -> String
+displayModuleWithOptions filterOpts displayOpts mod =
+  let filteredMod = applyFilters filterOpts mod
+      tree = moduleToTree displayOpts filteredMod
    in drawTree tree
 
 -- | Convert Module to Tree structure with full details
-moduleToTree :: Module -> Tree String
-moduleToTree mod =
+moduleToTree :: DisplayOptions -> Module -> Tree String
+moduleToTree displayOpts mod =
   Node
     (T.unpack (moduleName mod) ++ " (" ++ T.unpack (modulePackage mod) ++ "-" ++ T.unpack (moduleVersion mod) ++ ")")
-    [ Node "Functions:" (map functionTreeNode (moduleExportedFunctions mod)),
-      Node "Types:" (map typeTreeNode (moduleExportedTypes mod)),
-      Node "Type Classes:" (map typeClassTreeNode (moduleExportedClasses mod))
+    [ Node "Functions:" (map (functionTreeNode displayOpts) (moduleExportedFunctions mod)),
+      Node "Types:" (map (typeTreeNode displayOpts) (moduleExportedTypes mod)),
+      Node "Type Classes:" (map (typeClassTreeNode displayOpts) (moduleExportedClasses mod))
     ]
 
--- | Convert Function to Tree node
-functionTreeNode :: Function -> Tree String
-functionTreeNode func =
+-- | Convert Function to Tree node (with optional documentation)
+functionTreeNode :: DisplayOptions -> Function -> Tree String
+functionTreeNode displayOpts func =
   let name = T.unpack (functionName func)
       sig = T.unpack (functionSignature func)
-      docNode = case functionDocumentation func of
-        Just doc -> [Node ("  " ++ T.unpack doc) []]
-        Nothing -> []
+      docNode =
+        if withComments displayOpts
+          then case functionDocumentation func of
+            Just doc -> [Node ("  -- " ++ T.unpack doc) []]
+            Nothing -> []
+          else []
    in Node (name ++ " " ++ sig) docNode
 
--- | Convert Type to Tree node (T060)
-typeTreeNode :: Type -> Tree String
-typeTreeNode typ =
-  Node (T.unpack (typeName typ)) []
+-- | Convert Type to Tree node (with optional documentation)
+typeTreeNode :: DisplayOptions -> Type -> Tree String
+typeTreeNode displayOpts typ =
+  let name = T.unpack (typeName typ)
+      docNode =
+        if withComments displayOpts
+          then case typeDocumentation typ of
+            Just doc -> [Node ("  -- " ++ T.unpack doc) []]
+            Nothing -> []
+          else []
+   in Node name docNode
 
--- | Convert TypeClass to Tree node (T061)
-typeClassTreeNode :: TypeClass -> Tree String
-typeClassTreeNode tc =
-  Node (T.unpack (typeClassName tc)) []
+-- | Convert TypeClass to Tree node (with optional documentation)
+typeClassTreeNode :: DisplayOptions -> TypeClass -> Tree String
+typeClassTreeNode displayOpts tc =
+  let name = T.unpack (typeClassName tc)
+      docNode =
+        if withComments displayOpts
+          then case typeClassDocumentation tc of
+            Just doc -> [Node ("  -- " ++ T.unpack doc) []]
+            Nothing -> []
+          else []
+   in Node name docNode

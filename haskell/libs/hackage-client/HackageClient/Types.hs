@@ -20,6 +20,12 @@ module HackageClient.Types
     Method (..),
     QueryMetadata (..),
 
+    -- * Filter and Display Options
+    FilterOptions (..),
+    DisplayOptions (..),
+    defaultFilterOptions,
+    defaultDisplayOptions,
+
     -- * Utility Functions
     isCacheValid,
   )
@@ -217,3 +223,33 @@ instance (FromJSON a) => FromJSON (CacheEntry a)
 isCacheValid :: CacheEntry a -> UTCTime -> Bool
 isCacheValid entry now =
   diffUTCTime now (cacheTimestamp entry) < cacheTTL entry
+
+-- | Filter options for controlling which entity types to display
+data FilterOptions = FilterOptions
+  { filterFunctions :: Bool, -- Show functions?
+    filterTypes :: Bool, -- Show types?
+    filterClasses :: Bool -- Show classes?
+  }
+  deriving (Show, Eq, Generic)
+
+instance ToJSON FilterOptions
+
+instance FromJSON FilterOptions
+
+-- | Default filter options (show all entity types)
+defaultFilterOptions :: FilterOptions
+defaultFilterOptions = FilterOptions True True True
+
+-- | Display options for controlling output verbosity
+data DisplayOptions = DisplayOptions
+  { withComments :: Bool -- Include Haddock documentation?
+  }
+  deriving (Show, Eq, Generic)
+
+instance ToJSON DisplayOptions
+
+instance FromJSON DisplayOptions
+
+-- | Default display options (concise output without comments)
+defaultDisplayOptions :: DisplayOptions
+defaultDisplayOptions = DisplayOptions False
