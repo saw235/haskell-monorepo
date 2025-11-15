@@ -85,7 +85,7 @@ cd tools/mcp-shrimp-task-manager && npx prettier --write .
 
 ### Advanced Build System
 - **Primary:** Bazel 7.4.0 with Bzlmod enabled for modern dependency management
-- **Haskell toolchain:** GHC 9.8.1 via Stackage LTS-23.22 snapshot (64 packages)
+- **Haskell toolchain:** GHC 9.10.1 via Stackage LTS-24.19 snapshot
 - **Multi-language:** Integrated TypeScript/NodeJS builds via aspect_rules_js
 - **Platform support:** OS-specific configurations in .bazelrc for macOS/Windows/Linux
 - **Custom extensions:** Non-module dependencies via non_module_deps.bzl
