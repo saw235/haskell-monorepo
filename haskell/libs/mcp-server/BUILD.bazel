@@ -12,7 +12,7 @@ haskell_library(
     deps = [
         "@stackage//:aeson",
         "//:base",
-        "@stackage//:bytestring",
+        "//:bytestring",
         "@stackage//:containers",
         # "@stackage//:mtl",
         "@stackage//:stm",

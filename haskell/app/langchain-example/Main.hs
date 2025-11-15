@@ -5,74 +5,128 @@ module Main (main) where
 
 import Langchain.LLM.Core
 import Langchain.PromptTemplate
-import Langchain.Callback
+import Langchain.Message (ChatMessage(..))
 import qualified Data.Map.Strict as Map
 import qualified Data.Text as T
 import Data.Text (Text)
 import Data.Maybe (fromMaybe)
 import Network.HTTP.Simple
 import qualified Data.Text.Encoding as TE
-import Data.Aeson (object, (.=), encode)
+import Data.Aeson (object, (.=), encode, decode, Value(..))
+import Data.Aeson.Types (parseMaybe)
+import qualified Data.Aeson.KeyMap as KM
 import qualified Data.ByteString.Lazy as BL
 
--- Qwen LLM implementation
-data Qwen = Qwen
-  { qwApiKey    :: Text      -- ^ Your Qwen API key
-  , qwEndpoint  :: Text      -- ^ Base URL of the Qwen API
-  , qwModel     :: Text      -- ^ Model name, e.g. "qwen-turbo"
+-- Kimi LLM implementation
+data Kimi = Kimi
+  { kimiApiKey    :: Text      -- ^ Your Kimi API key
+  , kimiEndpoint  :: Text      -- ^ Base URL of the Kimi API
+  , kimiModel     :: Text      -- ^ Model name, e.g. "kimi-k2-0905-preview"
   }
 
-data QwenParams = QwenParams
-  { qwTemperature :: Maybe Double  -- ^ Sampling temperature
-  , qwMaxTokens   :: Maybe Int     -- ^ Maximum tokens in output
+data KimiParams = KimiParams
+  { kimiTemperature :: Maybe Double  -- ^ Sampling temperature (0.0 to 1.0)
+  , kimiMaxTokens   :: Maybe Int     -- ^ Maximum tokens in output
   }
 
-defaultQwenParams :: QwenParams
-defaultQwenParams = QwenParams
-  { qwTemperature = Just 0.7
-  , qwMaxTokens = Just 1500
+defaultKimiParams :: KimiParams
+defaultKimiParams = KimiParams
+  { kimiTemperature = Just 0.7
+  , kimiMaxTokens = Just 1500
   }
 
-instance LLM Qwen where
-  type LLMParams Qwen = QwenParams
+-- Extract content from API response
+extractContent :: BL.ByteString -> Maybe Text
+extractContent body = do
+  val <- decode body
+  case val of
+    Object obj -> do
+      Object choices <- KM.lookup "choices" obj
+      Object choice <- KM.lookup "0" (KM.singleton "0" choices)
+      Object message <- KM.lookup "message" choice
+      String content <- KM.lookup "content" message
+      return content
+    _ -> Nothing
 
-  generate Qwen{..} prompt mParams = do
-    let params = fromMaybe defaultQwenParams mParams
+instance LLM Kimi where
+  type LLMParams Kimi = KimiParams
+
+  generate Kimi{..} prompt mParams = do
+    let params = fromMaybe defaultKimiParams mParams
         reqBody = object
-          [ "model" .= qwModel
+          [ "model" .= kimiModel
           , "messages" .= [object ["role" .= ("user" :: Text), "content" .= prompt]]
-          , "temperature" .= qwTemperature params
-          , "max_tokens" .= qwMaxTokens params
+          , "temperature" .= kimiTemperature params
+          , "max_tokens" .= kimiMaxTokens params
           ]
+        endpoint = T.unpack kimiEndpoint <> "/chat/completions"
 
-    request <- parseRequest (T.unpack qwEndpoint)
+    request <- parseRequest endpoint
     let req = setRequestMethod "POST"
-            $ setRequestHeader "Authorization" [TE.encodeUtf8 $ "Bearer " <> qwApiKey]
+            $ setRequestHeader "Authorization" [TE.encodeUtf8 $ "Bearer " <> kimiApiKey]
             $ setRequestHeader "Content-Type" ["application/json"]
             $ setRequestBodyLBS (encode reqBody)
             $ request
 
-    response <- httpBS req
+    response <- httpLBS req
     let status = getResponseStatusCode response
-        body   = TE.decodeUtf8 $ getResponseBody response
-    return $ if status >= 200 && status < 300
-      then Right body
-      else Left $ "Qwen error: HTTP " ++ show status ++ "; " ++ T.unpack body
+        body   = getResponseBody response
+
+    if status >= 200 && status < 300
+      then case extractContent body of
+        Just content -> return $ Right content
+        Nothing -> return $ Right $ TE.decodeUtf8 $ BL.toStrict body  -- Fallback to full response
+      else return $ Left $ "Kimi API error: HTTP " ++ show status ++ "; " ++ show (TE.decodeUtf8 $ BL.toStrict body)
+
+  -- Chat method: accepts ChatMessage list
+  chat kimi messages mParams = do
+    -- Convert ChatMessage to Text and use generate
+    let prompt = T.intercalate "\n" $ map chatMessageContent messages
+    generate kimi prompt mParams
+
+  -- Stream not implemented
+  stream _ _ _ _ = return $ Left "Streaming not supported for Kimi"
+
+-- Helper to extract content from ChatMessage
+chatMessageContent :: ChatMessage -> Text
+chatMessageContent (UserMessage txt) = txt
+chatMessageContent (AssistantMessage txt) = txt
+chatMessageContent (SystemMessage txt) = txt
 
 main :: IO ()
 main = do
-  let qwenLLM = Qwen
-        { qwApiKey = "sk-0463077ca85348c98d700fc5158198a4"
-        , qwEndpoint = "https://dashscope-intl.aliyuncs.com/compatible-mode/v1/chat/completions"
-        , qwModel = "qwen-turbo"
+  let kimiLLM = Kimi
+        { kimiApiKey = "sk-mky1mf4lC9tVOCTLXqqe9KT0b3NCaNXsJ3PPO13vopiUaCSn"
+        , kimiEndpoint = "https://api.moonshot.ai/v1"
+        , kimiModel = "moonshot-v1-8k"
         }
-      prompt = PromptTemplate "Translate the following English text to French: {text}"
+
+  -- Example 1: Simple prompt using generate
+  putStrLn "=== Example 1: Simple Generate ==="
+  result1 <- generate kimiLLM "What is the capital of France?" Nothing
+  case result1 of
+    Left err -> putStrLn $ "Error: " ++ err
+    Right response -> putStrLn $ "Response: " ++ T.unpack response
+
+  putStrLn "\n=== Example 2: Using PromptTemplate ==="
+  let prompt = PromptTemplate "Translate the following English text to French: {text}"
       input = Map.fromList [("text", "Hello, how are you?")]
 
   case renderPrompt prompt input of
     Left e -> putStrLn $ "Error: " ++ e
     Right renderedPrompt -> do
-      eRes <- generate qwenLLM renderedPrompt Nothing
-      case eRes of
+      result2 <- generate kimiLLM renderedPrompt Nothing
+      case result2 of
         Left err -> putStrLn $ "Error: " ++ err
-        Right response -> putStrLn $ "Translation: " ++ (T.unpack response)
+        Right response -> putStrLn $ "Translation: " ++ T.unpack response
+
+  putStrLn "\n=== Example 3: Using Chat with Messages ==="
+  let messages =
+        [ SystemMessage "You are a helpful assistant."
+        , UserMessage "Tell me a joke about programming."
+        ]
+
+  result3 <- chat kimiLLM messages Nothing
+  case result3 of
+    Left err -> putStrLn $ "Error: " ++ err
+    Right response -> putStrLn $ "Joke: " ++ T.unpack response
