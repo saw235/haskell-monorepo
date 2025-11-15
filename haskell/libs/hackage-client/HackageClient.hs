@@ -9,7 +9,7 @@ where
 import Data.Text (Text)
 import Data.Time (diffUTCTime, getCurrentTime, secondsToNominalDiffTime)
 import HackageClient.API (fetchPackageInfo)
-import HackageClient.Cache (readCache, writeCache, versionedCacheKey)
+import HackageClient.Cache (readCache, versionedCacheKey, writeCache)
 import HackageClient.Parser (parsePackageResponse)
 import HackageClient.Types
   ( CacheEntry (..),

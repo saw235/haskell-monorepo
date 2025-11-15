@@ -2,9 +2,9 @@ module Main (main) where
 
 import CacheSpec (cacheTests)
 import ParserSpec (parserTests)
-import TreeDisplaySpec (treeDisplayTests)
 import System.Exit (exitFailure, exitSuccess)
 import Test.HUnit
+import TreeDisplaySpec (treeDisplayTests)
 
 main :: IO ()
 main = do

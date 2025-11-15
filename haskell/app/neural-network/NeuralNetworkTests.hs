@@ -1,14 +1,14 @@
 module Main where
 
 import Control.Monad (replicateM)
-import Control.Monad.Reader (ReaderT, runReaderT, ask, lift)
+import Control.Monad.Reader (ReaderT, ask, lift, runReaderT)
 import Data.Vector (Vector)
 import qualified Data.Vector as V
-import System.Random (Random, RandomGen, randomR, mkStdGen)
-import Test.QuickCheck
-import Text.Printf (printf)
 import qualified NeuralNetwork as NN
+import System.Random (Random, RandomGen, mkStdGen, randomR)
+import Test.QuickCheck
 import Test.QuickCheck.Monadic (monadicIO, run)
+import Text.Printf (printf)
 
 -- =============================================================================
 -- QUICKCHECK NEURAL NETWORK TESTS
@@ -25,15 +25,15 @@ import Test.QuickCheck.Monadic (monadicIO, run)
 -- Generate valid layer sizes (at least 2 layers, each with 1+ neurons)
 genLayerSizes :: Gen [Int]
 genLayerSizes = do
-  numLayers <- choose (2, 5)  -- 2-5 layers
-  layerSizes <- replicateM numLayers (choose (1, 8))  -- 1-8 neurons per layer
+  numLayers <- choose (2, 5) -- 2-5 layers
+  layerSizes <- replicateM numLayers (choose (1, 8)) -- 1-8 neurons per layer
   return layerSizes
 
 -- Generate small layer sizes for detailed testing
 genSmallLayerSizes :: Gen [Int]
 genSmallLayerSizes = do
-  numLayers <- choose (2, 3)  -- 2-3 layers only
-  layerSizes <- replicateM numLayers (choose (1, 4))  -- 1-4 neurons per layer
+  numLayers <- choose (2, 3) -- 2-3 layers only
+  layerSizes <- replicateM numLayers (choose (1, 4)) -- 1-4 neurons per layer
   return layerSizes
 
 -- Generate a random vector of specified length
@@ -55,7 +55,7 @@ genNeuralNetwork layerSizes = do
 genExample :: Int -> Gen NN.Example
 genExample inputSize = do
   inputs <- genVector inputSize
-  expectedOutputs <- genVector 1  -- Assume single output
+  expectedOutputs <- genVector 1 -- Assume single output
   return $ NN.Example inputs expectedOutputs
 
 -- =============================================================================
@@ -64,9 +64,9 @@ genExample inputSize = do
 
 -- Property: Sigmoid output is always in range [0, 1]
 prop_sigmoid_range :: Double -> Bool
-prop_sigmoid_range x = 
+prop_sigmoid_range x =
   let result = NN.activate NN.sigmoidActivation x
-  in result >= 0 && result <= 1
+   in result >= 0 && result <= 1
 
 -- Property: Sigmoid derivative is correctly computed
 prop_sigmoid_derivative :: Double -> Bool
@@ -75,7 +75,7 @@ prop_sigmoid_derivative x =
       expected = sig * (1 - sig)
       actual = NN.derivative NN.sigmoidActivation sig
       tolerance = 1e-10
-  in abs (expected - actual) < tolerance
+   in abs (expected - actual) < tolerance
 
 -- Property: ReLU is never negative
 prop_relu_nonnegative :: Double -> Bool
@@ -86,13 +86,13 @@ prop_relu_nonnegative x =
 prop_relu_derivative :: Double -> Bool
 prop_relu_derivative x =
   let deriv = NN.derivative NN.reluActivation x
-  in deriv == 0 || deriv == 1
+   in deriv == 0 || deriv == 1
 
 -- Property: Tanh output is always in range [-1, 1]
 prop_tanh_range :: Double -> Bool
 prop_tanh_range x =
   let result = NN.activate NN.tanhActivation x
-  in result >= -1 && result <= 1
+   in result >= -1 && result <= 1
 
 -- =============================================================================
 -- VECTOR AND DIMENSION PROPERTIES
@@ -111,12 +111,16 @@ prop_parameter_count layerSizes =
   length layerSizes >= 2 && all (> 0) layerSizes ==> monadicIO $ do
     network <- run $ generate (genNeuralNetwork layerSizes)
     let NN.NeuralNetwork layers = network
-        expectedParams = sum $ zipWith (\inSize outSize -> outSize * inSize + outSize) 
-                                       layerSizes (tail layerSizes)
+        expectedParams =
+          sum $
+            zipWith
+              (\inSize outSize -> outSize * inSize + outSize)
+              layerSizes
+              (tail layerSizes)
         actualParams = sum $ map countLayerParams layers
     return $ expectedParams == actualParams
   where
-    countLayerParams (NN.Layer weights biases _) = 
+    countLayerParams (NN.Layer weights biases _) =
       V.length biases + V.sum (V.map V.length weights)
 
 -- =============================================================================
@@ -144,7 +148,7 @@ prop_forward_no_crash layerSizes =
     return $ V.length output > 0
 
 -- Property: Forward pass produces finite values
-prop_forward_finite :: [Int] -> Property  
+prop_forward_finite :: [Int] -> Property
 prop_forward_finite layerSizes =
   length layerSizes >= 2 && all (> 0) layerSizes && all (<= 5) layerSizes ==> monadicIO $ do
     network <- run $ generate (genNeuralNetwork layerSizes)
@@ -169,9 +173,9 @@ prop_backward_dimensions layerSizes =
         biasDimsCorrect = and $ zipWith checkBiasDims layers biasGrads
     return $ weightDimsCorrect && biasDimsCorrect
   where
-    checkWeightDims (NN.Layer weights _ _) grads = 
-      V.length weights == V.length grads &&
-      V.and (V.zipWith (\w g -> V.length w == V.length g) weights grads)
+    checkWeightDims (NN.Layer weights _ _) grads =
+      V.length weights == V.length grads
+        && V.and (V.zipWith (\w g -> V.length w == V.length g) weights grads)
     checkBiasDims (NN.Layer _ biases _) grads =
       V.length biases == V.length grads
 
@@ -184,8 +188,9 @@ prop_backward_no_crash layerSizes =
     target <- run $ generate (genVector (last layerSizes))
     let (weightGrads, biasGrads) = NN.backward network input target
     -- Test passes if we get here without crashing
-    return $ length weightGrads == length layerSizes - 1 && 
-             length biasGrads == length layerSizes - 1
+    return $
+      length weightGrads == length layerSizes - 1
+        && length biasGrads == length layerSizes - 1
 
 -- Property: Activations computation produces correct number of layers
 prop_activations_count :: [Int] -> Property
@@ -194,7 +199,7 @@ prop_activations_count layerSizes =
     network <- run $ generate (genNeuralNetwork layerSizes)
     input <- run $ generate (genVector (head layerSizes))
     let activations = NN.computeActivations network input
-        expectedCount = length layerSizes  -- input + all layer outputs
+        expectedCount = length layerSizes -- input + all layer outputs
     return $ length activations == expectedCount
 
 -- =============================================================================
@@ -202,70 +207,96 @@ prop_activations_count layerSizes =
 -- =============================================================================
 
 -- Simple numerical gradient approximation
-numericalGradient :: NN.NeuralNetwork -> Vector Double -> Vector Double -> Double -> 
-                    ([Vector (Vector Double)], [Vector Double])
+numericalGradient ::
+  NN.NeuralNetwork ->
+  Vector Double ->
+  Vector Double ->
+  Double ->
+  ([Vector (Vector Double)], [Vector Double])
 numericalGradient network inputs targets epsilon =
   let NN.NeuralNetwork layers = network
       loss net = NN.mse (NN.forward net inputs) targets
-      
+
       -- Compute numerical weight gradients
-      weightGrads = map (computeLayerWeightGrads loss network epsilon) [0..length layers - 1]
-      
-      -- Compute numerical bias gradients  
-      biasGrads = map (computeLayerBiasGrads loss network epsilon) [0..length layers - 1]
-      
-  in (weightGrads, biasGrads)
+      weightGrads = map (computeLayerWeightGrads loss network epsilon) [0 .. length layers - 1]
+
+      -- Compute numerical bias gradients
+      biasGrads = map (computeLayerBiasGrads loss network epsilon) [0 .. length layers - 1]
+   in (weightGrads, biasGrads)
   where
     computeLayerWeightGrads lossFunc net eps layerIdx =
       let NN.NeuralNetwork layers = net
           layer = layers !! layerIdx
           NN.Layer weights biases activation = layer
-      in V.imap (\i neuronWeights ->
-           V.imap (\j weight ->
-             let net1 = updateNetworkWeight net layerIdx i j (weight + eps)
-                 net2 = updateNetworkWeight net layerIdx i j (weight - eps)
-                 loss1 = lossFunc net1
-                 loss2 = lossFunc net2
-             in (loss1 - loss2) / (2 * eps)) neuronWeights) weights
-    
+       in V.imap
+            ( \i neuronWeights ->
+                V.imap
+                  ( \j weight ->
+                      let net1 = updateNetworkWeight net layerIdx i j (weight + eps)
+                          net2 = updateNetworkWeight net layerIdx i j (weight - eps)
+                          loss1 = lossFunc net1
+                          loss2 = lossFunc net2
+                       in (loss1 - loss2) / (2 * eps)
+                  )
+                  neuronWeights
+            )
+            weights
+
     computeLayerBiasGrads lossFunc net eps layerIdx =
       let NN.NeuralNetwork layers = net
           layer = layers !! layerIdx
           NN.Layer weights biases activation = layer
-      in V.imap (\i bias ->
-           let net1 = updateNetworkBias net layerIdx i (bias + eps)
-               net2 = updateNetworkBias net layerIdx i (bias - eps)
-               loss1 = lossFunc net1
-               loss2 = lossFunc net2
-           in (loss1 - loss2) / (2 * eps)) biases
+       in V.imap
+            ( \i bias ->
+                let net1 = updateNetworkBias net layerIdx i (bias + eps)
+                    net2 = updateNetworkBias net layerIdx i (bias - eps)
+                    loss1 = lossFunc net1
+                    loss2 = lossFunc net2
+                 in (loss1 - loss2) / (2 * eps)
+            )
+            biases
 
 -- Helper functions to update network weights/biases for numerical gradients
 updateNetworkWeight :: NN.NeuralNetwork -> Int -> Int -> Int -> Double -> NN.NeuralNetwork
 updateNetworkWeight (NN.NeuralNetwork layers) layerIdx neuronIdx weightIdx newWeight =
-  let updatedLayers = zipWith (\i layer ->
-        if i == layerIdx
-          then updateLayerWeight layer neuronIdx weightIdx newWeight
-          else layer) [0..] layers
-  in NN.NeuralNetwork updatedLayers
+  let updatedLayers =
+        zipWith
+          ( \i layer ->
+              if i == layerIdx
+                then updateLayerWeight layer neuronIdx weightIdx newWeight
+                else layer
+          )
+          [0 ..]
+          layers
+   in NN.NeuralNetwork updatedLayers
   where
     updateLayerWeight (NN.Layer weights biases activation) nIdx wIdx newW =
-      let updatedWeights = V.imap (\i neuronWeights ->
-            if i == nIdx
-              then V.imap (\j w -> if j == wIdx then newW else w) neuronWeights
-              else neuronWeights) weights
-      in NN.Layer updatedWeights biases activation
+      let updatedWeights =
+            V.imap
+              ( \i neuronWeights ->
+                  if i == nIdx
+                    then V.imap (\j w -> if j == wIdx then newW else w) neuronWeights
+                    else neuronWeights
+              )
+              weights
+       in NN.Layer updatedWeights biases activation
 
 updateNetworkBias :: NN.NeuralNetwork -> Int -> Int -> Double -> NN.NeuralNetwork
 updateNetworkBias (NN.NeuralNetwork layers) layerIdx neuronIdx newBias =
-  let updatedLayers = zipWith (\i layer ->
-        if i == layerIdx
-          then updateLayerBias layer neuronIdx newBias
-          else layer) [0..] layers
-  in NN.NeuralNetwork updatedLayers
+  let updatedLayers =
+        zipWith
+          ( \i layer ->
+              if i == layerIdx
+                then updateLayerBias layer neuronIdx newBias
+                else layer
+          )
+          [0 ..]
+          layers
+   in NN.NeuralNetwork updatedLayers
   where
     updateLayerBias (NN.Layer weights biases activation) nIdx newB =
       let updatedBiases = V.imap (\i b -> if i == nIdx then newB else b) biases
-      in NN.Layer weights updatedBiases activation
+       in NN.Layer weights updatedBiases activation
 
 -- Property: Analytical gradients are close to numerical gradients
 prop_gradient_correctness :: Property
@@ -281,10 +312,10 @@ prop_gradient_correctness = forAll genSmallLayerSizes $ \layerSizes ->
   where
     gradientsClose (wGrads1, bGrads1) (wGrads2, bGrads2) tol =
       weightsClose wGrads1 wGrads2 tol && biasesClose bGrads1 bGrads2 tol
-    
+
     weightsClose wgs1 wgs2 tol = and $ zipWith (layerWeightsClose tol) wgs1 wgs2
     biasesClose bgs1 bgs2 tol = and $ zipWith (vectorClose tol) bgs1 bgs2
-    
+
     layerWeightsClose tol wg1 wg2 = V.and $ V.zipWith (vectorClose tol) wg1 wg2
     vectorClose tol v1 v2 = V.and $ V.zipWith (\a b -> abs (a - b) < tol) v1 v2
 
@@ -299,16 +330,17 @@ prop_specific_architecture_no_crash = monadicIO $ do
   network <- run $ generate (genNeuralNetwork layerSizes)
   input <- run $ generate (genVector 2)
   target <- run $ generate (genVector 1)
-  
+
   -- Test NN.forward pass
   let output = NN.forward network input
-  
+
   -- Test backward pass (this should not crash)
   let (weightGrads, biasGrads) = NN.backward network input target
-  
-  return $ V.length output == 1 && 
-           length weightGrads == 4 && 
-           length biasGrads == 4
+
+  return $
+    V.length output == 1
+      && length weightGrads == 4
+      && length biasGrads == 4
 
 -- =============================================================================
 -- MAIN FUNCTION
@@ -324,7 +356,7 @@ main = do
   quickCheck prop_sigmoid_range
   quickCheck prop_sigmoid_derivative
   quickCheck prop_relu_nonnegative
-  quickCheck prop_relu_derivative  
+  quickCheck prop_relu_derivative
   quickCheck prop_tanh_range
 
   putStrLn "\n2. Testing vector and dimension properties..."
@@ -343,7 +375,7 @@ main = do
 
   putStrLn "\n5. Testing numerical gradient correctness..."
   putStrLn "This may take longer as it computes numerical gradients..."
-  quickCheckWith stdArgs { maxSuccess = 10 } prop_gradient_correctness
+  quickCheckWith stdArgs {maxSuccess = 10} prop_gradient_correctness
 
   putStrLn "\n6. Testing specific failing architecture [2,8,6,4,1]..."
   quickCheck prop_specific_architecture_no_crash

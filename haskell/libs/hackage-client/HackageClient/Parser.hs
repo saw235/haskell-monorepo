@@ -9,31 +9,31 @@ module HackageClient.Parser
   )
 where
 
-import Control.Applicative ((<|>), empty)
-import Data.Aeson (Value (..), decode, Object)
+import Control.Applicative (empty, (<|>))
+import Data.Aeson (Object, Value (..), decode)
 import Data.Aeson.Key (toString)
 import qualified Data.Aeson.KeyMap as KM
 import qualified Data.ByteString as BS
 import qualified Data.ByteString.Lazy as BL
-import Data.List (sortBy, nub)
-import Data.Maybe (fromMaybe, listToMaybe, catMaybes)
-import Data.Ord (Down(..), comparing)
+import Data.Char (isDigit)
+import Data.List (nub, sortBy)
+import Data.Maybe (catMaybes, fromMaybe, listToMaybe)
+import Data.Ord (Down (..), comparing)
 import Data.Text (Text)
 import qualified Data.Text as T
 import qualified Data.Text.Encoding as TE
 import Data.Time (UTCTime)
-import Data.Char (isDigit)
-import Text.HTML.Scalpel
 import HackageClient.Types
   ( Dependency (..),
+    Function (..),
     Module (..),
     Package (..),
-    Version (..),
-    Function (..),
     Type (..),
     TypeClass (..),
     TypeKind (..),
+    Version (..),
   )
+import Text.HTML.Scalpel
 
 -- | Parse Hackage JSON response into Package type (T026)
 -- Hackage returns: {"version1": "normal", "version2": "deprecated", ...}
@@ -41,18 +41,19 @@ parsePackageResponse :: Text -> BL.ByteString -> Maybe Package
 parsePackageResponse pkgName bs = do
   versionMap <- decode bs :: Maybe Object
   let versions = map parseVersion $ KM.toList versionMap
-  return $ Package
-    { packageName = pkgName,
-      packageVersions = sortBy (comparing (Down . versionNumber)) versions,
-      packageSynopsis = "Package " <> pkgName,
-      packageDescription = "See https://hackage.haskell.org/package/" <> pkgName,
-      packageMaintainer = "Unknown",
-      packageHomepage = Nothing,
-      packageDocUrl = "https://hackage.haskell.org/package/" <> pkgName,
-      packageUploadDate = read "2025-01-01 00:00:00 UTC",
-      packageDependencies = [],
-      packageModules = []
-    }
+  return $
+    Package
+      { packageName = pkgName,
+        packageVersions = sortBy (comparing (Down . versionNumber)) versions,
+        packageSynopsis = "Package " <> pkgName,
+        packageDescription = "See https://hackage.haskell.org/package/" <> pkgName,
+        packageMaintainer = "Unknown",
+        packageHomepage = Nothing,
+        packageDocUrl = "https://hackage.haskell.org/package/" <> pkgName,
+        packageUploadDate = read "2025-01-01 00:00:00 UTC",
+        packageDependencies = [],
+        packageModules = []
+      }
   where
     parseVersion (key, val) =
       let versionStr = T.pack $ toString key
@@ -62,10 +63,11 @@ parsePackageResponse pkgName bs = do
        in Version
             { versionNumber = versionStr,
               versionReleaseDate = read "2025-01-01 00:00:00 UTC",
-              versionIsPrerelease = T.isInfixOf "rc" (T.toLower versionStr) ||
-                                   T.isInfixOf "alpha" (T.toLower versionStr) ||
-                                   T.isInfixOf "beta" (T.toLower versionStr),
-              versionIsLatest = False,  -- Will be set by caller
+              versionIsPrerelease =
+                T.isInfixOf "rc" (T.toLower versionStr)
+                  || T.isInfixOf "alpha" (T.toLower versionStr)
+                  || T.isInfixOf "beta" (T.toLower versionStr),
+              versionIsLatest = False, -- Will be set by caller
               versionIsPreferred = status == "normal"
             }
 
@@ -106,7 +108,7 @@ validateVersion versionStr
       let -- Split on hyphen to separate main version from pre-release tag
           (mainVer, preRelease) = case T.breakOn "-" versionStr of
             (v, "") -> (v, "")
-            (v, rest) -> (v, T.drop 1 rest)  -- drop the hyphen
+            (v, rest) -> (v, T.drop 1 rest) -- drop the hyphen
 
           -- Split main version by dots
           parts = T.splitOn "." mainVer
@@ -139,16 +141,17 @@ parseModuleHTML pkgName version htmlContent = do
     -- Extract type classes from class declarations (T061)
     classes <- parseTypeClasses
 
-    return $ Module
-      { moduleName = T.strip modName,
-        modulePackage = pkgName,
-        moduleVersion = version,
-        moduleExportedFunctions = functions,
-        moduleExportedTypes = types,
-        moduleExportedClasses = classes,
-        moduleDocumentation = Nothing,  -- TODO: Extract module-level documentation
-        moduleSourceUrl = Just $ "https://hackage.haskell.org/package/" <> pkgName <> "-" <> version <> "/docs/src/" <> modName <> ".html"
-      }
+    return $
+      Module
+        { moduleName = T.strip modName,
+          modulePackage = pkgName,
+          moduleVersion = version,
+          moduleExportedFunctions = functions,
+          moduleExportedTypes = types,
+          moduleExportedClasses = classes,
+          moduleDocumentation = Nothing, -- TODO: Extract module-level documentation
+          moduleSourceUrl = Just $ "https://hackage.haskell.org/package/" <> pkgName <> "-" <> version <> "/docs/src/" <> modName <> ".html"
+        }
 
 -- | Parse functions from the synopsis section and their detailed documentation
 parseFunctions :: Scraper Text [Function]
@@ -177,15 +180,18 @@ parseSynopsisFunction = do
       -- Extract signature - it's the full content after the function name
       -- The signature typically includes :: and the type
       let parts = T.breakOn "::" fullSignature
-      let signature = if T.null (snd parts)
-                        then fullSignature  -- No :: found, use full text
-                        else snd parts  -- Use part after ::
-      return $ Just $ Function
-        { functionName = T.strip funcName,
-          functionSignature = T.strip signature,
-          functionDocumentation = Nothing,
-          functionSourceCode = Nothing
-        }
+      let signature =
+            if T.null (snd parts)
+              then fullSignature -- No :: found, use full text
+              else snd parts -- Use part after ::
+      return $
+        Just $
+          Function
+            { functionName = T.strip funcName,
+              functionSignature = T.strip signature,
+              functionDocumentation = Nothing,
+              functionSourceCode = Nothing
+            }
 
 -- | Parse a single function from detailed documentation (includes docs)
 parseDetailedFunction :: Scraper Text (Maybe Function)
@@ -200,21 +206,27 @@ parseDetailedFunction = do
     (Nothing, _) -> return Nothing
     (Just funcName, fullSignature) -> do
       -- Extract documentation from <div class="doc">
-      docText <- (T.strip . T.unwords . T.words <$>
-                 chroot ("div" @: [hasClass "doc"]) (text anySelector)) <|> return ""
+      docText <-
+        ( T.strip . T.unwords . T.words
+            <$> chroot ("div" @: [hasClass "doc"]) (text anySelector)
+          )
+          <|> return ""
 
       -- Extract signature
       let parts = T.breakOn "::" fullSignature
-      let signature = if T.null (snd parts)
-                        then fullSignature
-                        else snd parts
+      let signature =
+            if T.null (snd parts)
+              then fullSignature
+              else snd parts
 
-      return $ Just $ Function
-        { functionName = T.strip funcName,
-          functionSignature = T.strip signature,
-          functionDocumentation = if T.null docText then Nothing else Just docText,
-          functionSourceCode = Nothing
-        }
+      return $
+        Just $
+          Function
+            { functionName = T.strip funcName,
+              functionSignature = T.strip signature,
+              functionDocumentation = if T.null docText then Nothing else Just docText,
+              functionSourceCode = Nothing
+            }
 
 -- | Merge function data from synopsis and detailed sections
 -- Prefers detailed information (with docs) over synopsis-only information
@@ -223,9 +235,9 @@ mergeFunctions synopsis detailed =
   let detailedMap = [(functionName f, f) | f <- detailed]
       synopsisMap = [(functionName f, f) | f <- synopsis]
       allNames = nub $ map fst detailedMap ++ map fst synopsisMap
-   in [fromMaybe synFunc (lookup name detailedMap)
-       | name <- allNames
-       , let synFunc = fromMaybe (Function name "" Nothing Nothing) (lookup name synopsisMap)
+   in [ fromMaybe synFunc (lookup name detailedMap)
+        | name <- allNames,
+          let synFunc = fromMaybe (Function name "" Nothing Nothing) (lookup name synopsisMap)
       ]
 
 -- | Extract source code from Haddock HTML or tarball (T058)
@@ -252,15 +264,15 @@ extractSourceCode pkgName version htmlContent =
         -- This is a common pattern in Haddock documentation
         links <- attrs "href" "a"
         case filter (T.isInfixOf "src/") links of
-          (url:_) -> return url
+          (url : _) -> return url
           [] -> empty
-  in case sourceUrl of
-       Just url ->
-         -- Construct the full URL if it's a relative path
-         if T.isPrefixOf "http" url
-           then Just url
-           else Just $ "https://hackage.haskell.org/package/" <> pkgName <> "-" <> version <> "/docs/" <> url
-       Nothing -> Just $ "Source code available in package: " <> pkgName <> "-" <> version
+   in case sourceUrl of
+        Just url ->
+          -- Construct the full URL if it's a relative path
+          if T.isPrefixOf "http" url
+            then Just url
+            else Just $ "https://hackage.haskell.org/package/" <> pkgName <> "-" <> version <> "/docs/" <> url
+        Nothing -> Just $ "Source code available in package: " <> pkgName <> "-" <> version
 
 -- | Parse types from Haddock HTML (T060)
 -- Types in Haddock are marked with ids like "t:TypeName" and use keywords like "data", "newtype", "type"
@@ -288,8 +300,11 @@ parseDetailedType = do
         then return Nothing
         else do
           -- Extract documentation from <div class="doc">
-          docText <- (T.strip . T.unwords . T.words <$>
-                     chroot ("div" @: [hasClass "doc"]) (text anySelector)) <|> return ""
+          docText <-
+            ( T.strip . T.unwords . T.words
+                <$> chroot ("div" @: [hasClass "doc"]) (text anySelector)
+              )
+              <|> return ""
 
           -- Determine type kind based on keywords
           let typeKind
@@ -297,16 +312,17 @@ parseDetailedType = do
                 | "newtype " `T.isInfixOf` fullDef = NewType
                 | "type " `T.isInfixOf` fullDef && "family" `T.isInfixOf` fullDef = TypeFamily
                 | "type " `T.isInfixOf` fullDef = TypeAlias
-                | otherwise = DataType  -- Default
-
-          return $ Just $ Type
-            { typeName = T.strip typeName,
-              typeDefinition = T.strip fullDef,
-              typeConstructors = [],  -- Could be parsed from constructor tables
-              typeRecordFields = [],  -- Could be parsed from record field tables
-              typeDocumentation = if T.null docText then Nothing else Just docText,
-              typeKind = typeKind
-            }
+                | otherwise = DataType -- Default
+          return $
+            Just $
+              Type
+                { typeName = T.strip typeName,
+                  typeDefinition = T.strip fullDef,
+                  typeConstructors = [], -- Could be parsed from constructor tables
+                  typeRecordFields = [], -- Could be parsed from record field tables
+                  typeDocumentation = if T.null docText then Nothing else Just docText,
+                  typeKind = typeKind
+                }
 
 -- | Parse type classes from Haddock HTML (T061)
 -- Type classes are marked with ids like "t:ClassName" and use the "class" keyword
@@ -334,13 +350,18 @@ parseDetailedTypeClass = do
         then return Nothing
         else do
           -- Extract documentation from <div class="doc">
-          docText <- (T.strip . T.unwords . T.words <$>
-                     chroot ("div" @: [hasClass "doc"]) (text anySelector)) <|> return ""
+          docText <-
+            ( T.strip . T.unwords . T.words
+                <$> chroot ("div" @: [hasClass "doc"]) (text anySelector)
+              )
+              <|> return ""
 
-          return $ Just $ TypeClass
-            { typeClassName = T.strip className,
-              typeClassParams = [],  -- Could be parsed from the definition
-              typeClassConstraints = [],  -- Could be parsed from constraints
-              typeClassMethods = [],  -- Methods would need separate parsing
-              typeClassDocumentation = if T.null docText then Nothing else Just docText
-            }
+          return $
+            Just $
+              TypeClass
+                { typeClassName = T.strip className,
+                  typeClassParams = [], -- Could be parsed from the definition
+                  typeClassConstraints = [], -- Could be parsed from constraints
+                  typeClassMethods = [], -- Methods would need separate parsing
+                  typeClassDocumentation = if T.null docText then Nothing else Just docText
+                }

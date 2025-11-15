@@ -10,7 +10,7 @@ module HackageClient.Cache
   )
 where
 
-import Control.Exception (catch, IOException)
+import Control.Exception (IOException, catch)
 import Data.Aeson (FromJSON, ToJSON, decodeFileStrict, encodeFile)
 import Data.Text (Text)
 import qualified Data.Text as T

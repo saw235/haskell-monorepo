@@ -1,7 +1,7 @@
 module Main (main) where
 
 import CLI.Commands (handleCommand)
-import CLI.Options (parseOptions, optCommand)
+import CLI.Options (optCommand, parseOptions)
 
 -- | Main entry point (T032)
 main :: IO ()

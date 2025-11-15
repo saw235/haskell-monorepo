@@ -4,45 +4,46 @@ module TreeDisplaySpec (treeDisplayTests) where
 
 import Data.Text (Text)
 import qualified Data.Text as T
+import HackageClient.TreeDisplay (displayModule, displayModuleWithOptions)
 import HackageClient.Types
-  ( Module (..),
+  ( DisplayOptions (..),
+    FilterOptions (..),
     Function (..),
+    Module (..),
     Type (..),
     TypeClass (..),
-    FilterOptions (..),
-    DisplayOptions (..),
     TypeKind (..),
   )
-import HackageClient.TreeDisplay (displayModule, displayModuleWithOptions)
 import Test.HUnit
 
 -- | Test module detail tree formatting (T055)
 test_moduleTreeDisplay :: Test
 test_moduleTreeDisplay =
   TestCase $ do
-    let testModule = Module
-          { moduleName = "Data.Aeson",
-            modulePackage = "aeson",
-            moduleVersion = "2.2.3.0",
-            moduleExportedFunctions =
-              [ Function
-                  { functionName = "decode",
-                    functionSignature = ":: FromJSON a => ByteString -> Maybe a",
-                    functionDocumentation = Just "Parse a JSON value from a ByteString.",
-                    functionSourceCode = Nothing
-                  },
-                Function
-                  { functionName = "encode",
-                    functionSignature = ":: ToJSON a => a -> ByteString",
-                    functionDocumentation = Just "Encode a Haskell value as a JSON ByteString.",
-                    functionSourceCode = Nothing
-                  }
-              ],
-            moduleExportedTypes = [],
-            moduleExportedClasses = [],
-            moduleDocumentation = Just "Types and functions for working efficiently with JSON data.",
-            moduleSourceUrl = Just "https://hackage.haskell.org/package/aeson-2.2.3.0/docs/src/Data.Aeson.html"
-          }
+    let testModule =
+          Module
+            { moduleName = "Data.Aeson",
+              modulePackage = "aeson",
+              moduleVersion = "2.2.3.0",
+              moduleExportedFunctions =
+                [ Function
+                    { functionName = "decode",
+                      functionSignature = ":: FromJSON a => ByteString -> Maybe a",
+                      functionDocumentation = Just "Parse a JSON value from a ByteString.",
+                      functionSourceCode = Nothing
+                    },
+                  Function
+                    { functionName = "encode",
+                      functionSignature = ":: ToJSON a => a -> ByteString",
+                      functionDocumentation = Just "Encode a Haskell value as a JSON ByteString.",
+                      functionSourceCode = Nothing
+                    }
+                ],
+              moduleExportedTypes = [],
+              moduleExportedClasses = [],
+              moduleDocumentation = Just "Types and functions for working efficiently with JSON data.",
+              moduleSourceUrl = Just "https://hackage.haskell.org/package/aeson-2.2.3.0/docs/src/Data.Aeson.html"
+            }
 
     let treeDisplay = displayModule testModule
 
@@ -60,16 +61,17 @@ test_moduleTreeDisplay =
 test_emptyModuleTreeDisplay :: Test
 test_emptyModuleTreeDisplay =
   TestCase $ do
-    let emptyModule = Module
-          { moduleName = "Data.Empty",
-            modulePackage = "test",
-            moduleVersion = "1.0.0",
-            moduleExportedFunctions = [],
-            moduleExportedTypes = [],
-            moduleExportedClasses = [],
-            moduleDocumentation = Nothing,
-            moduleSourceUrl = Nothing
-          }
+    let emptyModule =
+          Module
+            { moduleName = "Data.Empty",
+              modulePackage = "test",
+              moduleVersion = "1.0.0",
+              moduleExportedFunctions = [],
+              moduleExportedTypes = [],
+              moduleExportedClasses = [],
+              moduleDocumentation = Nothing,
+              moduleSourceUrl = Nothing
+            }
 
     let treeDisplay = displayModule emptyModule
 

@@ -58,11 +58,23 @@ fetchModuleDetails :: Text -> Text -> Text -> IO (Either String BS.ByteString)
 fetchModuleDetails pkgName version moduleName = do
   -- Convert module name like "Data.Aeson" to "Data-Aeson.html"
   let moduleFileName = T.replace "." "-" moduleName <> ".html"
-  let path = "/package/" ++ T.unpack pkgName ++ "-" ++ T.unpack version
-             ++ "/docs/" ++ T.unpack moduleFileName
+  let path =
+        "/package/"
+          ++ T.unpack pkgName
+          ++ "-"
+          ++ T.unpack version
+          ++ "/docs/"
+          ++ T.unpack moduleFileName
   response <- hackageRequest path
   let statusCode = getResponseStatusCode response
   if statusCode == 200
     then return $ Right $ getResponseBody response
-    else return $ Left $ "HTTP " ++ show statusCode ++ " error for module: "
-                         ++ T.unpack moduleName ++ " in package " ++ T.unpack pkgName
+    else
+      return $
+        Left $
+          "HTTP "
+            ++ show statusCode
+            ++ " error for module: "
+            ++ T.unpack moduleName
+            ++ " in package "
+            ++ T.unpack pkgName

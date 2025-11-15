@@ -29,15 +29,15 @@ type SimpleState = StateT Int IO
 -- Reader: "I need to read a name"
 readName :: SimpleReader String
 readName = do
-  name <- ask  -- ask gets the value that was passed in
+  name <- ask -- ask gets the value that was passed in
   return $ "Hello, " ++ name
 
 -- State: "I need to count something"
 incrementCounter :: SimpleState Int
 incrementCounter = do
-  current <- get  -- get reads the current state
+  current <- get -- get reads the current state
   let newValue = current + 1
-  put newValue   -- put writes the new state
+  put newValue -- put writes the new state
   return newValue
 
 -- ============================================================================
@@ -50,9 +50,9 @@ type ReaderWithState = ReaderT String (StateT Int IO)
 -- This function can both read a name AND update a counter
 greetAndCount :: ReaderWithState String
 greetAndCount = do
-  name <- ask        -- "I need the name from my environment"
-  current <- get     -- "I need the current count from my notebook"
-  put (current + 1)  -- "I'm writing the new count to my notebook"
+  name <- ask -- "I need the name from my environment"
+  current <- get -- "I need the current count from my notebook"
+  put (current + 1) -- "I'm writing the new count to my notebook"
   return $ "Hello " ++ name ++ "! You are visitor #" ++ show (current + 1)
 
 -- ============================================================================
@@ -63,22 +63,22 @@ main :: IO ()
 main = do
   putStrLn "=== Simple Monad Transformer Examples (2 Effects Only) ==="
   putStrLn ""
-  
+
   -- Test individual effects
   putStrLn "--- Individual Effects ---"
-  
+
   -- Reader
   putStrLn "1. Reader Effect (Reading a name):"
   result1 <- runReaderT readName "Alice"
   putStrLn $ "   " ++ result1
   putStrLn ""
-  
-  -- State  
+
+  -- State
   putStrLn "2. State Effect (Counting):"
   (result2, finalCount) <- runStateT incrementCounter 0
   putStrLn $ "   Counter is now: " ++ show finalCount
   putStrLn ""
-  
+
   -- Test combining two effects
   putStrLn "--- Combining Two Effects ---"
   putStrLn "3. Reader + State (Reading name + counting):"
@@ -86,7 +86,7 @@ main = do
   putStrLn $ "   " ++ result3
   putStrLn $ "   Final counter: " ++ show finalCount3
   putStrLn ""
-  
+
   putStrLn "=== The Core Principle ==="
   putStrLn ""
   putStrLn "Monad transformers let you:"
@@ -97,11 +97,11 @@ main = do
   putStrLn "The type system ensures you can't forget to handle state"
   putStrLn "or access configuration incorrectly. It's like having a safety net!"
   putStrLn ""
-  
+
   -- Show the comparison with manual approach
   putStrLn "=== COMPARISON: With vs Without Monad Transformers ==="
   putStrLn ""
-  
+
   putStrLn "WITH Monad Transformers (clean):"
   putStrLn "greetAndCount :: ReaderWithState String"
   putStrLn "greetAndCount = do"
@@ -110,7 +110,7 @@ main = do
   putStrLn "  put (current + 1)     -- Update state"
   putStrLn "  return $ \"Hello \" ++ name ++ \"! You are visitor #\" ++ show (current + 1)"
   putStrLn ""
-  
+
   putStrLn "WITHOUT Monad Transformers (messy):"
   putStrLn "greetAndCountManual :: String -> Int -> (String, Int)"
   putStrLn "greetAndCountManual name currentCount = "
@@ -118,7 +118,7 @@ main = do
   putStrLn "      newCount = currentCount + 1"
   putStrLn "  in (greeting, newCount)"
   putStrLn ""
-  
+
   putStrLn "=== Key Problems Monad Transformers Solve ==="
   putStrLn ""
   putStrLn "1. MANUAL STATE THREADING: Without transformers, you must manually"
@@ -135,4 +135,4 @@ main = do
   putStrLn ""
   putStrLn "5. MAINTAINABILITY: Changes require updating many function signatures"
   putStrLn ""
-  putStrLn "=== Example completed! ===" 
+  putStrLn "=== Example completed! ==="

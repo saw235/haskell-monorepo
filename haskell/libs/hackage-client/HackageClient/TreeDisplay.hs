@@ -16,18 +16,18 @@ import Data.Time (NominalDiffTime)
 import Data.Tree (Tree (..), drawTree)
 import HackageClient.Filter (applyFilters)
 import HackageClient.Types
-  ( Module (..),
+  ( DisplayOptions (..),
+    FilterOptions (..),
+    Function (..),
+    Module (..),
     Package (..),
     QueryMetadata (..),
     QueryResult (..),
-    Version (..),
-    Function (..),
     Type (..),
     TypeClass (..),
-    FilterOptions (..),
-    DisplayOptions (..),
-    defaultFilterOptions,
+    Version (..),
     defaultDisplayOptions,
+    defaultFilterOptions,
   )
 
 -- | Display package as a tree structure (T028)
@@ -58,11 +58,12 @@ packageToTree pkg =
 versionNode :: Version -> Tree String
 versionNode v =
   let vNum = T.unpack (versionNumber v)
-      tags = concat [
-          if versionIsLatest v then " [latest]" else "",
-          if versionIsPreferred v then " [preferred]" else "",
-          if versionIsPrerelease v then " [prerelease]" else ""
-        ]
+      tags =
+        concat
+          [ if versionIsLatest v then " [latest]" else "",
+            if versionIsPreferred v then " [preferred]" else "",
+            if versionIsPrerelease v then " [prerelease]" else ""
+          ]
    in Node (vNum ++ tags) []
 
 -- | Format a module as a tree node (basic)

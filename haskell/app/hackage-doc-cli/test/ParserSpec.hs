@@ -3,13 +3,13 @@
 module ParserSpec (parserTests) where
 
 import Data.Aeson (decode, encode)
-import qualified Data.ByteString.Lazy as BL
 import qualified Data.ByteString as BS
+import qualified Data.ByteString.Lazy as BL
 import Data.List (sortBy)
-import Data.Maybe (isJust, isNothing, fromMaybe)
+import Data.Maybe (fromMaybe, isJust, isNothing)
 import Data.Ord (Down (..), comparing)
-import HackageClient.Types (Package (..), Version (..), Module (..), Function (..), packageName, versionNumber)
-import HackageClient.Parser (validateVersion, parseModuleHTML)
+import HackageClient.Parser (parseModuleHTML, validateVersion)
+import HackageClient.Types (Function (..), Module (..), Package (..), Version (..), packageName, versionNumber)
 import Test.HUnit
 
 -- | HUnit test: Parse Package from fixture aeson-package.json (T022)

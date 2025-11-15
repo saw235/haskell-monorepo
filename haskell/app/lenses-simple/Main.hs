@@ -19,15 +19,17 @@ import Data.Char (toUpper)
 
 -- Simple person with address
 data Person = Person
-  { _personName :: String
-  , _personAge :: Int
-  , _personAddress :: Address
-  } deriving (Show)
+  { _personName :: String,
+    _personAge :: Int,
+    _personAddress :: Address
+  }
+  deriving (Show)
 
 data Address = Address
-  { _addressStreet :: String
-  , _addressCity :: String
-  } deriving (Show)
+  { _addressStreet :: String,
+    _addressCity :: String
+  }
+  deriving (Show)
 
 -- Generate lenses automatically (this creates: personName, personAge, personAddress, addressStreet, addressCity)
 makeLenses ''Person
@@ -60,7 +62,7 @@ setCity newCity person = person & personAddress . addressCity .~ newCity
 
 -- MODIFYING values (over or %~)
 incrementAge :: Person -> Person
-incrementAge person = person & personAge %~ (+1)
+incrementAge person = person & personAge %~ (+ 1)
 
 uppercaseName :: Person -> Person
 uppercaseName person = person & personName %~ map toUpper
@@ -71,10 +73,11 @@ uppercaseName person = person & personName %~ map toUpper
 
 -- Multiple operations in one go
 updatePerson :: Person -> Person
-updatePerson person = person
-  & personName .~ "Alice Smith"
-  & personAge %~ (+5)
-  & personAddress . addressCity .~ "New York"
+updatePerson person =
+  person
+    & personName .~ "Alice Smith"
+    & personAge %~ (+ 5)
+    & personAddress . addressCity .~ "New York"
 
 -- Deep nested access and modification
 updateStreet :: String -> Person -> Person
@@ -88,42 +91,42 @@ main :: IO ()
 main = do
   putStrLn "=== Simple Lens Examples (3 Operations Only) ==="
   putStrLn ""
-  
+
   -- Test individual operations
   putStrLn "--- Individual Operations ---"
-  
+
   -- Getting values
   putStrLn "1. Getting values:"
   putStrLn $ "   Alice's name: " ++ getName alice
   putStrLn $ "   Alice's age: " ++ show (getAge alice)
   putStrLn $ "   Alice's street: " ++ getStreet alice
   putStrLn ""
-  
+
   -- Setting values
   putStrLn "2. Setting values:"
   let aliceOlder = setAge 31 alice
   putStrLn $ "   Alice after birthday: " ++ show aliceOlder
-  
+
   let aliceMoved = setCity "New York" alice
   putStrLn $ "   Alice after moving: " ++ show aliceMoved
   putStrLn ""
-  
+
   -- Modifying values
   putStrLn "3. Modifying values:"
   let aliceAged = incrementAge alice
   putStrLn $ "   Alice aged by 1 year: " ++ show aliceAged
-  
+
   let aliceUpperCase = uppercaseName alice
   putStrLn $ "   Alice with uppercase name: " ++ show aliceUpperCase
   putStrLn ""
-  
+
   -- Test combining operations
   putStrLn "--- Combining Operations ---"
   putStrLn "4. Multiple operations together:"
   let aliceUpdated = updatePerson alice
   putStrLn $ "   Alice completely updated: " ++ show aliceUpdated
   putStrLn ""
-  
+
   putStrLn "=== The Core Principle ==="
   putStrLn ""
   putStrLn "Lenses let you:"
@@ -134,11 +137,11 @@ main = do
   putStrLn "The type system ensures you can't access non-existent fields"
   putStrLn "or modify data incorrectly. It's like having a safety net!"
   putStrLn ""
-  
+
   -- Show the comparison with manual approach
   putStrLn "=== COMPARISON: With vs Without Lenses ==="
   putStrLn ""
-  
+
   putStrLn "WITH Lenses (clean):"
   putStrLn "updatePerson :: Person -> Person"
   putStrLn "updatePerson person = person"
@@ -146,7 +149,7 @@ main = do
   putStrLn "  & personAge %~ (+5)"
   putStrLn "  & personAddress . addressCity .~ \"New York\""
   putStrLn ""
-  
+
   putStrLn "WITHOUT Lenses (messy):"
   putStrLn "updatePersonManual :: Person -> Person"
   putStrLn "updatePersonManual person = person"
@@ -157,7 +160,7 @@ main = do
   putStrLn "      }"
   putStrLn "  }"
   putStrLn ""
-  
+
   putStrLn "=== Key Problems Lenses Solve ==="
   putStrLn ""
   putStrLn "1. VERBOSE SYNTAX: Without lenses, nested updates require"
@@ -175,5 +178,5 @@ main = do
   putStrLn "5. MAINTAINABILITY: Changes require updating many record"
   putStrLn "   constructors"
   putStrLn ""
-  
-  putStrLn "=== Example completed! ===" 
+
+  putStrLn "=== Example completed! ==="

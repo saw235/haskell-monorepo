@@ -5,16 +5,16 @@ module CLI.Commands
   )
 where
 
-import CLI.Options (Command (..), FilterOpts (..), DisplayOpts (..))
-import Control.Exception (catch, SomeException)
+import CLI.Options (Command (..), DisplayOpts (..), FilterOpts (..))
+import Control.Exception (SomeException, catch)
 import Data.Text (Text)
 import qualified Data.Text as T
 import HackageClient (QueryResult (..), queryPackageWithCache)
 import HackageClient.API (fetchModuleDetails)
-import HackageClient.Parser (validateVersion, parseModuleHTML)
-import HackageClient.TreeDisplay (displayPackageTree, displayVersionList, displayModule, displayModuleWithOptions)
-import HackageClient.Types (Package (..), Version (..), FilterOptions (..), DisplayOptions (..))
-import System.Exit (exitFailure, exitWith, ExitCode(..))
+import HackageClient.Parser (parseModuleHTML, validateVersion)
+import HackageClient.TreeDisplay (displayModule, displayModuleWithOptions, displayPackageTree, displayVersionList)
+import HackageClient.Types (DisplayOptions (..), FilterOptions (..), Package (..), Version (..))
+import System.Exit (ExitCode (..), exitFailure, exitWith)
 import System.IO (hPutStrLn, stderr)
 
 -- | Handle CLI command execution (T031, T043, T051, T063, T079)
@@ -24,7 +24,6 @@ handleCommand (QueryPackage pkgName maybeVersion listVersions maybeModule filter
   case maybeModule of
     Just moduleName -> handleModuleQuery pkgName maybeVersion moduleName filterOpts displayOpts
     Nothing -> handlePackageQuery pkgName maybeVersion listVersions
-
 handleCommand (QueryModule pkgName maybeVersion moduleName filterOpts displayOpts) =
   handleModuleQuery pkgName maybeVersion moduleName filterOpts displayOpts
 
@@ -88,7 +87,7 @@ handleModuleQuery pkgName maybeVersion moduleName filterOpts displayOpts = do
             [] -> do
               hPutStrLn stderr $ "Error: No versions found for package " ++ T.unpack pkgName
               exitWith (ExitFailure 1)
-            (latestVer:_) -> runModuleQuery (versionNumber latestVer)
+            (latestVer : _) -> runModuleQuery (versionNumber latestVer)
   where
     runModuleQuery version = do
       -- Fetch module details from Hackage
