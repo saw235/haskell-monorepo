@@ -4,6 +4,8 @@
 
 module Main (main) where
 
+import Control.Exception (SomeException, catch)
+import Control.Monad (forM_, unless)
 import Data.Aeson (Value (..), decode, encode, object, (.=))
 import qualified Data.Aeson.KeyMap as KM
 import Data.Aeson.Types (parseMaybe)
@@ -16,8 +18,6 @@ import Data.Text (Text)
 import qualified Data.Text as T
 import qualified Data.Text.Encoding as TE
 import qualified Data.Vector as Vector
-import Control.Exception (catch, SomeException)
-import Control.Monad (forM_, unless)
 import Langchain.LLM.Core
 import Langchain.PromptTemplate
 import Network.HTTP.Simple
@@ -119,20 +119,20 @@ loadEnvFile path = do
       let textLines = T.lines $ T.pack content
           trimmedLines = map T.strip textLines
           nonEmptyLines = filter (not . T.null) trimmedLines
-          validLines = filter (not . T.isPrefixOf "#") nonEmptyLines  -- Skip comments
+          validLines = filter (not . T.isPrefixOf "#") nonEmptyLines -- Skip comments
       forM_ validLines $ \line ->
         case T.breakOn "=" line of
           (key, value) | not (T.null value) -> do
-            let val = T.tail value  -- Remove the '=' character
+            let val = T.tail value -- Remove the '=' character
                 key' = T.unpack $ T.strip key
                 val' = T.unpack $ T.strip val
             unless (null key' || null val') $ do
               existing <- lookupEnv key'
               case existing of
-                Nothing -> setEnv key' val'  -- Only set if not already set
-                Just _ -> return ()  -- Don't override existing env vars
-          _ -> return ()  -- Skip invalid lines
-    else return ()  -- Silently ignore if file doesn't exist
+                Nothing -> setEnv key' val' -- Only set if not already set
+                Just _ -> return () -- Don't override existing env vars
+          _ -> return () -- Skip invalid lines
+    else return () -- Silently ignore if file doesn't exist
 
 main :: IO ()
 main = do
@@ -171,16 +171,18 @@ main = do
         Right response -> putStrLn $ "Translation: " ++ T.unpack response
 
   putStrLn "\n=== Example 3: Using Chat with Messages ==="
-  let systemMsg = Message
-        { role = System,
-          content = "You are a helpful assistant.",
-          messageData = defaultMessageData
-        }
-      userMsg = Message
-        { role = User,
-          content = "Tell me a joke about programming.",
-          messageData = defaultMessageData
-        }
+  let systemMsg =
+        Message
+          { role = System,
+            content = "You are a helpful assistant.",
+            messageData = defaultMessageData
+          }
+      userMsg =
+        Message
+          { role = User,
+            content = "Tell me a joke about programming.",
+            messageData = defaultMessageData
+          }
       messages = systemMsg :| [userMsg]
 
   result3 <- chat kimiLLM messages Nothing
