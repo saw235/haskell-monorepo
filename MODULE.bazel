@@ -163,6 +163,7 @@ _ALT_SIMPLE_PACKAGES = [
     "aeson",
     "bytestring",
     "http-conduit",
+    "vector",
 ]
 
 [stack_alt.package(name = pkg) for pkg in _ALT_SIMPLE_PACKAGES]
@@ -194,6 +195,7 @@ stack_alt.package(
     name = "langchain-hs-0.0.2.0",
     setup_deps = ["@Cabal//:Cabal"]
 )
+
 
 # Note: LTS-24.19 includes bytestring-0.12.2.0 by default (not 0.10.4.0)
 # The primary snapshot (@stackage) has bytestring-0.10.4.0 pinned

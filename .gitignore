@@ -5,3 +5,5 @@ bazel-testlogs
 bazel-haskell-monorepo 
 
 **/node_modules
+
+.env

@@ -7,6 +7,10 @@ description: Retrieve documentation from Hackage. Use this Skill when you need a
 
 A CLI tool to query Hackage package documentation with filtering and display options.
 
+## Instructions
+1. use `bazel run //haskell/app/hackage-doc-cli:hackage-doc-cli -- <package_name> --list-versions` to discover what package versions are there
+2. then use `bazel run //haskell/app/hackage-doc-cli:hackage-doc-cli -- <package_name> --version <version>` to discover the modules that are in the package
+
 ## Quick Start
 
 ### List all available versions

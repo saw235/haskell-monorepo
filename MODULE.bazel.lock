@@ -1280,7 +1280,7 @@
     "@@rules_haskell~//extensions:stack_snapshot.bzl%stack_snapshot%<root>~stack_alt": {
       "general": {
         "bzlTransitiveDigest": "I9dE/IPkeO/mkCmDvxjs6J9WP1Tf8kV6hE6XhXWYcuw=",
-        "usagesDigest": "7K8SWpRKWPQdsyqcj9TJohAFKrQXIpGCAltSGYTSQmU=",
+        "usagesDigest": "oL4p8wW9k1O8bCLCqqbTnub+1qKCX/GzO0bpmsRCy8U=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},
         "envVariables": {},
@@ -1312,6 +1312,7 @@
                 "aeson",
                 "bytestring",
                 "http-conduit",
+                "vector",
                 "ollama-haskell-0.1.3.0",
                 "attoparsec",
                 "langchain-hs-0.0.2.0"
@@ -1338,6 +1339,7 @@
                 "aeson",
                 "bytestring",
                 "http-conduit",
+                "vector",
                 "ollama-haskell-0.1.3.0",
                 "attoparsec",
                 "langchain-hs-0.0.2.0"

@@ -1,17 +1,18 @@
-#load("@rules_haskell//haskell:defs.bzl", "haskell_binary")
+load("@rules_haskell//haskell:defs.bzl", "haskell_binary")
 
-#haskell_binary(
-#    name = "langchain-example",
-#    srcs = ["Main.hs"],
-#    deps = [
-#        "//:base",
-#        "@stackage_alt//:langchain-hs",
-#        "@stackage_alt//:attoparsec",
-#        "@stackage_alt//:containers",
-#        "@stackage_alt//:text",
-#        "@stackage_alt//:aeson",
-#        "@stackage_alt//:bytestring",
-#        "@stackage_alt//:http-conduit",
-#    ],
-#    visibility = ["//visibility:public"],
-#)
+haskell_binary(
+    name = "langchain-example",
+    srcs = ["Main.hs"],
+    deps = [
+        "//:base",
+        "@stackage_alt//:aeson",
+        "@stackage_alt//:bytestring",
+        "@stackage_alt//:containers",
+        "@stackage_alt//:http-conduit",
+        "@stackage_alt//:langchain-hs",
+        "@stackage_alt//:text",
+        "@stackage_alt//:vector",
+        "//:directory",
+    ],
+    visibility = ["//visibility:public"],
+)
