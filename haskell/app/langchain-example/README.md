@@ -33,6 +33,52 @@ bazel build //haskell/app/langchain-example:langchain-example
 bazel run //haskell/app/langchain-example:langchain-example
 ```
 
+### Configuration
+
+The application supports multiple ways to configure API credentials:
+
+#### Option 1: Using environment variables (Recommended for Bazel)
+
+Since Bazel runs in a sandbox, using environment variables is the most reliable approach:
+
+```bash
+export KIMI_API_KEY="your-actual-api-key"
+export KIMI_ENDPOINT="https://api.moonshot.ai/v1"  # Optional
+export KIMI_MODEL="moonshot-v1-8k"                # Optional
+bazel run //haskell/app/langchain-example:langchain-example
+```
+
+#### Option 2: Using .env file
+
+The application can load a `.env` file from the current working directory. However, note that Bazel runs in a sandbox, so this works best when running the compiled binary directly:
+
+```bash
+# Create .env file in the project root
+cp haskell/app/langchain-example/.env.example .env
+
+# Edit with your API key
+nano .env  # or your preferred editor
+
+# Run the compiled binary directly (not through bazel run)
+bazel build //haskell/app/langchain-example:langchain-example
+./bazel-bin/haskell/app/langchain-example/langchain-example
+```
+
+Example `.env` file:
+```bash
+KIMI_API_KEY=your-actual-api-key
+KIMI_ENDPOINT=https://api.moonshot.ai/v1
+KIMI_MODEL=moonshot-v1-8k
+```
+
+### Environment Variables
+
+- `KIMI_API_KEY`: Your Kimi/Moonshot API key (default: "your-api-key-here")
+- `KIMI_ENDPOINT`: API endpoint URL (default: "https://api.moonshot.ai/v1")
+- `KIMI_MODEL`: Model name to use (default: "moonshot-v1-8k")
+
+Available models: `moonshot-v1-8k`, `moonshot-v1-32k`, `moonshot-v1-128k`
+
 ## Note on Dependencies
 
 The actual langchain-hs library has dependency conflicts with `pdf-toolbox-core` on the current LTS-24.19 snapshot due to `bytestring` version requirements. This example provides a conceptual demonstration of the library's approach using a custom implementation.
