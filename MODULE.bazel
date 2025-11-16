@@ -89,6 +89,9 @@ _SIMPLE_PACKAGES = [
     "hspec-discover",
     # Note: langchain-hs not yet available in Stackage
     # Note: tiktoken FFI will be configured via non_module_deps.bzl
+    "terminal-size",  # Terminal width/height detection
+    "wcwidth",        # Unicode display width calculation
+    "ansi-terminal",  # Terminal capability detection
 ]
 
 [stack.package(name = pkg) for pkg in _SIMPLE_PACKAGES]

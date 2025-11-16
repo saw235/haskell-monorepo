@@ -1,0 +1,27 @@
+load("@rules_haskell//haskell:defs.bzl", "haskell_library")
+
+haskell_library(
+    name = "rich",
+    srcs = [
+        "src/Rich.hs",
+        "src/Rich/Console.hs",
+        "src/Rich/Panel.hs",
+        "src/Rich/Progress.hs",
+        "src/Rich/Style.hs",
+        "src/Rich/Table.hs",
+        "src/Rich/Terminal.hs",
+        "src/Rich/Terminal/Capability.hs",
+        "src/Rich/Terminal/Size.hs",
+        "src/Rich/Terminal/Width.hs",
+        "src/Rich/Tree.hs",
+    ],
+    src_strip_prefix = "src",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//:base",
+        "//:text",
+        "@stackage//:terminal-size",
+        "@stackage//:wcwidth",
+        "@stackage//:ansi-terminal",
+    ],
+)
