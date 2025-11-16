@@ -123,7 +123,7 @@ summarizeContext llmConfig config ctx = do
               <> " tokens"
 
           if fallbackToTruncation config
-            then return $ hardTruncate config ctx
+            then hardTruncate config ctx
             else return ctx
         Just (Left (err :: SomeException)) -> do
           -- Summarization failed (FR-044)
@@ -134,7 +134,7 @@ summarizeContext llmConfig config ctx = do
               <> " tokens"
 
           if fallbackToTruncation config
-            then return $ hardTruncate config ctx
+            then hardTruncate config ctx
             else return ctx
         Just (Right summary) -> do
           -- Summarization succeeded
@@ -222,9 +222,42 @@ formatMessage (SystemMessage content timestamp) =
 
 -- | Hard truncation fallback (FR-044)
 --   Keep only the most recent N messages
-hardTruncate :: SummarizationConfig -> AgentContext -> AgentContext
-hardTruncate config ctx =
+--   Also marks that summarization/truncation was triggered and recalculates token count
+hardTruncate :: SummarizationConfig -> AgentContext -> IO AgentContext
+hardTruncate config ctx = do
+  timestamp <- getCurrentTime
   let conversation = contextConversation ctx
       recentCount = preserveRecentMessages config
       truncated = drop (max 0 (length conversation - recentCount)) conversation
-   in ctx {contextConversation = truncated}
+
+      -- Recalculate token count for truncated messages
+      -- Simple approximation: ~4 characters per token
+      truncatedTokens =
+        sum $
+          map
+            ( \msg ->
+                let content = case msg of
+                      UserMessage {messageContent = c} -> c
+                      AssistantMessage {messageContent = c} -> c
+                      SystemMessage {messageContent = c} -> c
+                 in fromIntegral (T.length content) `div` 4
+            )
+            truncated
+
+      metrics = contextTokenMetrics ctx
+      newPercentage = fromIntegral truncatedTokens / fromIntegral (modelTokenLimit metrics)
+
+      -- Mark that context reduction (via truncation) was triggered
+      newMetrics =
+        metrics
+          { currentTokenCount = truncatedTokens,
+            percentageUsed = newPercentage,
+            summarizationTriggered = True,
+            lastSummarization = Just timestamp
+          }
+
+  return $
+    ctx
+      { contextConversation = truncated,
+        contextTokenMetrics = newMetrics
+      }

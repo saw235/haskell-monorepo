@@ -50,7 +50,7 @@ module AgenticFramework.Agent
   )
 where
 
-import AgenticFramework.Context (AgentContext (..), addMessage, addToolExecution, createContext)
+import AgenticFramework.Context (AgentContext (..), addMessage, addToolExecution, createContext, getTokenMetrics)
 import qualified AgenticFramework.Context.Summarization as Sum
 import AgenticFramework.LLM.Kimi (KimiLLM, createKimiLLM, defaultKimiParams)
 import AgenticFramework.LLM.Ollama (OllamaLLM, createOllamaLLM, defaultOllamaParams)
@@ -171,7 +171,14 @@ executeAgentWithContext agent ctx input = do
           }
 
   -- Add user message to context
-  let ctx'' = addMessage userMsg ctx'
+  let ctxWithUserMsg = addMessage userMsg ctx'
+
+  -- Check if we need to summarize after adding user message (FR-042)
+  -- This catches cases where the user message itself pushes us over the threshold
+  ctx'' <-
+    if Sum.shouldTriggerSummarization Sum.defaultSummarizationConfig ctxWithUserMsg
+      then Sum.summarizeContext (llmConfig agent) Sum.defaultSummarizationConfig ctxWithUserMsg
+      else return ctxWithUserMsg
 
   -- Create execution log
   startTime <- getCurrentTime
@@ -234,7 +241,13 @@ executeAgentWithContext agent ctx input = do
                         messageTimestamp = assistantTimestamp
                       }
 
-              let finalCtx = addMessage assistantMsg ctx'''
+              let ctxAfterResponse = addMessage assistantMsg ctx'''
+
+              -- Check if we need to summarize after adding the response (FR-042)
+              finalCtx <-
+                if Sum.shouldTriggerSummarization Sum.defaultSummarizationConfig ctxAfterResponse
+                  then Sum.summarizeContext (llmConfig agent) Sum.defaultSummarizationConfig ctxAfterResponse
+                  else return ctxAfterResponse
 
               endTime <- getCurrentTime
               let finalLog = execLog {execLogEndTime = Just endTime}
@@ -268,7 +281,13 @@ executeAgentWithContext agent ctx input = do
                     messageTimestamp = assistantTimestamp
                   }
 
-          let finalCtx = addMessage assistantMsg ctx''
+          let ctxAfterResponse = addMessage assistantMsg ctx''
+
+          -- Check if we need to summarize after adding the response (FR-042)
+          finalCtx <-
+            if Sum.shouldTriggerSummarization Sum.defaultSummarizationConfig ctxAfterResponse
+              then Sum.summarizeContext (llmConfig agent) Sum.defaultSummarizationConfig ctxAfterResponse
+              else return ctxAfterResponse
 
           endTime <- getCurrentTime
           let finalLog = execLog {execLogEndTime = Just endTime}
