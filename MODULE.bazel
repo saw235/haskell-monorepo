@@ -76,6 +76,9 @@ _SIMPLE_PACKAGES = [
     "tagsoup",
     "directory",
     "filepath",
+    "terminal-size",  # Terminal width/height detection
+    "wcwidth",        # Unicode display width calculation
+    "ansi-terminal",  # Terminal capability detection
 ]
 
 [stack.package(name = pkg) for pkg in _SIMPLE_PACKAGES]
