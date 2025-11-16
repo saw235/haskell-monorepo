@@ -76,6 +76,19 @@ _SIMPLE_PACKAGES = [
     "tagsoup",
     "directory",
     "filepath",
+    # Agentic Framework dependencies
+    "monad-logger",
+    "ansi-terminal",
+    "uuid",
+    "async",
+    "hashable",
+    "unordered-containers",
+    "bytestring",
+    "time",
+    "hspec",
+    "hspec-discover",
+    # Note: langchain-hs not yet available in Stackage
+    # Note: tiktoken FFI will be configured via non_module_deps.bzl
 ]
 
 [stack.package(name = pkg) for pkg in _SIMPLE_PACKAGES]
@@ -288,3 +301,18 @@ npm_sprite.npm_translate_lock(
 )
 use_repo(npm_sprite, "npm_electron_sprite_animation")
 
+bazel_dep(name = "rules_rust", version = "0.67.0")
+rust = use_extension("@rules_rust//rust:extensions.bzl", "rust")
+rust.toolchain(
+    edition = "2024",
+    versions = [ "1.85.0" ],
+)
+
+# Cargo dependencies for Rust crates
+crate = use_extension("@rules_rust//crate_universe:extensions.bzl", "crate")
+crate.from_cargo(
+    name = "crates",
+    cargo_lockfile = "//haskell/libs/agentic-framework/rust-ffi:Cargo.lock",
+    manifests = ["//haskell/libs/agentic-framework/rust-ffi:Cargo.toml"],
+)
+use_repo(crate, "crates")

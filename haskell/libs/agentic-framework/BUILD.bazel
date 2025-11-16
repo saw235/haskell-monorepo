@@ -1,0 +1,91 @@
+load("@rules_haskell//haskell:defs.bzl", "haskell_library", "haskell_test")
+
+# Main library target
+haskell_library(
+    name = "agentic-framework",
+    srcs = glob([
+        "src/**/*.hs",
+    ]),
+    visibility = ["//visibility:public"],
+    deps = [
+        "//:base",
+        "//:text",
+        "//:containers",
+        "//:bytestring",
+        "//:directory",
+        "//:filepath",
+        "//:time",
+        "@stackage//:aeson",
+        "@stackage//:unordered-containers",
+        "@stackage//:vector",
+        "@stackage//:uuid",
+        "@stackage//:monad-logger",
+        "@stackage//:ansi-terminal",
+        "@stackage//:http-conduit",
+        "@stackage//:async",
+        "@stackage//:hashable",
+        "@stackage//:mtl",
+        "@stackage//:transformers",
+        "@stackage_alt//:langchain-hs",
+        "//haskell/libs/agentic-framework/rust-ffi:agentic_tokenizer_ffi",
+    ],
+)
+
+# Unit tests
+haskell_test(
+    name = "agentic-framework-test",
+    srcs = glob([
+        "test/AgenticFramework/**/*.hs",
+    ]),
+    main_file = "test/AgenticFramework/Main.hs",
+    deps = [
+        ":agentic-framework",
+        "//:base",
+        "//:text",
+        "//:containers",
+        "//:time",
+        "//:bytestring",
+        "@stackage//:hspec",
+        "@stackage//:hspec-discover",
+        "@stackage//:QuickCheck",
+        "@stackage//:aeson",
+        "@stackage//:uuid",
+        "@stackage//:unordered-containers",
+        "@stackage//:ansi-terminal",
+    ],
+)
+
+# Property-based tests
+haskell_test(
+    name = "property-tests",
+    srcs = glob([
+        "test/Property/**/*.hs",
+    ]),
+    main_file = "test/Property/Main.hs",
+    deps = [
+        ":agentic-framework",
+        "//:base",
+        "//:text",
+        "@stackage//:QuickCheck",
+        "@stackage//:hspec",
+        "@stackage//:hspec-discover",
+    ],
+)
+
+# Integration tests
+haskell_test(
+    name = "integration-tests",
+    srcs = glob([
+        "test/Integration/**/*.hs",
+    ]),
+    main_file = "test/Integration/Main.hs",
+    deps = [
+        ":agentic-framework",
+        "//:base",
+        "//:text",
+        "//:directory",
+        "@stackage//:hspec",
+        "@stackage//:hspec-discover",
+        "@stackage//:aeson",
+    ],
+)
