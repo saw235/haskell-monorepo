@@ -61,13 +61,20 @@ module Rich.Style
     -- * Rendering
     render,
     renderText,
+
+    -- * Capability-Aware Rendering
+    renderWithCapability,
+    renderTextWithCapability,
+    degradeStyle,
   )
 where
 
+import Prelude hiding (reverse)
 import Data.List (intercalate)
 import Data.Text (Text)
 import qualified Data.Text as T
 import Data.Word (Word8)
+import Rich.Terminal.Capability (ColorCapability (..))
 
 -- | Represents a color in the terminal
 data Color
@@ -380,3 +387,112 @@ renderText s text =
    in if T.null ansi
         then text
         else ansi <> text <> resetCode
+
+-- ============================================================================
+-- Capability-Aware Rendering
+-- ============================================================================
+
+-- | Degrade a style to match terminal color capability
+--
+-- This function adjusts colors in a style to match what the terminal supports:
+-- - NoColor: Removes all colors, keeps text attributes
+-- - Color16: Converts RGB to nearest basic ANSI color
+-- - Color256: Keeps RGB (256-color terminals support RGB via approximation)
+-- - TrueColor: Keeps RGB unchanged
+degradeStyle :: ColorCapability -> Style -> Style
+degradeStyle capability style =
+  case capability of
+    NoColor ->
+      -- Remove all colors, keep only text attributes
+      style {styleForeground = Nothing, styleBackground = Nothing}
+    Color16 ->
+      -- Degrade RGB to basic 16 ANSI colors
+      style
+        { styleForeground = degradeColor16 <$> styleForeground style,
+          styleBackground = degradeColor16 <$> styleBackground style
+        }
+    Color256 ->
+      -- Color256 terminals support RGB via approximation, keep as-is
+      style
+    TrueColor ->
+      -- Full RGB support, keep as-is
+      style
+
+-- | Degrade a color to basic 16-color ANSI
+--
+-- Maps RGB colors to the nearest basic ANSI color using simple heuristics:
+-- - Use brightness and hue to pick the closest match
+degradeColor16 :: Color -> Color
+degradeColor16 color = case color of
+  -- Already basic colors, keep them
+  Black -> Black
+  Red -> Red
+  Green -> Green
+  Yellow -> Yellow
+  Blue -> Blue
+  Magenta -> Magenta
+  Cyan -> Cyan
+  White -> White
+  BrightBlack -> BrightBlack
+  BrightRed -> BrightRed
+  BrightGreen -> BrightGreen
+  BrightYellow -> BrightYellow
+  BrightBlue -> BrightBlue
+  BrightMagenta -> BrightMagenta
+  BrightCyan -> BrightCyan
+  BrightWhite -> BrightWhite
+  -- Convert RGB to nearest basic color
+  RGB r g b ->
+    let -- Calculate brightness
+        brightness = (fromIntegral r + fromIntegral g + fromIntegral b :: Int) `div` 3
+        -- Determine if bright variant should be used
+        isBright = brightness > 128
+        -- Find dominant color channel
+        maxChannel = max r (max g b)
+        -- Pick color based on dominant channels
+        baseColor
+          | r == maxChannel && g == maxChannel = Yellow -- Red + Green
+          | r == maxChannel && b == maxChannel = Magenta -- Red + Blue
+          | g == maxChannel && b == maxChannel = Cyan -- Green + Blue
+          | r == maxChannel = Red
+          | g == maxChannel = Green
+          | b == maxChannel = Blue
+          | brightness < 64 = Black -- Very dark
+          | otherwise = White -- Grayish
+     in if isBright
+          then case baseColor of
+            Black -> BrightBlack
+            Red -> BrightRed
+            Green -> BrightGreen
+            Yellow -> BrightYellow
+            Blue -> BrightBlue
+            Magenta -> BrightMagenta
+            Cyan -> BrightCyan
+            White -> BrightWhite
+            _ -> baseColor
+          else baseColor
+
+-- | Render text with a style, degrading colors to match terminal capability
+--
+-- This function automatically adjusts the style to match what the terminal
+-- supports, ensuring graceful degradation.
+--
+-- Example:
+-- @
+-- capability <- detectColorCapability
+-- let styled = renderWithCapability capability (rgb 100 150 200 style) "Hello"
+-- -- On Color16 terminal: converts RGB to nearest basic color
+-- -- On TrueColor terminal: uses full RGB
+-- @
+renderWithCapability :: ColorCapability -> Style -> String -> String
+renderWithCapability capability style text =
+  let degraded = degradeStyle capability style
+   in render degraded text
+
+-- | Render Text with a style, degrading colors to match terminal capability
+--
+-- Text version of 'renderWithCapability'.
+renderTextWithCapability :: ColorCapability -> Style -> Text -> Text
+renderTextWithCapability capability style text =
+  let degraded = degradeStyle capability style
+   in renderText degraded text

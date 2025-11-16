@@ -8,6 +8,8 @@ import Data.Text (Text)
 import qualified Data.Text as T
 import qualified Data.Text.IO as TIO
 import Rich
+import qualified Rich.Panel as Panel
+import qualified Rich.Table as Table
 import System.IO (hFlush, stdout)
 
 main :: IO ()
@@ -18,6 +20,46 @@ main = do
   printStyledLn console (bold . brightCyan $ style) "╔═══════════════════════════════════════════════════╗"
   printStyledLn console (bold . brightCyan $ style) "║   Rich Library Demo - Beautiful Terminal Output   ║"
   printStyledLn console (bold . brightCyan $ style) "╚═══════════════════════════════════════════════════╝"
+  emptyLine console
+
+  -- Demo 0: Terminal Detection (NEW!)
+  rule console (Just "0. Terminal Detection & Capabilities")
+  emptyLine console
+
+  -- Show terminal size
+  maybeSize <- getTerminalSize
+  case maybeSize of
+    Just size -> do
+      printInfo console $ "Terminal size: " <> T.pack (show (termWidth size)) <> " cols × " <> T.pack (show (termHeight size)) <> " rows"
+    Nothing ->
+      printWarning console "Not in a terminal (output redirected)"
+
+  -- Show color capability
+  capability <- detectColorCapability
+  printInfo console $ "Color capability: " <> T.pack (show capability)
+
+  -- Explain what this means
+  case capability of
+    TrueColor -> printSuccess console "Your terminal supports full RGB colors!"
+    Color256 -> printSuccess console "Your terminal supports 256 colors"
+    Color16 -> printWarning console "Your terminal supports basic 16 colors only"
+    NoColor -> printError console "No color support detected"
+
+  emptyLine console
+
+  -- Demonstrate automatic color degradation
+  printLn console "RGB color test (adapts to your terminal):"
+  printStyled console (rgb 100 150 200 style) "  → RGB(100, 150, 200) - Auto-degraded for your terminal"
+  emptyLine console
+
+  -- Unicode width detection
+  printLn console "Unicode width calculation:"
+  let asciiText = "Hello"
+      cjkText = "你好"
+      emojiText = "😀"
+  printLn console $ "  ASCII '" <> asciiText <> "' = " <> T.pack (show $ displayWidth asciiText) <> " columns"
+  printLn console $ "  CJK   '" <> cjkText <> "' = " <> T.pack (show $ displayWidth cjkText) <> " columns"
+  printLn console $ "  Emoji '" <> emojiText <> "' = " <> T.pack (show $ displayWidth emojiText) <> " columns"
   emptyLine console
 
   -- Demo 1: Styled Text
@@ -83,8 +125,8 @@ main = do
   emptyLine console
 
   let peopleTable =
-        setBorderStyle RoundedBorder $
-          setTitle "Team Members" $
+        Table.setBorderStyle RoundedBorder $
+          Table.setTitle "Team Members" $
             simpleTable
               ["Name", "Role", "Experience"]
               [ ["Alice Johnson", "Senior Developer", "8 years"],
@@ -100,19 +142,19 @@ main = do
   rule console (Just "5. Border Styles")
   emptyLine console
 
-  let simpleBorderTable = setBorderStyle SimpleBorder $ simpleTable ["Style"] [["Simple"]]
+  let simpleBorderTable = Table.setBorderStyle SimpleBorder $ simpleTable ["Style"] [["Simple"]]
   TIO.putStrLn (renderTable simpleBorderTable)
   emptyLine console
 
-  let roundedBorderTable = setBorderStyle RoundedBorder $ simpleTable ["Style"] [["Rounded"]]
+  let roundedBorderTable = Table.setBorderStyle RoundedBorder $ simpleTable ["Style"] [["Rounded"]]
   TIO.putStrLn (renderTable roundedBorderTable)
   emptyLine console
 
-  let doubleBorderTable = setBorderStyle DoubleBorder $ simpleTable ["Style"] [["Double"]]
+  let doubleBorderTable = Table.setBorderStyle DoubleBorder $ simpleTable ["Style"] [["Double"]]
   TIO.putStrLn (renderTable doubleBorderTable)
   emptyLine console
 
-  let heavyBorderTable = setBorderStyle HeavyBorder $ simpleTable ["Style"] [["Heavy"]]
+  let heavyBorderTable = Table.setBorderStyle HeavyBorder $ simpleTable ["Style"] [["Heavy"]]
   TIO.putStrLn (renderTable heavyBorderTable)
   emptyLine console
 
@@ -129,7 +171,7 @@ main = do
   emptyLine console
 
   let infoPanel =
-        setBorderStyle DoubleBorder $
+        Panel.setBorderStyle DoubleBorder $
           simplePanel
             "Important Notice"
             "Panels can have different border styles too!"
@@ -212,7 +254,7 @@ main = do
   emptyLine console
 
   let summaryPanel =
-        setBorderStyle RoundedBorder $
+        Panel.setBorderStyle RoundedBorder $
           simplePanel
             "Demo Summary"
             "You've seen:\n\
