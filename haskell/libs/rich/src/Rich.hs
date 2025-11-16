@@ -77,16 +77,22 @@
 module Rich
   ( -- * Re-exports from Rich.Style
     module Rich.Style,
+
     -- * Re-exports from Rich.Console
     module Rich.Console,
+
     -- * Re-exports from Rich.Table
     module Rich.Table,
+
     -- * Re-exports from Rich.Panel
     module Rich.Panel,
+
     -- * Re-exports from Rich.Tree
     module Rich.Tree,
+
     -- * Re-exports from Rich.Progress
     module Rich.Progress,
+
     -- * Re-exports from Rich.Terminal
     module Rich.Terminal,
   )

@@ -69,12 +69,12 @@ module Rich.Style
   )
 where
 
-import Prelude hiding (reverse)
 import Data.List (intercalate)
 import Data.Text (Text)
 import qualified Data.Text as T
 import Data.Word (Word8)
 import Rich.Terminal.Capability (ColorCapability (..))
+import Prelude hiding (reverse)
 
 -- | Represents a color in the terminal
 data Color

@@ -144,11 +144,14 @@ capabilityTests =
       [ TestLabel "QuickCheck Properties" $
           TestList
             [ TestLabel "prop_colorCapabilityOrdered" $
-                TestCase $ assertBool "ColorCapability ordering" prop_colorCapabilityOrdered,
+                TestCase $
+                  assertBool "ColorCapability ordering" prop_colorCapabilityOrdered,
               TestLabel "prop_colorCapabilityEnum" $
-                TestCase $ assertBool "ColorCapability enum instances" prop_colorCapabilityEnum,
+                TestCase $
+                  assertBool "ColorCapability enum instances" prop_colorCapabilityEnum,
               TestLabel "prop_colorCapabilityBounded" $
-                TestCase $ assertBool "ColorCapability bounded instances" prop_colorCapabilityBounded
+                TestCase $
+                  assertBool "ColorCapability bounded instances" prop_colorCapabilityBounded
             ],
         TestLabel "Color Degradation Tests" $
           TestList

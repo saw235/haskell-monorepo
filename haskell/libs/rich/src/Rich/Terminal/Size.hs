@@ -25,10 +25,10 @@ import System.IO (Handle, stdout)
 
 -- | Represents terminal dimensions in columns and rows
 data TerminalSize = TerminalSize
-  { termWidth :: Int,
-    -- ^ Terminal width in columns (positive integer)
+  { -- | Terminal width in columns (positive integer)
+    termWidth :: Int,
+    -- | Terminal height in rows (positive integer)
     termHeight :: Int
-    -- ^ Terminal height in rows (positive integer)
   }
   deriving (Show, Eq)
 
