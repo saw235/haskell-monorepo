@@ -17,8 +17,8 @@ import Test.Hspec
 
 -- | Integration test for single agent with tools
 -- These tests verify that agents can successfully execute tools and complete tasks
-spec :: Spec
-spec = do
+spec :: LLMConfig -> Spec
+spec llmConfig = do
   describe "[FR-005,FR-006,FR-007] Single Agent with Tools" $ do
     it "agent completes task using calculator tool" $ do
       -- Create agent with calculator tool
@@ -27,7 +27,7 @@ spec = do
               { configName = "calculator-agent",
                 configSystemPrompt = "You are a helpful math assistant. Use the calculator tool for computations.",
                 configTools = [calculatorTool],
-                configLLM = testLLMConfig,
+                configLLM = llmConfig,
                 configSkillsDir = Nothing,
                 configMaxTokens = Nothing,
                 configTemperature = Nothing
@@ -45,14 +45,18 @@ spec = do
 
       -- CRITICAL: Verify the calculator tool was ACTUALLY USED
       length (resultToolsUsed result) `shouldSatisfy` (> 0)
-      toolExecName (head (resultToolsUsed result)) `shouldBe` "calculator"
+      case resultToolsUsed result of
+        (firstExec:_) -> toolExecName firstExec `shouldBe` "calculator"
+        [] -> expectationFailure "No tools were executed"
 
       -- CRITICAL: Verify the correct answer (345) appears in the output
       T.pack "345" `shouldSatisfy` (`T.isInfixOf` resultOutput result)
 
       -- Verify calculator tool was available
       length (availableTools agent) `shouldBe` 1
-      toolName (head (availableTools agent)) `shouldBe` "calculator"
+      case availableTools agent of
+        (firstTool:_) -> toolName firstTool `shouldBe` "calculator"
+        [] -> expectationFailure "No tools were available"
 
     it "agent completes task using file reader tool" $ do
       withTempDir "agentic-test" $ \tmpDir -> do
@@ -66,7 +70,7 @@ spec = do
                 { configName = "file-agent",
                   configSystemPrompt = "You are a helpful file assistant. Use the file tools to read and write files.",
                   configTools = [readFileTool, writeFileTool],
-                  configLLM = testLLMConfig,
+                  configLLM = llmConfig,
                   configSkillsDir = Nothing,
                   configMaxTokens = Nothing,
                   configTemperature = Nothing
@@ -98,7 +102,7 @@ spec = do
                   configSystemPrompt =
                     "You are a versatile assistant. Use file tools to read files and calculator for math.",
                   configTools = [readFileTool, calculatorTool, listDirectoryTool],
-                  configLLM = testLLMConfig,
+                  configLLM = llmConfig,
                   configSkillsDir = Nothing,
                   configMaxTokens = Nothing,
                   configTemperature = Nothing
@@ -129,7 +133,7 @@ spec = do
               { configName = "error-handling-agent",
                 configSystemPrompt = "You are a file assistant.",
                 configTools = [readFileTool],
-                configLLM = testLLMConfig,
+                configLLM = llmConfig,
                 configSkillsDir = Nothing,
                 configMaxTokens = Nothing,
                 configTemperature = Nothing
@@ -156,7 +160,7 @@ spec = do
                 { configName = "context-agent",
                   configSystemPrompt = "You are a file assistant with good memory.",
                   configTools = [readFileTool],
-                  configLLM = testLLMConfig,
+                  configLLM = llmConfig,
                   configSkillsDir = Nothing,
                   configMaxTokens = Nothing,
                   configTemperature = Nothing
@@ -193,14 +197,4 @@ withTempDir template action = do
     (\dir -> removeDirectoryRecursive dir)
     action
 
--- | Test LLM configuration
-testLLMConfig :: LLMConfig
-testLLMConfig =
-  LLMConfig
-    { llmProvider = Ollama,
-      llmModel = "qwen3",
-      llmApiKey = Nothing,
-      llmBaseUrl = Just "http://localhost:11434",
-      llmMaxTokens = 4096,
-      llmTemperature = 0.7
-    }
+-- LLM configuration is now passed from Main.hs via environment variables
