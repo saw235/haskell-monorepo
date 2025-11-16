@@ -46,12 +46,12 @@ spec = do
       percentageUsed metrics `shouldSatisfy` (>= 0.0)
 
     it "triggers summarization at 90% threshold" $ pending
-      -- This test requires a way to artificially push context to 90%
-      -- Will be implemented after summarization module (T036)
+    -- This test requires a way to artificially push context to 90%
+    -- Will be implemented after summarization module (T036)
 
     it "falls back to truncation if summarization fails" $ pending
-      -- This test requires summarization failure scenario
-      -- Will be implemented after T038 (fallback implementation)
+    -- This test requires summarization failure scenario
+    -- Will be implemented after T038 (fallback implementation)
 
     it "updates token metrics after each message" $ do
       let llmConfig =
@@ -92,13 +92,14 @@ spec = do
 
   describe "[FR-003,FR-042,FR-044] Context Summarization" $ do
     it "reduces token count by at least 50%" $ pending
-      -- Requires summarization implementation (T036)
+    -- Requires summarization implementation (T036)
 
     it "preserves key information after summarization" $ pending
-      -- Requires summarization implementation (T036)
+    -- Requires summarization implementation (T036)
 
     it "logs WARNING when summarization is triggered" $ pending
-      -- Requires logging integration (T039)
+    -- Requires logging integration (T039)
 
     it "logs ERROR when summarization fails and falls back to truncation" $ pending
-      -- Requires fallback implementation (T038)
+
+-- Requires fallback implementation (T038)

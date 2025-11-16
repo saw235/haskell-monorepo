@@ -52,9 +52,9 @@ where
 
 import AgenticFramework.Context (AgentContext (..), addMessage, addToolExecution, createContext)
 import qualified AgenticFramework.Context.Summarization as Sum
-import AgenticFramework.Logging (ExecutionLog (..), logAgentReasoning)
 import AgenticFramework.LLM.Kimi (KimiLLM, createKimiLLM, defaultKimiParams)
 import AgenticFramework.LLM.Ollama (OllamaLLM, createOllamaLLM, defaultOllamaParams)
+import AgenticFramework.Logging (ExecutionLog (..), logAgentReasoning)
 import AgenticFramework.Tool (executeTool)
 import AgenticFramework.Types
 import Data.Aeson (Value, object, (.=))
@@ -157,9 +157,10 @@ executeAgent agent input = do
 executeAgentWithContext :: Agent -> AgentContext -> Text -> IO AgentResult
 executeAgentWithContext agent ctx input = do
   -- Check if we need to summarize context before proceeding (FR-042, T037)
-  ctx' <- if Sum.shouldTriggerSummarization Sum.defaultSummarizationConfig ctx
-    then Sum.summarizeContext (llmConfig agent) Sum.defaultSummarizationConfig ctx
-    else return ctx
+  ctx' <-
+    if Sum.shouldTriggerSummarization Sum.defaultSummarizationConfig ctx
+      then Sum.summarizeContext (llmConfig agent) Sum.defaultSummarizationConfig ctx
+      else return ctx
 
   -- Create initial user message
   timestamp <- getCurrentTime
@@ -192,9 +193,8 @@ executeAgentWithContext agent ctx input = do
       case findTool (availableTools agent) toolName of
         Nothing -> do
           endTime <- getCurrentTime
-          let finalLog = execLog { execLogEndTime = Just endTime }
+          let finalLog = execLog {execLogEndTime = Just endTime}
           return $ failureResult ("Tool not found: " <> toolName) ctx'' finalLog
-
         Just tool -> do
           -- Execute the tool
           toolResult <- executeTool tool toolInput
@@ -202,22 +202,22 @@ executeAgentWithContext agent ctx input = do
           case toolResult of
             Left toolErr -> do
               endTime <- getCurrentTime
-              let finalLog = execLog { execLogEndTime = Just endTime }
+              let finalLog = execLog {execLogEndTime = Just endTime}
               let errMsg = case toolErr of
                     ToolExecutionError msg -> "Tool execution error: " <> msg
                     ToolTimeoutError -> "Tool execution timed out"
               return $ failureResult errMsg ctx'' finalLog
-
             Right toolOutputResult -> do
               -- Record tool execution
               toolExecTime <- getCurrentTime
-              let toolExec = ToolExecution
-                    { toolExecName = toolName
-                    , toolExecInput = toolInput
-                    , toolExecOutput = Right toolOutputResult
-                    , toolExecTimestamp = toolExecTime
-                    , toolExecDuration = 0 -- TODO: track actual duration
-                    }
+              let toolExec =
+                    ToolExecution
+                      { toolExecName = toolName,
+                        toolExecInput = toolInput,
+                        toolExecOutput = Right toolOutputResult,
+                        toolExecTimestamp = toolExecTime,
+                        toolExecDuration = 0 -- TODO: track actual duration
+                      }
 
               let ctx''' = addToolExecution toolExec ctx''
 
@@ -228,18 +228,18 @@ executeAgentWithContext agent ctx input = do
               let response = formatToolResponse toolName output
 
               assistantTimestamp <- getCurrentTime
-              let assistantMsg = AssistantMessage
-                    { messageContent = response
-                    , messageTimestamp = assistantTimestamp
-                    }
+              let assistantMsg =
+                    AssistantMessage
+                      { messageContent = response,
+                        messageTimestamp = assistantTimestamp
+                      }
 
               let finalCtx = addMessage assistantMsg ctx'''
 
               endTime <- getCurrentTime
-              let finalLog = execLog { execLogEndTime = Just endTime }
+              let finalLog = execLog {execLogEndTime = Just endTime}
 
               return $ successResult response finalCtx finalLog
-
     Nothing -> do
       -- Fall back to LLM-only execution (no tool use)
       -- TODO: Implement full ReAct loop with LLM-driven tool selection
@@ -249,31 +249,29 @@ executeAgentWithContext agent ctx input = do
         Ollama -> do
           let ollamaLLM = createOllamaLLM (llmConfig agent)
           LLM.generate ollamaLLM fullPrompt (Just defaultOllamaParams)
-
         Kimi -> do
           case createKimiLLM (llmConfig agent) of
             Nothing -> return $ Left "Kimi API key not provided in LLMConfig"
             Just kimiLLM -> LLM.generate kimiLLM fullPrompt (Just defaultKimiParams)
-
         _ -> return $ Left "LLM provider not yet implemented"
 
       case llmResult of
         Left err -> do
           endTime <- getCurrentTime
-          let finalLog = execLog { execLogEndTime = Just endTime }
+          let finalLog = execLog {execLogEndTime = Just endTime}
           return $ failureResult (T.pack err) ctx'' finalLog
-
         Right response -> do
           assistantTimestamp <- getCurrentTime
-          let assistantMsg = AssistantMessage
-                { messageContent = response
-                , messageTimestamp = assistantTimestamp
-                }
+          let assistantMsg =
+                AssistantMessage
+                  { messageContent = response,
+                    messageTimestamp = assistantTimestamp
+                  }
 
           let finalCtx = addMessage assistantMsg ctx''
 
           endTime <- getCurrentTime
-          let finalLog = execLog { execLogEndTime = Just endTime }
+          let finalLog = execLog {execLogEndTime = Just endTime}
 
           return $ successResult response finalCtx finalLog
 
@@ -314,20 +312,19 @@ failureResult err ctx log =
 tryDirectToolExecution :: Agent -> Text -> Maybe (Text, ToolInput)
 tryDirectToolExecution agent input =
   -- Pattern match for calculator tool: "Calculate X * Y" or "Calculate X + Y" etc.
-  if "calculate" `T.isInfixOf` T.toLower input then
-    let expr = extractExpression input
-    in if T.null expr
-         then Nothing
-         else Just ("calculator", ToolInput $ object ["expression" .= expr])
+  if "calculate" `T.isInfixOf` T.toLower input
+    then
+      let expr = extractExpression input
+       in if T.null expr
+            then Nothing
+            else Just ("calculator", ToolInput $ object ["expression" .= expr])
+    else -- Pattern match for file reader: "Read the file at X" or "Read X"
 
-  -- Pattern match for file reader: "Read the file at X" or "Read X"
-  else if "read" `T.isInfixOf` T.toLower input && ("file" `T.isInfixOf` T.toLower input || "path" `T.isInfixOf` T.toLower input) then
-    case extractFilePath input of
-      Nothing -> Nothing
-      Just path -> Just ("read_file", ToolInput $ object ["path" .= path])
-
-  else
-    Nothing
+      if "read" `T.isInfixOf` T.toLower input && ("file" `T.isInfixOf` T.toLower input || "path" `T.isInfixOf` T.toLower input)
+        then case extractFilePath input of
+          Nothing -> Nothing
+          Just path -> Just ("read_file", ToolInput $ object ["path" .= path])
+        else Nothing
 
 -- | Extract mathematical expression from text
 --   "Calculate 15 * 23" -> "15 * 23"
@@ -337,7 +334,7 @@ extractExpression input =
       -- Find "calculate" and take everything after it
       afterCalculate = case T.breakOn "calculate" lower of
         (_, rest) -> T.drop (T.length "calculate") rest
-  in T.strip afterCalculate
+   in T.strip afterCalculate
 
 -- | Extract file path from text
 --   "Read the file at /path/to/file" -> Just "/path/to/file"
@@ -349,7 +346,7 @@ extractFilePath input =
       tryPattern pattern = case T.breakOn pattern lower of
         (_, "") -> Nothing
         (_, rest) -> Just $ T.strip $ T.drop (T.length pattern) rest
-  in List.find (not . T.null . T.strip) $ map (maybe "" id . tryPattern) patterns
+   in List.find (not . T.null . T.strip) $ map (maybe "" id . tryPattern) patterns
 
 -- | Find a tool by name in the agent's available tools
 findTool :: [Tool] -> Text -> Maybe Tool

@@ -242,7 +242,7 @@ extractSelector _ = Nothing
 --   TODO: Replace with proper expression parser or langchain-hs calculator for complex expressions
 evaluateSimpleExpression :: Text -> IO Double
 evaluateSimpleExpression expr = do
-  let cleanExpr = T.filter (/= ' ') expr  -- Remove spaces
+  let cleanExpr = T.filter (/= ' ') expr -- Remove spaces
   case parseAndEval (T.unpack cleanExpr) of
     Just result -> return result
     Nothing -> error $ "Cannot evaluate expression: " <> T.unpack expr
@@ -259,10 +259,10 @@ parseExpr str = do
   (left, rest1) <- parseTerm str
   parseExpr' left rest1
   where
-    parseExpr' acc ('+':rest) = do
+    parseExpr' acc ('+' : rest) = do
       (right, rest') <- parseTerm rest
       parseExpr' (acc + right) rest'
-    parseExpr' acc ('-':rest) = do
+    parseExpr' acc ('-' : rest) = do
       (right, rest') <- parseTerm rest
       parseExpr' (acc - right) rest'
     parseExpr' acc rest = Just (acc, rest)
@@ -273,22 +273,22 @@ parseTerm str = do
   (left, rest1) <- parseFactor str
   parseTerm' left rest1
   where
-    parseTerm' acc ('*':rest) = do
+    parseTerm' acc ('*' : rest) = do
       (right, rest') <- parseFactor rest
       parseTerm' (acc * right) rest'
-    parseTerm' acc ('/':rest) = do
+    parseTerm' acc ('/' : rest) = do
       (right, rest') <- parseFactor rest
       if right == 0
-        then Nothing  -- Division by zero
+        then Nothing -- Division by zero
         else parseTerm' (acc / right) rest'
     parseTerm' acc rest = Just (acc, rest)
 
 -- Parse factor (handles numbers and parentheses)
 parseFactor :: String -> Maybe (Double, String)
-parseFactor ('(':rest) = do
+parseFactor ('(' : rest) = do
   (result, rest') <- parseExpr rest
   case rest' of
-    (')':rest'') -> Just (result, rest'')
+    (')' : rest'') -> Just (result, rest'')
     _ -> Nothing
 parseFactor str = parseNumber str
 

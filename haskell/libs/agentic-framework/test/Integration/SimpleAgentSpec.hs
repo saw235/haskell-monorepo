@@ -3,15 +3,15 @@
 module Integration.SimpleAgentSpec (spec) where
 
 import AgenticFramework.Agent
-import AgenticFramework.Context (AgentContext(..))
+import AgenticFramework.Context (AgentContext (..))
 import AgenticFramework.Tool
-import AgenticFramework.Tool.File (readFileTool, writeFileTool, listDirectoryTool)
+import AgenticFramework.Tool.File (listDirectoryTool, readFileTool, writeFileTool)
 import AgenticFramework.Tool.LangChain (calculatorTool)
 import AgenticFramework.Types
 import Control.Exception (bracket)
 import qualified Data.Text as T
 import qualified Data.Text.IO as TIO
-import System.Directory (createDirectoryIfMissing, removeDirectoryRecursive, removeFile, getTemporaryDirectory)
+import System.Directory (createDirectoryIfMissing, getTemporaryDirectory, removeDirectoryRecursive, removeFile)
 import System.FilePath ((</>))
 import Test.Hspec
 

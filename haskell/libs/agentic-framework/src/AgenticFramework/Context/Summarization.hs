@@ -27,15 +27,15 @@ module AgenticFramework.Context.Summarization
   )
 where
 
-import AgenticFramework.Types
 import AgenticFramework.Context (AgentContext (..), getTokenMetrics, updateTokenMetrics)
-import AgenticFramework.LLM.Ollama (createOllamaLLM, defaultOllamaParams)
 import AgenticFramework.LLM.Kimi (createKimiLLM, defaultKimiParams)
-import qualified Langchain.LLM.Core as LLM
-import Control.Exception (try, SomeException)
+import AgenticFramework.LLM.Ollama (createOllamaLLM, defaultOllamaParams)
+import AgenticFramework.Types
+import Control.Exception (SomeException, try)
 import Data.Text (Text)
 import qualified Data.Text as T
 import Data.Time (UTCTime, getCurrentTime)
+import qualified Langchain.LLM.Core as LLM
 import System.Timeout (timeout)
 
 --------------------------------------------------------------------------------
@@ -44,14 +44,14 @@ import System.Timeout (timeout)
 
 -- | Configuration for context summarization
 data SummarizationConfig = SummarizationConfig
-  { summarizationThreshold :: Double
-    -- ^ Percentage of token limit that triggers summarization (default: 0.9 for 90%)
-  , preserveRecentMessages :: Int
-    -- ^ Number of recent messages to preserve without summarization (default: 5)
-  , summarizationTimeout :: Int
-    -- ^ Timeout for summarization in microseconds (default: 30 seconds)
-  , fallbackToTruncation :: Bool
-    -- ^ Whether to fallback to truncation if summarization fails (default: True)
+  { -- | Percentage of token limit that triggers summarization (default: 0.9 for 90%)
+    summarizationThreshold :: Double,
+    -- | Number of recent messages to preserve without summarization (default: 5)
+    preserveRecentMessages :: Int,
+    -- | Timeout for summarization in microseconds (default: 30 seconds)
+    summarizationTimeout :: Int,
+    -- | Whether to fallback to truncation if summarization fails (default: True)
+    fallbackToTruncation :: Bool
   }
   deriving (Show, Eq)
 
@@ -105,45 +105,52 @@ summarizeContext llmConfig config ctx = do
       return ctx
     else do
       -- Attempt summarization with timeout
-      summaryResult <- timeout (summarizationTimeout config) $
-        try $ generateSummary llmConfig olderMessages
+      summaryResult <-
+        timeout (summarizationTimeout config) $
+          try $
+            generateSummary llmConfig olderMessages
 
       case summaryResult of
         Nothing -> do
           -- Timeout occurred (FR-044)
-          putStrLn $ "ERROR: Context summarization timed out after "
-            <> show (summarizationTimeout config `div` 1_000_000) <> " seconds"
-          putStrLn $ "Falling back to hard truncation. Original: "
-            <> show (currentTokenCount metrics) <> " tokens"
+          putStrLn $
+            "ERROR: Context summarization timed out after "
+              <> show (summarizationTimeout config `div` 1_000_000)
+              <> " seconds"
+          putStrLn $
+            "Falling back to hard truncation. Original: "
+              <> show (currentTokenCount metrics)
+              <> " tokens"
 
           if fallbackToTruncation config
             then return $ hardTruncate config ctx
             else return ctx
-
         Just (Left (err :: SomeException)) -> do
           -- Summarization failed (FR-044)
           putStrLn $ "ERROR: Context summarization failed: " <> show err
-          putStrLn $ "Falling back to hard truncation. Original: "
-            <> show (currentTokenCount metrics) <> " tokens"
+          putStrLn $
+            "Falling back to hard truncation. Original: "
+              <> show (currentTokenCount metrics)
+              <> " tokens"
 
           if fallbackToTruncation config
             then return $ hardTruncate config ctx
             else return ctx
-
         Just (Right summary) -> do
           -- Summarization succeeded
           let originalTokens = currentTokenCount metrics
 
           -- Create summary message
           timestamp <- getCurrentTime
-          let summaryMessage = SystemMessage
-                { messageContent = "Previous conversation summary:\n\n" <> summary
-                , messageTimestamp = timestamp
-                }
+          let summaryMessage =
+                SystemMessage
+                  { messageContent = "Previous conversation summary:\n\n" <> summary,
+                    messageTimestamp = timestamp
+                  }
 
           -- Build new conversation with summary + recent messages
           let newConversation = [summaryMessage] ++ recentMessages
-          let newCtx = ctx { contextConversation = newConversation }
+          let newCtx = ctx {contextConversation = newConversation}
 
           -- Update token metrics (will be recalculated)
           newCtx' <- updateTokenMetrics newCtx summary
@@ -161,12 +168,14 @@ summarizeContext llmConfig config ctx = do
           putStrLn $ "  Messages preserved: " <> show (length recentMessages)
 
           -- Mark that summarization occurred
-          let finalCtx = newCtx'
-                { contextTokenMetrics = (contextTokenMetrics newCtx')
-                    { summarizationTriggered = True
-                    , lastSummarization = Just timestamp
-                    }
-                }
+          let finalCtx =
+                newCtx'
+                  { contextTokenMetrics =
+                      (contextTokenMetrics newCtx')
+                        { summarizationTriggered = True,
+                          lastSummarization = Just timestamp
+                        }
+                  }
 
           return finalCtx
 
@@ -177,26 +186,25 @@ generateSummary llmConfig messages = do
   let messageTexts = map formatMessage messages
       conversationText = T.intercalate "\n\n" messageTexts
 
-      prompt = T.unlines
-        [ "Please provide a concise summary of the following conversation."
-        , "Focus on key facts, decisions, and context that would be important to remember."
-        , "Be brief but comprehensive."
-        , ""
-        , "Conversation:"
-        , conversationText
-        ]
+      prompt =
+        T.unlines
+          [ "Please provide a concise summary of the following conversation.",
+            "Focus on key facts, decisions, and context that would be important to remember.",
+            "Be brief but comprehensive.",
+            "",
+            "Conversation:",
+            conversationText
+          ]
 
   -- Call LLM based on provider
   result <- case llmProvider llmConfig of
     Ollama -> do
       let llm = createOllamaLLM llmConfig
       LLM.generate llm prompt (Just defaultOllamaParams)
-
     Kimi -> do
       case createKimiLLM llmConfig of
         Nothing -> return $ Left "Kimi API key not provided"
         Just llm -> LLM.generate llm prompt (Just defaultKimiParams)
-
     _ -> return $ Left "LLM provider not supported for summarization"
 
   case result of
@@ -219,4 +227,4 @@ hardTruncate config ctx =
   let conversation = contextConversation ctx
       recentCount = preserveRecentMessages config
       truncated = drop (max 0 (length conversation - recentCount)) conversation
-  in ctx { contextConversation = truncated }
+   in ctx {contextConversation = truncated}
