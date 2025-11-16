@@ -77,12 +77,18 @@ newtype AgentId = AgentId {unAgentId :: UUID}
 
 -- | Supported LLM providers for agent execution.
 data LLMProvider
-  = Ollama          -- ^ Local Ollama instance
-  | OpenAI          -- ^ OpenAI API (GPT models)
-  | Claude          -- ^ Anthropic Claude API
-  | HuggingFace     -- ^ HuggingFace Inference API
-  | Kimi            -- ^ Moonshot AI Kimi API
-  | Custom Text     -- ^ Custom provider with name
+  = -- | Local Ollama instance
+    Ollama
+  | -- | OpenAI API (GPT models)
+    OpenAI
+  | -- | Anthropic Claude API
+    Claude
+  | -- | HuggingFace Inference API
+    HuggingFace
+  | -- | Moonshot AI Kimi API
+    Kimi
+  | -- | Custom provider with name
+    Custom Text
   deriving (Show, Eq, Generic)
 
 instance ToJSON LLMProvider

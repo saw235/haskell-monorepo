@@ -22,11 +22,10 @@ import AgenticFramework.Tool
 import AgenticFramework.Tool.File
 import AgenticFramework.Tool.LangChain
 import AgenticFramework.Types
-import AgenticFramework.Context (AgentContext(..))
-import System.Environment (lookupEnv)
 import Data.Text (Text)
 import qualified Data.Text as T
 import qualified Data.Text.IO as TIO
+import System.Environment (lookupEnv)
 
 main :: IO ()
 main = do
@@ -73,14 +72,15 @@ createSimpleAgent = do
         Just key -> Just (T.pack key)
         Nothing -> Nothing
 
-  let llmCfg = LLMConfig
-        { llmProvider = Kimi
-        , llmModel = "moonshot-v1-8k"
-        , llmApiKey = apiKey
-        , llmBaseUrl = Just "https://api.moonshot.ai/v1"
-        , llmMaxTokens = 4096
-        , llmTemperature = 0.7
-        }
+  let llmCfg =
+        LLMConfig
+          { llmProvider = Kimi,
+            llmModel = "moonshot-v1-8k",
+            llmApiKey = apiKey,
+            llmBaseUrl = Just "https://api.moonshot.ai/v1",
+            llmMaxTokens = 4096,
+            llmTemperature = 0.7
+          }
 
   let config =
         AgentConfig

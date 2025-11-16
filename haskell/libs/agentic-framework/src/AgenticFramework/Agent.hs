@@ -51,13 +51,10 @@ module AgenticFramework.Agent
 where
 
 import AgenticFramework.Context (AgentContext (..), addMessage, createContext)
-import AgenticFramework.Logging (ExecutionLog (..))
-import AgenticFramework.Types
-import AgenticFramework.Context (AgentContext(..), createContext, addMessage)
-import AgenticFramework.Logging (ExecutionLog(..), logAgentReasoning)
-import AgenticFramework.LLM.Ollama (OllamaLLM, createOllamaLLM, defaultOllamaParams)
 import AgenticFramework.LLM.Kimi (KimiLLM, createKimiLLM, defaultKimiParams)
-import qualified Langchain.LLM.Core as LLM
+import AgenticFramework.LLM.Ollama (OllamaLLM, createOllamaLLM, defaultOllamaParams)
+import AgenticFramework.Logging (ExecutionLog (..), logAgentReasoning)
+import AgenticFramework.Types
 import Data.Text (Text)
 import qualified Data.Text as T
 import Data.Time (getCurrentTime)
@@ -65,6 +62,7 @@ import Data.UUID (UUID)
 import qualified Data.UUID as UUID
 import qualified Data.UUID.V4 as UUID4
 import GHC.Generics (Generic)
+import qualified Langchain.LLM.Core as LLM
 
 --------------------------------------------------------------------------------
 -- Agent Data Types
@@ -183,33 +181,31 @@ executeAgentWithContext agent ctx input = do
     Ollama -> do
       let ollamaLLM = createOllamaLLM (llmConfig agent)
       LLM.generate ollamaLLM fullPrompt (Just defaultOllamaParams)
-
     Kimi -> do
       case createKimiLLM (llmConfig agent) of
         Nothing -> return $ Left "Kimi API key not provided in LLMConfig"
         Just kimiLLM -> LLM.generate kimiLLM fullPrompt (Just defaultKimiParams)
-
     _ -> return $ Left "LLM provider not yet implemented"
 
   case llmResult of
     Left err -> do
       -- Handle LLM error
       endTime <- getCurrentTime
-      let finalLog = execLog { execLogEndTime = Just endTime }
+      let finalLog = execLog {execLogEndTime = Just endTime}
       return $ failureResult (T.pack err) ctx' finalLog
-
     Right response -> do
       -- Success - add assistant message to context
       assistantTimestamp <- getCurrentTime
-      let assistantMsg = AssistantMessage
-            { messageContent = response
-            , messageTimestamp = assistantTimestamp
-            }
+      let assistantMsg =
+            AssistantMessage
+              { messageContent = response,
+                messageTimestamp = assistantTimestamp
+              }
 
       let finalCtx = addMessage assistantMsg ctx'
 
       endTime <- getCurrentTime
-      let finalLog = execLog { execLogEndTime = Just endTime }
+      let finalLog = execLog {execLogEndTime = Just endTime}
 
       return $ successResult response finalCtx finalLog
 

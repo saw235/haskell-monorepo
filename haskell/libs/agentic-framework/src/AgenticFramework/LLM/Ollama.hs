@@ -1,94 +1,101 @@
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE TypeFamilies #-}
 
-{- |
-Module      : AgenticFramework.LLM.Ollama
-Description : Ollama LLM implementation
-Copyright   : (c) 2025
-License     : MIT
-
-This module provides an LLM instance for Ollama.
--}
-
+-- |
+-- Module      : AgenticFramework.LLM.Ollama
+-- Description : Ollama LLM implementation
+-- Copyright   : (c) 2025
+-- License     : MIT
+--
+-- This module provides an LLM instance for Ollama.
 module AgenticFramework.LLM.Ollama
-  ( OllamaLLM(..)
-  , OllamaParams(..)
-  , defaultOllamaParams
-  , createOllamaLLM
-  ) where
+  ( OllamaLLM (..),
+    OllamaParams (..),
+    defaultOllamaParams,
+    createOllamaLLM,
+  )
+where
 
-import AgenticFramework.Types (LLMConfig(..))
-import qualified Langchain.LLM.Core as LLM
+import AgenticFramework.Types (LLMConfig (..))
+import Data.Aeson (Value (..), decode, encode, object, (.=))
+import qualified Data.Aeson.KeyMap as KM
+import qualified Data.ByteString.Lazy as BL
+import qualified Data.List.NonEmpty as NE
+import Data.Maybe (fromMaybe)
 import Data.Text (Text)
 import qualified Data.Text as T
 import qualified Data.Text.Encoding as TE
-import Data.Aeson (Value(..), encode, decode, object, (.=))
-import qualified Data.Aeson.KeyMap as KM
-import qualified Data.ByteString.Lazy as BL
 import qualified Data.Vector as Vector
+import qualified Langchain.LLM.Core as LLM
 import Network.HTTP.Simple
-import Data.Maybe (fromMaybe)
-import qualified Data.List.NonEmpty as NE
 
 -- | Ollama LLM implementation
 data OllamaLLM = OllamaLLM
-  { ollamaModel :: Text
-  , ollamaBaseUrl :: Text
-  } deriving (Show)
+  { ollamaModel :: Text,
+    ollamaBaseUrl :: Text
+  }
+  deriving (Show)
 
 -- | Parameters for Ollama requests
 data OllamaParams = OllamaParams
-  { ollamaTemperature :: Maybe Double
-  , ollamaMaxTokens :: Maybe Int
-  } deriving (Show)
+  { ollamaTemperature :: Maybe Double,
+    ollamaMaxTokens :: Maybe Int
+  }
+  deriving (Show)
 
 -- | Default parameters
 defaultOllamaParams :: OllamaParams
-defaultOllamaParams = OllamaParams
-  { ollamaTemperature = Just 0.7
-  , ollamaMaxTokens = Just 4096
-  }
+defaultOllamaParams =
+  OllamaParams
+    { ollamaTemperature = Just 0.7,
+      ollamaMaxTokens = Just 4096
+    }
 
 -- | Create an Ollama LLM from our config
 createOllamaLLM :: LLMConfig -> OllamaLLM
-createOllamaLLM config = OllamaLLM
-  { ollamaModel = llmModel config
-  , ollamaBaseUrl = fromMaybe "http://localhost:11434" (llmBaseUrl config)
-  }
+createOllamaLLM config =
+  OllamaLLM
+    { ollamaModel = llmModel config,
+      ollamaBaseUrl = fromMaybe "http://localhost:11434" (llmBaseUrl config)
+    }
 
 -- | Extract content from Ollama API response
 extractContent :: BL.ByteString -> Maybe Text
 extractContent body = do
   val <- decode body
   case val of
-    Object obj -> KM.lookup "response" obj >>= \case
-      String content -> Just content
-      _ -> Nothing
+    Object obj ->
+      KM.lookup "response" obj >>= \case
+        String content -> Just content
+        _ -> Nothing
     _ -> Nothing
 
 instance LLM.LLM OllamaLLM where
   type LLMParams OllamaLLM = OllamaParams
 
-  generate OllamaLLM{..} prompt mParams = do
+  generate OllamaLLM {..} prompt mParams = do
     let params = fromMaybe defaultOllamaParams mParams
-        reqBody = object
-          [ "model" .= ollamaModel
-          , "prompt" .= prompt
-          , "stream" .= False
-          , "options" .= object
-              [ "temperature" .= ollamaTemperature params
-              , "num_predict" .= ollamaMaxTokens params
-              ]
-          ]
+        reqBody =
+          object
+            [ "model" .= ollamaModel,
+              "prompt" .= prompt,
+              "stream" .= False,
+              "options"
+                .= object
+                  [ "temperature" .= ollamaTemperature params,
+                    "num_predict" .= ollamaMaxTokens params
+                  ]
+            ]
         endpoint = T.unpack ollamaBaseUrl <> "/api/generate"
 
     request <- parseRequest endpoint
-    let req = setRequestMethod "POST"
-            $ setRequestHeader "Content-Type" ["application/json"]
-            $ setRequestBodyLBS (encode reqBody)
-            $ request
+    let req =
+          setRequestMethod "POST" $
+            setRequestHeader "Content-Type" ["application/json"] $
+              setRequestBodyLBS (encode reqBody) $
+                request
 
     response <- httpLBS req
     let status = getResponseStatusCode response

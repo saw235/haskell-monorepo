@@ -1,67 +1,70 @@
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE TypeFamilies #-}
-{-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE TypeFamilies #-}
 
-{- |
-Module      : AgenticFramework.LLM.Kimi
-Description : Kimi LLM implementation
-Copyright   : (c) 2025
-License     : MIT
-
-This module provides an LLM instance for Kimi (Moonshot AI).
--}
-
+-- |
+-- Module      : AgenticFramework.LLM.Kimi
+-- Description : Kimi LLM implementation
+-- Copyright   : (c) 2025
+-- License     : MIT
+--
+-- This module provides an LLM instance for Kimi (Moonshot AI).
 module AgenticFramework.LLM.Kimi
-  ( KimiLLM(..)
-  , KimiParams(..)
-  , defaultKimiParams
-  , createKimiLLM
-  ) where
+  ( KimiLLM (..),
+    KimiParams (..),
+    defaultKimiParams,
+    createKimiLLM,
+  )
+where
 
-import AgenticFramework.Types (LLMConfig(..))
-import qualified Langchain.LLM.Core as LLM
-import Data.Text (Text)
-import qualified Data.Text as T
-import qualified Data.Text.Encoding as TE
-import Data.Aeson (Value(..), encode, decode, object, (.=))
+import AgenticFramework.Types (LLMConfig (..))
+import Data.Aeson (Value (..), decode, encode, object, (.=))
 import qualified Data.Aeson as Aeson
 import qualified Data.Aeson.KeyMap as KM
 import qualified Data.ByteString.Lazy as BL
-import qualified Data.Vector as Vector
-import Network.HTTP.Simple
-import Data.Maybe (fromMaybe)
 import qualified Data.List.NonEmpty as NE
+import Data.Maybe (fromMaybe)
+import Data.Text (Text)
+import qualified Data.Text as T
+import qualified Data.Text.Encoding as TE
+import qualified Data.Vector as Vector
+import qualified Langchain.LLM.Core as LLM
+import Network.HTTP.Simple
 
 -- | Kimi LLM implementation
 data KimiLLM = KimiLLM
-  { kimiModel :: Text
-  , kimiApiKey :: Text
-  , kimiBaseUrl :: Text
-  } deriving (Show)
+  { kimiModel :: Text,
+    kimiApiKey :: Text,
+    kimiBaseUrl :: Text
+  }
+  deriving (Show)
 
 -- | Parameters for Kimi requests
 data KimiParams = KimiParams
-  { kimiTemperature :: Maybe Double
-  , kimiMaxTokens :: Maybe Int
-  } deriving (Show)
+  { kimiTemperature :: Maybe Double,
+    kimiMaxTokens :: Maybe Int
+  }
+  deriving (Show)
 
 -- | Default parameters
 defaultKimiParams :: KimiParams
-defaultKimiParams = KimiParams
-  { kimiTemperature = Just 0.7
-  , kimiMaxTokens = Just 4096
-  }
+defaultKimiParams =
+  KimiParams
+    { kimiTemperature = Just 0.7,
+      kimiMaxTokens = Just 4096
+    }
 
 -- | Create a Kimi LLM from our config
 createKimiLLM :: LLMConfig -> Maybe KimiLLM
 createKimiLLM config = do
   apiKey <- llmApiKey config
-  return KimiLLM
-    { kimiModel = llmModel config
-    , kimiApiKey = apiKey
-    , kimiBaseUrl = fromMaybe "https://api.moonshot.ai/v1" (llmBaseUrl config)
-    }
+  return
+    KimiLLM
+      { kimiModel = llmModel config,
+        kimiApiKey = apiKey,
+        kimiBaseUrl = fromMaybe "https://api.moonshot.ai/v1" (llmBaseUrl config)
+      }
 
 -- | Extract content from Kimi API response
 extractContent :: BL.ByteString -> Maybe Text
@@ -78,9 +81,10 @@ extractContent body = do
               Object choice -> do
                 message <- KM.lookup "message" choice
                 case message of
-                  Object msg -> KM.lookup "content" msg >>= \case
-                    String content -> Just content
-                    _ -> Nothing
+                  Object msg ->
+                    KM.lookup "content" msg >>= \case
+                      String content -> Just content
+                      _ -> Nothing
                   _ -> Nothing
               _ -> Nothing
         _ -> Nothing
@@ -89,22 +93,24 @@ extractContent body = do
 instance LLM.LLM KimiLLM where
   type LLMParams KimiLLM = KimiParams
 
-  generate KimiLLM{..} prompt mParams = do
+  generate KimiLLM {..} prompt mParams = do
     let params = fromMaybe defaultKimiParams mParams
-        reqBody = object
-          [ "model" .= kimiModel
-          , "messages" .= [object ["role" .= ("user" :: Text), "content" .= prompt]]
-          , "temperature" .= kimiTemperature params
-          , "max_tokens" .= kimiMaxTokens params
-          ]
+        reqBody =
+          object
+            [ "model" .= kimiModel,
+              "messages" .= [object ["role" .= ("user" :: Text), "content" .= prompt]],
+              "temperature" .= kimiTemperature params,
+              "max_tokens" .= kimiMaxTokens params
+            ]
         endpoint = T.unpack kimiBaseUrl <> "/chat/completions"
 
     request <- parseRequest endpoint
-    let req = setRequestMethod "POST"
-            $ setRequestHeader "Content-Type" ["application/json"]
-            $ setRequestHeader "Authorization" [TE.encodeUtf8 $ "Bearer " <> kimiApiKey]
-            $ setRequestBodyLBS (encode reqBody)
-            $ request
+    let req =
+          setRequestMethod "POST" $
+            setRequestHeader "Content-Type" ["application/json"] $
+              setRequestHeader "Authorization" [TE.encodeUtf8 $ "Bearer " <> kimiApiKey] $
+                setRequestBodyLBS (encode reqBody) $
+                  request
 
     response <- httpLBS req
     let status = getResponseStatusCode response
