@@ -1,31 +1,30 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-{- |
-Module      : AgenticFramework.Tool.LangChain
-Description : Wrappers for langchain-hs tools
-Copyright   : (c) 2025
-License     : MIT
-
-This module provides wrappers around langchain-hs tools for use with agents.
-
-Note: These are placeholder implementations. Full langchain-hs integration
-will be implemented when the langchain-hs library provides these tools.
--}
-
+-- |
+-- Module      : AgenticFramework.Tool.LangChain
+-- Description : Wrappers for langchain-hs tools
+-- Copyright   : (c) 2025
+-- License     : MIT
+--
+-- This module provides wrappers around langchain-hs tools for use with agents.
+--
+-- Note: These are placeholder implementations. Full langchain-hs integration
+-- will be implemented when the langchain-hs library provides these tools.
 module AgenticFramework.Tool.LangChain
-  ( calculatorTool
-  , wikipediaTool
-  , webScraperTool
-  ) where
+  ( calculatorTool,
+    wikipediaTool,
+    webScraperTool,
+  )
+where
 
 import AgenticFramework.Types
-import Data.Text (Text)
+import Control.Exception (SomeException, try)
 import Data.Aeson (Value, object, (.=))
 import qualified Data.Aeson as Aeson
 import qualified Data.Aeson.KeyMap as KM
+import Data.Text (Text)
 import qualified Data.Text as T
 import qualified Data.Text.Read as TR
-import Control.Exception (try, SomeException)
 
 --------------------------------------------------------------------------------
 -- Calculator Tool
@@ -37,46 +36,56 @@ import Control.Exception (try, SomeException)
 --
 --   TODO: Integrate with langchain-hs calculator when available
 calculatorTool :: Tool
-calculatorTool = Tool
-  { toolName = "calculator"
-  , toolDescription = "Perform mathematical calculations. Input: {\"expression\": \"math expression\"}. Supports +, -, *, / operations."
-  , toolSchema = ToolSchema
-      { inputSchema = object
-          [ "type" .= ("object" :: Text)
-          , "properties" .= object
-              [ "expression" .= object
-                  [ "type" .= ("string" :: Text)
-                  , "description" .= ("Mathematical expression to evaluate" :: Text)
-                  ]
-              ]
-          , "required" .= (["expression"] :: [Text])
-          ]
-      , outputSchema = object
-          [ "type" .= ("object" :: Text)
-          , "properties" .= object
-              [ "result" .= object ["type" .= ("number" :: Text)]
-              , "expression" .= object ["type" .= ("string" :: Text)]
-              ]
-          ]
-      }
-  , toolExecute = \(ToolInput input) -> do
-      case extractExpression input of
-        Nothing -> return $ Left $ ToolExecutionError "Missing or invalid 'expression' field"
-        Just expr -> do
-          -- Simple eval for basic arithmetic (stub implementation)
-          -- TODO: Use langchain-hs calculator or proper expression parser
-          result <- try $ evaluateSimpleExpression expr
-          case result of
-            Left (err :: SomeException) ->
-              return $ Left $ ToolExecutionError $ T.pack $ "Failed to evaluate expression: " ++ show err
-            Right value ->
-              return $ Right $ ToolOutput $ object
-                [ "result" .= value
-                , "expression" .= expr
+calculatorTool =
+  Tool
+    { toolName = "calculator",
+      toolDescription = "Perform mathematical calculations. Input: {\"expression\": \"math expression\"}. Supports +, -, *, / operations.",
+      toolSchema =
+        ToolSchema
+          { inputSchema =
+              object
+                [ "type" .= ("object" :: Text),
+                  "properties"
+                    .= object
+                      [ "expression"
+                          .= object
+                            [ "type" .= ("string" :: Text),
+                              "description" .= ("Mathematical expression to evaluate" :: Text)
+                            ]
+                      ],
+                  "required" .= (["expression"] :: [Text])
+                ],
+            outputSchema =
+              object
+                [ "type" .= ("object" :: Text),
+                  "properties"
+                    .= object
+                      [ "result" .= object ["type" .= ("number" :: Text)],
+                        "expression" .= object ["type" .= ("string" :: Text)]
+                      ]
                 ]
-  , toolTimeout = Just 3_000_000  -- 3 seconds
-  , toolRetryable = True
-  }
+          },
+      toolExecute = \(ToolInput input) -> do
+        case extractExpression input of
+          Nothing -> return $ Left $ ToolExecutionError "Missing or invalid 'expression' field"
+          Just expr -> do
+            -- Simple eval for basic arithmetic (stub implementation)
+            -- TODO: Use langchain-hs calculator or proper expression parser
+            result <- try $ evaluateSimpleExpression expr
+            case result of
+              Left (err :: SomeException) ->
+                return $ Left $ ToolExecutionError $ T.pack $ "Failed to evaluate expression: " ++ show err
+              Right value ->
+                return $
+                  Right $
+                    ToolOutput $
+                      object
+                        [ "result" .= value,
+                          "expression" .= expr
+                        ],
+      toolTimeout = Just 3_000_000, -- 3 seconds
+      toolRetryable = True
+    }
 
 --------------------------------------------------------------------------------
 -- Wikipedia Tool
@@ -88,41 +97,51 @@ calculatorTool = Tool
 --
 --   TODO: Integrate with langchain-hs Wikipedia tool when available
 wikipediaTool :: Tool
-wikipediaTool = Tool
-  { toolName = "wikipedia"
-  , toolDescription = "Search Wikipedia and get article summaries. Input: {\"query\": \"search term\"}. Returns summary and URL."
-  , toolSchema = ToolSchema
-      { inputSchema = object
-          [ "type" .= ("object" :: Text)
-          , "properties" .= object
-              [ "query" .= object
-                  [ "type" .= ("string" :: Text)
-                  , "description" .= ("Search query for Wikipedia" :: Text)
-                  ]
-              ]
-          , "required" .= (["query"] :: [Text])
-          ]
-      , outputSchema = object
-          [ "type" .= ("object" :: Text)
-          , "properties" .= object
-              [ "summary" .= object ["type" .= ("string" :: Text)]
-              , "url" .= object ["type" .= ("string" :: Text)]
-              ]
-          ]
-      }
-  , toolExecute = \(ToolInput input) -> do
-      case extractQuery input of
-        Nothing -> return $ Left $ ToolExecutionError "Missing or invalid 'query' field"
-        Just query -> do
-          -- Stub implementation
-          -- TODO: Implement actual Wikipedia API call via langchain-hs
-          return $ Right $ ToolOutput $ object
-            [ "summary" .= ("Wikipedia integration pending. Query was: " <> query :: Text)
-            , "url" .= ("https://en.wikipedia.org/wiki/" <> T.replace " " "_" query :: Text)
-            ]
-  , toolTimeout = Just 10_000_000  -- 10 seconds for network request
-  , toolRetryable = True
-  }
+wikipediaTool =
+  Tool
+    { toolName = "wikipedia",
+      toolDescription = "Search Wikipedia and get article summaries. Input: {\"query\": \"search term\"}. Returns summary and URL.",
+      toolSchema =
+        ToolSchema
+          { inputSchema =
+              object
+                [ "type" .= ("object" :: Text),
+                  "properties"
+                    .= object
+                      [ "query"
+                          .= object
+                            [ "type" .= ("string" :: Text),
+                              "description" .= ("Search query for Wikipedia" :: Text)
+                            ]
+                      ],
+                  "required" .= (["query"] :: [Text])
+                ],
+            outputSchema =
+              object
+                [ "type" .= ("object" :: Text),
+                  "properties"
+                    .= object
+                      [ "summary" .= object ["type" .= ("string" :: Text)],
+                        "url" .= object ["type" .= ("string" :: Text)]
+                      ]
+                ]
+          },
+      toolExecute = \(ToolInput input) -> do
+        case extractQuery input of
+          Nothing -> return $ Left $ ToolExecutionError "Missing or invalid 'query' field"
+          Just query -> do
+            -- Stub implementation
+            -- TODO: Implement actual Wikipedia API call via langchain-hs
+            return $
+              Right $
+                ToolOutput $
+                  object
+                    [ "summary" .= ("Wikipedia integration pending. Query was: " <> query :: Text),
+                      "url" .= ("https://en.wikipedia.org/wiki/" <> T.replace " " "_" query :: Text)
+                    ],
+      toolTimeout = Just 10_000_000, -- 10 seconds for network request
+      toolRetryable = True
+    }
 
 --------------------------------------------------------------------------------
 -- Web Scraper Tool
@@ -134,46 +153,57 @@ wikipediaTool = Tool
 --
 --   TODO: Integrate with langchain-hs web scraper when available
 webScraperTool :: Tool
-webScraperTool = Tool
-  { toolName = "web_scraper"
-  , toolDescription = "Scrape content from web pages. Input: {\"url\": \"https://...\", \"selector\": \"CSS selector\"}. Returns extracted content."
-  , toolSchema = ToolSchema
-      { inputSchema = object
-          [ "type" .= ("object" :: Text)
-          , "properties" .= object
-              [ "url" .= object
-                  [ "type" .= ("string" :: Text)
-                  , "description" .= ("URL to scrape" :: Text)
-                  ]
-              , "selector" .= object
-                  [ "type" .= ("string" :: Text)
-                  , "description" .= ("CSS selector for content extraction (optional)" :: Text)
-                  ]
-              ]
-          , "required" .= (["url"] :: [Text])
-          ]
-      , outputSchema = object
-          [ "type" .= ("object" :: Text)
-          , "properties" .= object
-              [ "content" .= object ["type" .= ("string" :: Text)]
-              , "url" .= object ["type" .= ("string" :: Text)]
-              ]
-          ]
-      }
-  , toolExecute = \(ToolInput input) -> do
-      case extractUrl input of
-        Nothing -> return $ Left $ ToolExecutionError "Missing or invalid 'url' field"
-        Just url -> do
-          -- Stub implementation
-          -- TODO: Implement actual web scraping via langchain-hs or http-conduit + scalpel
-          let selector = maybe "body" id (extractSelector input)
-          return $ Right $ ToolOutput $ object
-            [ "content" .= ("Web scraper integration pending. URL: " <> url <> ", Selector: " <> selector :: Text)
-            , "url" .= url
-            ]
-  , toolTimeout = Just 15_000_000  -- 15 seconds for network request
-  , toolRetryable = True
-  }
+webScraperTool =
+  Tool
+    { toolName = "web_scraper",
+      toolDescription = "Scrape content from web pages. Input: {\"url\": \"https://...\", \"selector\": \"CSS selector\"}. Returns extracted content.",
+      toolSchema =
+        ToolSchema
+          { inputSchema =
+              object
+                [ "type" .= ("object" :: Text),
+                  "properties"
+                    .= object
+                      [ "url"
+                          .= object
+                            [ "type" .= ("string" :: Text),
+                              "description" .= ("URL to scrape" :: Text)
+                            ],
+                        "selector"
+                          .= object
+                            [ "type" .= ("string" :: Text),
+                              "description" .= ("CSS selector for content extraction (optional)" :: Text)
+                            ]
+                      ],
+                  "required" .= (["url"] :: [Text])
+                ],
+            outputSchema =
+              object
+                [ "type" .= ("object" :: Text),
+                  "properties"
+                    .= object
+                      [ "content" .= object ["type" .= ("string" :: Text)],
+                        "url" .= object ["type" .= ("string" :: Text)]
+                      ]
+                ]
+          },
+      toolExecute = \(ToolInput input) -> do
+        case extractUrl input of
+          Nothing -> return $ Left $ ToolExecutionError "Missing or invalid 'url' field"
+          Just url -> do
+            -- Stub implementation
+            -- TODO: Implement actual web scraping via langchain-hs or http-conduit + scalpel
+            let selector = maybe "body" id (extractSelector input)
+            return $
+              Right $
+                ToolOutput $
+                  object
+                    [ "content" .= ("Web scraper integration pending. URL: " <> url <> ", Selector: " <> selector :: Text),
+                      "url" .= url
+                    ],
+      toolTimeout = Just 15_000_000, -- 15 seconds for network request
+      toolRetryable = True
+    }
 
 --------------------------------------------------------------------------------
 -- Helper Functions

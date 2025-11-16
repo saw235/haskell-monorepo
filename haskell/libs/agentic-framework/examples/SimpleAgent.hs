@@ -1,30 +1,27 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-{- |
-Module      : SimpleAgent
-Description : Example demonstrating a simple agent with tools
-Copyright   : (c) 2025
-License     : MIT
-
-This example demonstrates creating and executing a simple agent with
-calculator and file reader tools.
-
-= Usage
-
-@
-bazel run //haskell/libs/agentic-framework/examples:simple-agent
-@
-
--}
-
+-- |
+-- Module      : SimpleAgent
+-- Description : Example demonstrating a simple agent with tools
+-- Copyright   : (c) 2025
+-- License     : MIT
+--
+-- This example demonstrates creating and executing a simple agent with
+-- calculator and file reader tools.
+--
+-- = Usage
+--
+-- @
+-- bazel run //haskell/libs/agentic-framework/examples:simple-agent
+-- @
 module Main (main) where
 
 import AgenticFramework.Agent
+import AgenticFramework.Context (AgentContext (..))
 import AgenticFramework.Tool
 import AgenticFramework.Tool.File
 import AgenticFramework.Tool.LangChain
 import AgenticFramework.Types
-import AgenticFramework.Context (AgentContext(..))
 import Data.Text (Text)
 import qualified Data.Text as T
 import qualified Data.Text.IO as TIO
@@ -68,24 +65,26 @@ main = do
 -- | Create a simple agent with calculator and file tools
 createSimpleAgent :: IO Agent
 createSimpleAgent = do
-  let llmCfg = LLMConfig
-        { llmProvider = Ollama
-        , llmModel = "llama2"
-        , llmApiKey = Nothing
-        , llmBaseUrl = Just "http://localhost:11434"
-        , llmMaxTokens = 4096
-        , llmTemperature = 0.7
-        }
+  let llmCfg =
+        LLMConfig
+          { llmProvider = Ollama,
+            llmModel = "llama2",
+            llmApiKey = Nothing,
+            llmBaseUrl = Just "http://localhost:11434",
+            llmMaxTokens = 4096,
+            llmTemperature = 0.7
+          }
 
-  let config = AgentConfig
-        { configName = "simple-agent"
-        , configSystemPrompt = "You are a helpful assistant with access to a calculator and file reader. Help users with calculations and reading files."
-        , configTools = [calculatorTool, readFileTool, listDirectoryTool]
-        , configLLM = llmCfg
-        , configSkillsDir = Nothing
-        , configMaxTokens = Nothing
-        , configTemperature = Nothing
-        }
+  let config =
+        AgentConfig
+          { configName = "simple-agent",
+            configSystemPrompt = "You are a helpful assistant with access to a calculator and file reader. Help users with calculations and reading files.",
+            configTools = [calculatorTool, readFileTool, listDirectoryTool],
+            configLLM = llmCfg,
+            configSkillsDir = Nothing,
+            configMaxTokens = Nothing,
+            configTemperature = Nothing
+          }
 
   createAgent config
 

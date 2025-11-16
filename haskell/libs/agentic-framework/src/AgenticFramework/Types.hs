@@ -2,72 +2,69 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-{- |
-Module      : AgenticFramework.Types
-Description : Core type definitions for the Agentic Framework
-Copyright   : (c) 2025
-License     : MIT
-
-This module contains all the core type definitions used throughout
-the Agentic Framework library. These types form the foundation for
-agents, tools, skills, context management, and orchestration.
-
-= Type Categories
-
-* Agent Types: 'AgentId', 'LLMProvider', 'LLMConfig'
-* Tool Types: 'ToolInput', 'ToolOutput', 'ToolError'
-* Skill Types: 'SkillLabel', 'SkillCategory'
-* Context Types: 'TokenMetrics', 'Message', 'ToolExecution'
-* Orchestration Types: 'ExecutionStatus', 'ErrorPolicy', 'AggregationStrategy'
-* Logging Types: 'LogLevel', 'LogEntry'
-
--}
-
+-- |
+-- Module      : AgenticFramework.Types
+-- Description : Core type definitions for the Agentic Framework
+-- Copyright   : (c) 2025
+-- License     : MIT
+--
+-- This module contains all the core type definitions used throughout
+-- the Agentic Framework library. These types form the foundation for
+-- agents, tools, skills, context management, and orchestration.
+--
+-- = Type Categories
+--
+-- * Agent Types: 'AgentId', 'LLMProvider', 'LLMConfig'
+-- * Tool Types: 'ToolInput', 'ToolOutput', 'ToolError'
+-- * Skill Types: 'SkillLabel', 'SkillCategory'
+-- * Context Types: 'TokenMetrics', 'Message', 'ToolExecution'
+-- * Orchestration Types: 'ExecutionStatus', 'ErrorPolicy', 'AggregationStrategy'
+-- * Logging Types: 'LogLevel', 'LogEntry'
 module AgenticFramework.Types
   ( -- * Agent Types
-    AgentId (..)
-  , LLMProvider (..)
-  , LLMConfig (..)
+    AgentId (..),
+    LLMProvider (..),
+    LLMConfig (..),
 
     -- * Tool Types
-  , Tool (..)
-  , ToolSchema (..)
-  , ToolConfig (..)
-  , ToolInput (..)
-  , ToolOutput (..)
-  , ToolError (..)
+    Tool (..),
+    ToolSchema (..),
+    ToolConfig (..),
+    ToolInput (..),
+    ToolOutput (..),
+    ToolError (..),
 
     -- * Skill Types
-  , SkillLabel (..)
-  , SkillCategory (..)
+    SkillLabel (..),
+    SkillCategory (..),
 
     -- * Context Types
-  , TokenMetrics (..)
-  , Message (..)
-  , ToolExecution (..)
+    TokenMetrics (..),
+    Message (..),
+    ToolExecution (..),
 
     -- * Orchestration Types
-  , ExecutionStatus (..)
-  , ErrorPolicy (..)
-  , AggregationStrategy (..)
+    ExecutionStatus (..),
+    ErrorPolicy (..),
+    AggregationStrategy (..),
 
     -- * Logging Types
-  , LogLevel (..)
-  , LogEntry (..)
-
-  ) where
+    LogLevel (..),
+    LogEntry (..),
+  )
+where
 
 import Data.Aeson (FromJSON, ToJSON)
-import Data.HashMap.Strict (HashMap)
-import Data.Text (Text)
-import Data.Time (NominalDiffTime, UTCTime)
-import Data.UUID (UUID)
-import GHC.Generics (Generic)
 import qualified Data.Aeson as Aeson
 import qualified Data.Aeson.Key as AesonKey
 import qualified Data.Aeson.KeyMap as KeyMap
 import qualified Data.Aeson.Types as AesonTypes
+import Data.HashMap.Strict (HashMap)
 import qualified Data.HashMap.Strict as HM
+import Data.Text (Text)
+import Data.Time (NominalDiffTime, UTCTime)
+import Data.UUID (UUID)
+import GHC.Generics (Generic)
 
 --------------------------------------------------------------------------------
 -- Agent Types
@@ -75,32 +72,45 @@ import qualified Data.HashMap.Strict as HM
 
 -- | Unique identifier for an agent.
 --   Agents are identified by UUIDs to ensure global uniqueness.
-newtype AgentId = AgentId { unAgentId :: UUID }
+newtype AgentId = AgentId {unAgentId :: UUID}
   deriving (Show, Eq, Ord, Generic, ToJSON, FromJSON)
 
 -- | Supported LLM providers for agent execution.
 data LLMProvider
-  = Ollama          -- ^ Local Ollama instance
-  | OpenAI          -- ^ OpenAI API (GPT models)
-  | Claude          -- ^ Anthropic Claude API
-  | HuggingFace     -- ^ HuggingFace Inference API
-  | Custom Text     -- ^ Custom provider with name
+  = -- | Local Ollama instance
+    Ollama
+  | -- | OpenAI API (GPT models)
+    OpenAI
+  | -- | Anthropic Claude API
+    Claude
+  | -- | HuggingFace Inference API
+    HuggingFace
+  | -- | Custom provider with name
+    Custom Text
   deriving (Show, Eq, Generic)
 
 instance ToJSON LLMProvider
+
 instance FromJSON LLMProvider
 
 -- | Configuration for LLM provider integration.
 data LLMConfig = LLMConfig
-  { llmProvider :: LLMProvider
-  , llmModel :: Text               -- ^ Model name (e.g., "gpt-4", "claude-3-opus")
-  , llmApiKey :: Maybe Text        -- ^ API key (if Nothing, retrieve from env)
-  , llmBaseUrl :: Maybe Text       -- ^ Base URL for custom endpoints
-  , llmMaxTokens :: Int            -- ^ Model's context window size
-  , llmTemperature :: Double       -- ^ Sampling temperature (default 0.7)
-  } deriving (Show, Eq, Generic)
+  { llmProvider :: LLMProvider,
+    -- | Model name (e.g., "gpt-4", "claude-3-opus")
+    llmModel :: Text,
+    -- | API key (if Nothing, retrieve from env)
+    llmApiKey :: Maybe Text,
+    -- | Base URL for custom endpoints
+    llmBaseUrl :: Maybe Text,
+    -- | Model's context window size
+    llmMaxTokens :: Int,
+    -- | Sampling temperature (default 0.7)
+    llmTemperature :: Double
+  }
+  deriving (Show, Eq, Generic)
 
 instance ToJSON LLMConfig
+
 instance FromJSON LLMConfig
 
 --------------------------------------------------------------------------------
@@ -109,34 +119,42 @@ instance FromJSON LLMConfig
 
 -- | Input parameters for tool execution.
 --   Tools receive JSON values as input (typically JSON objects).
-newtype ToolInput = ToolInput { unToolInput :: AesonTypes.Value }
+newtype ToolInput = ToolInput {unToolInput :: AesonTypes.Value}
   deriving (Show, Eq, Generic, ToJSON, FromJSON)
 
 -- | Output from tool execution.
 --   Tools return JSON values as output (typically JSON objects).
-newtype ToolOutput = ToolOutput { unToolOutput :: AesonTypes.Value }
+newtype ToolOutput = ToolOutput {unToolOutput :: AesonTypes.Value}
   deriving (Show, Eq, Generic, ToJSON, FromJSON)
 
 -- | Errors that can occur during tool execution.
 data ToolError
-  = ToolExecutionError Text       -- ^ General execution failure with message
-  | ToolTimeoutError              -- ^ Tool exceeded timeout limit
-  | ToolValidationError Text      -- ^ Input/output validation failed
-  | ToolAuthorizationError        -- ^ Tool not authorized for this agent
+  = -- | General execution failure with message
+    ToolExecutionError Text
+  | -- | Tool exceeded timeout limit
+    ToolTimeoutError
+  | -- | Input/output validation failed
+    ToolValidationError Text
+  | -- | Tool not authorized for this agent
+    ToolAuthorizationError
   deriving (Show, Eq, Generic)
 
 instance ToJSON ToolError
+
 instance FromJSON ToolError
 
 -- | A tool that an agent can execute.
 data Tool = Tool
-  { toolName :: Text
-  , toolDescription :: Text
-  , toolSchema :: ToolSchema
-  , toolExecute :: ToolInput -> IO (Either ToolError ToolOutput)
-  , toolTimeout :: Maybe Int        -- ^ Microseconds; Nothing = 10s default
-  , toolRetryable :: Bool           -- ^ Default True (supports 3 retries)
-  } deriving (Generic)
+  { toolName :: Text,
+    toolDescription :: Text,
+    toolSchema :: ToolSchema,
+    toolExecute :: ToolInput -> IO (Either ToolError ToolOutput),
+    -- | Microseconds; Nothing = 10s default
+    toolTimeout :: Maybe Int,
+    -- | Default True (supports 3 retries)
+    toolRetryable :: Bool
+  }
+  deriving (Generic)
 
 instance Show Tool where
   show t = "Tool {toolName = " ++ show (toolName t) ++ "}"
@@ -147,19 +165,22 @@ instance Eq Tool where
 
 -- | JSON Schema for tool input and output validation.
 data ToolSchema = ToolSchema
-  { inputSchema :: AesonTypes.Value    -- ^ JSON Schema for input validation
-  , outputSchema :: AesonTypes.Value   -- ^ JSON Schema for output validation
-  } deriving (Show, Eq, Generic)
+  { -- | JSON Schema for input validation
+    inputSchema :: AesonTypes.Value,
+    -- | JSON Schema for output validation
+    outputSchema :: AesonTypes.Value
+  }
+  deriving (Show, Eq, Generic)
 
 -- | Configuration for creating a new tool.
 data ToolConfig = ToolConfig
-  { toolConfigName :: Text
-  , toolConfigDescription :: Text
-  , toolConfigInputSchema :: AesonTypes.Value
-  , toolConfigOutputSchema :: AesonTypes.Value
-  , toolConfigExecute :: ToolInput -> IO (Either ToolError ToolOutput)
-  , toolConfigTimeout :: Maybe Int
-  , toolConfigRetryable :: Bool
+  { toolConfigName :: Text,
+    toolConfigDescription :: Text,
+    toolConfigInputSchema :: AesonTypes.Value,
+    toolConfigOutputSchema :: AesonTypes.Value,
+    toolConfigExecute :: ToolInput -> IO (Either ToolError ToolOutput),
+    toolConfigTimeout :: Maybe Int,
+    toolConfigRetryable :: Bool
   }
 
 --------------------------------------------------------------------------------
@@ -168,11 +189,11 @@ data ToolConfig = ToolConfig
 
 -- | Label identifying a skill.
 --   Labels are unique within a skills directory.
-newtype SkillLabel = SkillLabel { unSkillLabel :: Text }
+newtype SkillLabel = SkillLabel {unSkillLabel :: Text}
   deriving (Show, Eq, Ord, Generic, ToJSON, FromJSON)
 
 -- | Category for organizing skills.
-newtype SkillCategory = SkillCategory { unSkillCategory :: Text }
+newtype SkillCategory = SkillCategory {unSkillCategory :: Text}
   deriving (Show, Eq, Ord, Generic, ToJSON, FromJSON)
 
 --------------------------------------------------------------------------------
@@ -181,59 +202,69 @@ newtype SkillCategory = SkillCategory { unSkillCategory :: Text }
 
 -- | Token usage metrics for context window management.
 data TokenMetrics = TokenMetrics
-  { currentTokenCount :: Int           -- ^ Current token usage
-  , modelTokenLimit :: Int             -- ^ Model's maximum token limit
-  , percentageUsed :: Double           -- ^ Percentage used (0.0 to 100.0)
-  , summarizationTriggered :: Bool     -- ^ Whether summarization has occurred
-  , lastSummarization :: Maybe UTCTime -- ^ Timestamp of last summarization
-  } deriving (Show, Eq, Generic)
+  { -- | Current token usage
+    currentTokenCount :: Int,
+    -- | Model's maximum token limit
+    modelTokenLimit :: Int,
+    -- | Percentage used (0.0 to 100.0)
+    percentageUsed :: Double,
+    -- | Whether summarization has occurred
+    summarizationTriggered :: Bool,
+    -- | Timestamp of last summarization
+    lastSummarization :: Maybe UTCTime
+  }
+  deriving (Show, Eq, Generic)
 
 instance ToJSON TokenMetrics
+
 instance FromJSON TokenMetrics
 
 -- | Messages in an agent's conversation history.
 data Message
   = UserMessage
-      { messageContent :: Text
-      , messageTimestamp :: UTCTime
+      { messageContent :: Text,
+        messageTimestamp :: UTCTime
       }
   | AssistantMessage
-      { messageContent :: Text
-      , messageTimestamp :: UTCTime
+      { messageContent :: Text,
+        messageTimestamp :: UTCTime
       }
   | SystemMessage
-      { messageContent :: Text
-      , messageTimestamp :: UTCTime
+      { messageContent :: Text,
+        messageTimestamp :: UTCTime
       }
   | ToolMessage
-      { messageTool :: Text
-      , messageResult :: ToolOutput
-      , messageTimestamp :: UTCTime
+      { messageTool :: Text,
+        messageResult :: ToolOutput,
+        messageTimestamp :: UTCTime
       }
   deriving (Show, Eq, Generic)
 
 instance ToJSON Message
+
 instance FromJSON Message
 
 -- | Record of a tool execution with timing and results.
 data ToolExecution = ToolExecution
-  { toolExecName :: Text
-  , toolExecInput :: ToolInput
-  , toolExecOutput :: Either ToolError ToolOutput
-  , toolExecTimestamp :: UTCTime
-  , toolExecDuration :: NominalDiffTime
-  } deriving (Show, Eq, Generic)
+  { toolExecName :: Text,
+    toolExecInput :: ToolInput,
+    toolExecOutput :: Either ToolError ToolOutput,
+    toolExecTimestamp :: UTCTime,
+    toolExecDuration :: NominalDiffTime
+  }
+  deriving (Show, Eq, Generic)
 
 instance ToJSON ToolExecution where
-  toJSON te = Aeson.object
-    [ "name" Aeson..= toolExecName te
-    , "input" Aeson..= toolExecInput te
-    , "output" Aeson..= case toolExecOutput te of
-        Left err -> Aeson.object ["error" Aeson..= err]
-        Right out -> Aeson.object ["success" Aeson..= out]
-    , "timestamp" Aeson..= toolExecTimestamp te
-    , "duration_ms" Aeson..= (realToFrac (toolExecDuration te) * 1000 :: Double)
-    ]
+  toJSON te =
+    Aeson.object
+      [ "name" Aeson..= toolExecName te,
+        "input" Aeson..= toolExecInput te,
+        "output" Aeson..= case toolExecOutput te of
+          Left err -> Aeson.object ["error" Aeson..= err]
+          Right out -> Aeson.object ["success" Aeson..= out],
+        "timestamp" Aeson..= toolExecTimestamp te,
+        "duration_ms" Aeson..= (realToFrac (toolExecDuration te) * 1000 :: Double)
+      ]
 
 instance FromJSON ToolExecution where
   parseJSON = Aeson.withObject "ToolExecution" $ \v -> do
@@ -256,31 +287,42 @@ instance FromJSON ToolExecution where
 
 -- | Execution status for agents and workflows.
 data ExecutionStatus
-  = Success                           -- ^ Successful completion
-  | PartialSuccess Text               -- ^ Completed with warnings
-  | Failed Text                       -- ^ Failed with error message
+  = -- | Successful completion
+    Success
+  | -- | Completed with warnings
+    PartialSuccess Text
+  | -- | Failed with error message
+    Failed Text
   deriving (Show, Eq, Generic)
 
 instance ToJSON ExecutionStatus
+
 instance FromJSON ExecutionStatus
 
 -- | Error handling policy for sequential workflows.
 data ErrorPolicy
-  = StopOnError                       -- ^ Stop workflow on first error
-  | ContinueOnError                   -- ^ Log error and continue
+  = -- | Stop workflow on first error
+    StopOnError
+  | -- | Log error and continue
+    ContinueOnError
   deriving (Show, Eq, Generic)
 
 instance ToJSON ErrorPolicy
+
 instance FromJSON ErrorPolicy
 
 -- | Strategy for aggregating results from parallel execution.
 data AggregationStrategy
-  = CollectAll                        -- ^ Return all results
-  | MajorityVote                      -- ^ Use majority consensus
-  | FirstSuccess                      -- ^ Return first successful result
+  = -- | Return all results
+    CollectAll
+  | -- | Use majority consensus
+    MajorityVote
+  | -- | Return first successful result
+    FirstSuccess
   deriving (Show, Eq, Generic)
 
 instance ToJSON AggregationStrategy
+
 instance FromJSON AggregationStrategy
 
 --------------------------------------------------------------------------------
@@ -289,25 +331,34 @@ instance FromJSON AggregationStrategy
 
 -- | Log severity levels.
 data LogLevel
-  = DEBUG                             -- ^ Detailed debugging information
-  | INFO                              -- ^ General informational messages
-  | WARN                              -- ^ Warning messages
-  | ERROR                             -- ^ Error messages
+  = -- | Detailed debugging information
+    DEBUG
+  | -- | General informational messages
+    INFO
+  | -- | Warning messages
+    WARN
+  | -- | Error messages
+    ERROR
   deriving (Show, Eq, Ord, Enum, Bounded, Generic)
 
 instance ToJSON LogLevel
+
 instance FromJSON LogLevel
 
 -- | Individual log entry with metadata.
 data LogEntry = LogEntry
-  { logLevel :: LogLevel
-  , logTimestamp :: UTCTime
-  , logAgentId :: Maybe AgentId
-  , logToolName :: Maybe Text
-  , logMessage :: Text
-  , logMetadata :: AesonTypes.Value   -- ^ Metadata as JSON object
-  , logCallStack :: [AgentId]         -- ^ For nested agent calls
-  } deriving (Show, Eq, Generic)
+  { logLevel :: LogLevel,
+    logTimestamp :: UTCTime,
+    logAgentId :: Maybe AgentId,
+    logToolName :: Maybe Text,
+    logMessage :: Text,
+    -- | Metadata as JSON object
+    logMetadata :: AesonTypes.Value,
+    -- | For nested agent calls
+    logCallStack :: [AgentId]
+  }
+  deriving (Show, Eq, Generic)
 
 instance ToJSON LogEntry
+
 instance FromJSON LogEntry

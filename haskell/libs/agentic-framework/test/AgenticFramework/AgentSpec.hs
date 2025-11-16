@@ -2,35 +2,37 @@
 
 module AgenticFramework.AgentSpec (spec) where
 
-import Test.Hspec
 import AgenticFramework.Agent
-import AgenticFramework.Types
 import AgenticFramework.Context
-import AgenticFramework.Logging (ExecutionLog(..))
+import AgenticFramework.Logging (ExecutionLog (..))
+import AgenticFramework.Types
 import qualified Data.Text as T
+import Test.Hspec
 
 -- | Test specification for Agent API
 spec :: Spec
 spec = do
   describe "Agent Creation" $ do
     it "creates an agent with valid configuration" $ do
-      let llmCfg = LLMConfig
-            { llmProvider = Ollama
-            , llmModel = "test-model"
-            , llmApiKey = Nothing
-            , llmBaseUrl = Just "http://localhost:11434"
-            , llmMaxTokens = 4096
-            , llmTemperature = 0.7
-            }
-      let config = AgentConfig
-            { configName = "test-agent"
-            , configSystemPrompt = "You are a test agent"
-            , configTools = []
-            , configLLM = llmCfg
-            , configSkillsDir = Nothing
-            , configMaxTokens = Nothing
-            , configTemperature = Nothing
-            }
+      let llmCfg =
+            LLMConfig
+              { llmProvider = Ollama,
+                llmModel = "test-model",
+                llmApiKey = Nothing,
+                llmBaseUrl = Just "http://localhost:11434",
+                llmMaxTokens = 4096,
+                llmTemperature = 0.7
+              }
+      let config =
+            AgentConfig
+              { configName = "test-agent",
+                configSystemPrompt = "You are a test agent",
+                configTools = [],
+                configLLM = llmCfg,
+                configSkillsDir = Nothing,
+                configMaxTokens = Nothing,
+                configTemperature = Nothing
+              }
 
       agent <- createAgent config
 
@@ -41,15 +43,16 @@ spec = do
       contextThreshold agent `shouldBe` 0.9
 
     it "generates unique agent IDs" $ do
-      let config = AgentConfig
-            { configName = "agent1"
-            , configSystemPrompt = "test"
-            , configTools = []
-            , configLLM = testLLMConfig
-            , configSkillsDir = Nothing
-            , configMaxTokens = Nothing
-            , configTemperature = Nothing
-            }
+      let config =
+            AgentConfig
+              { configName = "agent1",
+                configSystemPrompt = "test",
+                configTools = [],
+                configLLM = testLLMConfig,
+                configSkillsDir = Nothing,
+                configMaxTokens = Nothing,
+                configTemperature = Nothing
+              }
 
       agent1 <- createAgent config
       agent2 <- createAgent config
@@ -75,7 +78,7 @@ spec = do
       let ctx1 = resultContext result1
 
       -- Check conversation has messages
-      length (contextConversation ctx1) `shouldSatisfy` (>= 2)  -- User + Assistant
+      length (contextConversation ctx1) `shouldSatisfy` (>= 2) -- User + Assistant
 
       -- Second execution with context
       result2 <- executeAgentWithContext agent ctx1 "Second message"
@@ -124,23 +127,26 @@ spec = do
 
 -- | Helper to create a test agent
 createTestAgent :: IO Agent
-createTestAgent = createAgent AgentConfig
-  { configName = "test-agent"
-  , configSystemPrompt = "You are a helpful test agent"
-  , configTools = []
-  , configLLM = testLLMConfig
-  , configSkillsDir = Nothing
-  , configMaxTokens = Nothing
-  , configTemperature = Nothing
-  }
+createTestAgent =
+  createAgent
+    AgentConfig
+      { configName = "test-agent",
+        configSystemPrompt = "You are a helpful test agent",
+        configTools = [],
+        configLLM = testLLMConfig,
+        configSkillsDir = Nothing,
+        configMaxTokens = Nothing,
+        configTemperature = Nothing
+      }
 
 -- | Test LLM configuration
 testLLMConfig :: LLMConfig
-testLLMConfig = LLMConfig
-  { llmProvider = Ollama
-  , llmModel = "test-model"
-  , llmApiKey = Nothing
-  , llmBaseUrl = Just "http://localhost:11434"
-  , llmMaxTokens = 4096
-  , llmTemperature = 0.7
-  }
+testLLMConfig =
+  LLMConfig
+    { llmProvider = Ollama,
+      llmModel = "test-model",
+      llmApiKey = Nothing,
+      llmBaseUrl = Just "http://localhost:11434",
+      llmMaxTokens = 4096,
+      llmTemperature = 0.7
+    }

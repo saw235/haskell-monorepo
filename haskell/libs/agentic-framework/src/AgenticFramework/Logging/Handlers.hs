@@ -1,57 +1,54 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-{- |
-Module      : AgenticFramework.Logging.Handlers
-Description : Built-in log handlers (colorized stdout, file logging)
-Copyright   : (c) 2025
-License     : MIT
-
-This module provides ready-to-use log handler implementations:
-
-* 'ColorizedStdoutHandler' - Console output with ANSI colors
-* 'FileHandler' - Append logs to a file
-
-= Usage
-
-@
-import AgenticFramework.Logging
-import AgenticFramework.Logging.Handlers
-
-main :: IO ()
-main = do
-  -- Colorized console output
-  let stdoutHandler = colorizedStdoutHandler
-
-  -- File logging
-  fileHandler <- fileHandler "agent.log"
-
-  -- Use handlers
-  logEntry stdoutHandler myLogEntry
-  logEntry fileHandler myLogEntry
-@
-
--}
-
+-- |
+-- Module      : AgenticFramework.Logging.Handlers
+-- Description : Built-in log handlers (colorized stdout, file logging)
+-- Copyright   : (c) 2025
+-- License     : MIT
+--
+-- This module provides ready-to-use log handler implementations:
+--
+-- * 'ColorizedStdoutHandler' - Console output with ANSI colors
+-- * 'FileHandler' - Append logs to a file
+--
+-- = Usage
+--
+-- @
+-- import AgenticFramework.Logging
+-- import AgenticFramework.Logging.Handlers
+--
+-- main :: IO ()
+-- main = do
+--   -- Colorized console output
+--   let stdoutHandler = colorizedStdoutHandler
+--
+--   -- File logging
+--   fileHandler <- fileHandler "agent.log"
+--
+--   -- Use handlers
+--   logEntry stdoutHandler myLogEntry
+--   logEntry fileHandler myLogEntry
+-- @
 module AgenticFramework.Logging.Handlers
   ( -- * Handlers
-    ColorizedStdoutHandler
-  , colorizedStdoutHandler
-  , FileHandler
-  , fileHandler
+    ColorizedStdoutHandler,
+    colorizedStdoutHandler,
+    FileHandler,
+    fileHandler,
 
     -- * Utilities
-  , colorize
-  , colorForLevel
+    colorize,
+    colorForLevel,
+  )
+where
 
-  ) where
-
-import AgenticFramework.Types (LogLevel(..), LogEntry(..))
-import AgenticFramework.Logging (LogHandler(..))
+import AgenticFramework.Logging (LogHandler (..))
+import AgenticFramework.Types (LogEntry (..), LogLevel (..))
 import Data.Text (Text)
 import qualified Data.Text as T
 import qualified Data.Text.IO as TIO
 import System.Console.ANSI
-import System.IO (Handle, IOMode(..), openFile, hPutStrLn, hFlush)
+import System.IO (Handle, IOMode (..), hFlush, hPutStrLn, openFile)
 
 --------------------------------------------------------------------------------
 -- Colorized Stdout Handler
@@ -90,7 +87,6 @@ data FileHandler = FileHandler FilePath Handle
 --
 -- The file will be created if it doesn't exist, and logs will be
 -- appended to preserve existing content.
---
 fileHandler :: FilePath -> IO FileHandler
 fileHandler path = do
   handle <- openFile path AppendMode
@@ -121,13 +117,12 @@ instance LogHandler FileHandler where
 -- * INFO - Green
 -- * WARN - Yellow
 -- * ERROR - Red (bold)
---
 colorize :: LogLevel -> Text -> Text
 colorize level text =
   let (color, bold) = colorForLevel level
       prefix = T.pack $ setSGRCode [SetColor Foreground Vivid color] ++ if bold then setSGRCode [SetConsoleIntensity BoldIntensity] else ""
       suffix = T.pack $ setSGRCode [Reset]
-  in prefix <> text <> suffix
+   in prefix <> text <> suffix
 
 -- | Get ANSI color and bold flag for a log level.
 colorForLevel :: LogLevel -> (Color, Bool)

@@ -2,10 +2,10 @@
 
 module Integration.SimpleAgentSpec (spec) where
 
-import Test.Hspec
 import AgenticFramework.Agent
 import AgenticFramework.Tool
 import AgenticFramework.Types
+import Test.Hspec
 
 -- | Integration test for single agent with tools
 spec :: Spec
