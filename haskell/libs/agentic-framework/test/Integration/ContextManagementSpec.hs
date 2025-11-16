@@ -175,8 +175,10 @@ spec _llmConfig = do
       -- Token count should increase
       count2 `shouldSatisfy` (> count1)
 
--- Note: The "triggers summarization at 90% threshold" test in the
--- "[FR-002b,FR-003] Token Management" section above already validates
--- that summarization is working correctly (FR-003, FR-042, FR-044).
--- Additional tests for token reduction percentage, information preservation,
--- and logging would require more complex test infrastructure.
+  describe "[FR-003,FR-042,FR-044] Context Summarization" $ do
+    it "logs WARNING when summarization is triggered" $ pending
+    -- Requires logging integration (T039)
+
+    it "logs ERROR when summarization fails and falls back to truncation" $ pending
+
+-- Requires fallback implementation (T038)
