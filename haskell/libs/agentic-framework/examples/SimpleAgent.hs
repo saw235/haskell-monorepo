@@ -25,6 +25,7 @@ import AgenticFramework.Tool.File
 import AgenticFramework.Tool.LangChain
 import AgenticFramework.Types
 import AgenticFramework.Context (AgentContext(..))
+import System.Environment (lookupEnv)
 import Data.Text (Text)
 import qualified Data.Text as T
 import qualified Data.Text.IO as TIO
@@ -65,14 +66,20 @@ main = do
 
   putStrLn "=== Example Complete ==="
 
--- | Create a simple agent with calculator and file tools
+-- | Create a simple agent with calculator and file tools using Kimi
 createSimpleAgent :: IO Agent
 createSimpleAgent = do
+  -- Get Kimi API key from environment
+  maybeApiKey <- lookupEnv "KIMI_API_KEY"
+  let apiKey = case maybeApiKey of
+        Just key -> Just (T.pack key)
+        Nothing -> Nothing
+
   let llmCfg = LLMConfig
-        { llmProvider = Ollama
-        , llmModel = "llama2"
-        , llmApiKey = Nothing
-        , llmBaseUrl = Just "http://localhost:11434"
+        { llmProvider = Kimi
+        , llmModel = "moonshot-v1-8k"
+        , llmApiKey = apiKey
+        , llmBaseUrl = Just "https://api.moonshot.ai/v1"
         , llmMaxTokens = 4096
         , llmTemperature = 0.7
         }

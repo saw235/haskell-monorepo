@@ -54,7 +54,10 @@ module AgenticFramework.Agent
 
 import AgenticFramework.Types
 import AgenticFramework.Context (AgentContext(..), createContext, addMessage)
-import AgenticFramework.Logging (ExecutionLog(..))
+import AgenticFramework.Logging (ExecutionLog(..), logAgentReasoning)
+import AgenticFramework.LLM.Ollama (OllamaLLM, createOllamaLLM, defaultOllamaParams)
+import AgenticFramework.LLM.Kimi (KimiLLM, createKimiLLM, defaultKimiParams)
+import qualified Langchain.LLM.Core as LLM
 import Data.Text (Text)
 import Data.UUID (UUID)
 import Data.Time (getCurrentTime)
@@ -165,24 +168,45 @@ executeAgentWithContext agent ctx input = do
         , execLogEndTime = Nothing
         }
 
-  -- For MVP, we'll create a simple stub response
-  -- TODO: Implement full ReAct loop with langchain-hs LLM calls
-  -- TODO: Implement tool selection and execution
+  -- Build prompt with system prompt and user input
+  let fullPrompt = systemPrompt agent <> "\n\nUser: " <> input
+
+  -- Call LLM based on provider type
+  -- TODO: Implement full ReAct loop with tool selection and execution
   -- TODO: Implement iterative reasoning loop
+  llmResult <- case llmProvider (llmConfig agent) of
+    Ollama -> do
+      let ollamaLLM = createOllamaLLM (llmConfig agent)
+      LLM.generate ollamaLLM fullPrompt (Just defaultOllamaParams)
 
-  assistantTimestamp <- getCurrentTime
-  let response = "This is a stub response. Full agent execution with langchain-hs will be implemented in T020-T021."
-  let assistantMsg = AssistantMessage
-        { messageContent = response
-        , messageTimestamp = assistantTimestamp
-        }
+    Kimi -> do
+      case createKimiLLM (llmConfig agent) of
+        Nothing -> return $ Left "Kimi API key not provided in LLMConfig"
+        Just kimiLLM -> LLM.generate kimiLLM fullPrompt (Just defaultKimiParams)
 
-  let finalCtx = addMessage assistantMsg ctx'
+    _ -> return $ Left "LLM provider not yet implemented"
 
-  endTime <- getCurrentTime
-  let finalLog = execLog { execLogEndTime = Just endTime }
+  case llmResult of
+    Left err -> do
+      -- Handle LLM error
+      endTime <- getCurrentTime
+      let finalLog = execLog { execLogEndTime = Just endTime }
+      return $ failureResult (T.pack err) ctx' finalLog
 
-  return $ successResult response finalCtx finalLog
+    Right response -> do
+      -- Success - add assistant message to context
+      assistantTimestamp <- getCurrentTime
+      let assistantMsg = AssistantMessage
+            { messageContent = response
+            , messageTimestamp = assistantTimestamp
+            }
+
+      let finalCtx = addMessage assistantMsg ctx'
+
+      endTime <- getCurrentTime
+      let finalLog = execLog { execLogEndTime = Just endTime }
+
+      return $ successResult response finalCtx finalLog
 
 --------------------------------------------------------------------------------
 -- Result Constructors

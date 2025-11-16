@@ -10,6 +10,11 @@ A CLI tool to query Hackage package documentation with filtering and display opt
 ## Instructions
 1. use `bazel run //haskell/app/hackage-doc-cli:hackage-doc-cli -- <package_name> --list-versions` to discover what package versions are there
 2. then use `bazel run //haskell/app/hackage-doc-cli:hackage-doc-cli -- <package_name> --version <version>` to discover the modules that are in the package
+3. If the hackage tool isn't finding modules, then use web fetch to https://hackage.haskell.org/package/<package_name> to discover directly the modules
+4. And follow up with one of:
+   - bazel run //haskell/app/hackage-doc-cli:hackage-doc-cli -- <package_name> --module <module> --filter-functions --with-comments --version <version>
+   - bazel run //haskell/app/hackage-doc-cli:hackage-doc-cli -- <package_name> --module <module> --filter-types --with-comments --version <version>
+   - bazel run //haskell/app/hackage-doc-cli:hackage-doc-cli -- <package_name> --module <module> --filter-classes --with-comments --version <version>
 
 ## Quick Start
 

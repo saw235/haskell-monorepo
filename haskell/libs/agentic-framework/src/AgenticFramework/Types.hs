@@ -84,6 +84,7 @@ data LLMProvider
   | OpenAI          -- ^ OpenAI API (GPT models)
   | Claude          -- ^ Anthropic Claude API
   | HuggingFace     -- ^ HuggingFace Inference API
+  | Kimi            -- ^ Moonshot AI Kimi API
   | Custom Text     -- ^ Custom provider with name
   deriving (Show, Eq, Generic)
 
