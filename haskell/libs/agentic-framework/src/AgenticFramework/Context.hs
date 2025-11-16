@@ -117,14 +117,15 @@ addMessage msg ctx =
       oldMetrics = contextTokenMetrics ctx
       newTokenCount = currentTokenCount oldMetrics + estimatedTokens
       newPercentage = fromIntegral newTokenCount / fromIntegral (modelTokenLimit oldMetrics)
-      newMetrics = oldMetrics
-        { currentTokenCount = newTokenCount
-        , percentageUsed = newPercentage
+      newMetrics =
+        oldMetrics
+          { currentTokenCount = newTokenCount,
+            percentageUsed = newPercentage
+          }
+   in ctx
+        { contextConversation = newConversation,
+          contextTokenMetrics = newMetrics
         }
-  in ctx
-    { contextConversation = newConversation
-    , contextTokenMetrics = newMetrics
-    }
 
 -- | Add a tool execution record to the history.
 addToolExecution :: ToolExecution -> AgentContext -> AgentContext

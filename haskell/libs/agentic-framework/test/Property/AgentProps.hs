@@ -121,7 +121,6 @@ spec = describe "Agent Execution Properties" $ do
               result <- executeAgent agent input
               -- Agent with tools should execute successfully
               return True -- Test passes if no exception thrown
-
     it "tool execution is captured in result" $ do
       agent <- createAgentWithTools
       result <- executeAgent agent "test with tools"

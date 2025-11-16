@@ -20,8 +20,7 @@ createTestLLMConfig = do
 
   let provider = case providerStr of
         Just "kimi" -> Kimi
-        _ -> Ollama  -- Default to Ollama
-
+        _ -> Ollama -- Default to Ollama
   let (defaultModel, baseUrl, key) = case provider of
         Kimi -> ("moonshot-v1-8k", Just (T.pack "https://api.moonshot.ai/v1"), fmap T.pack apiKey)
         Ollama -> ("qwen3", Just (T.pack "http://localhost:11434"), Nothing)
@@ -29,14 +28,15 @@ createTestLLMConfig = do
 
   let model = T.pack $ maybe defaultModel id modelName
 
-  return $ LLMConfig
-    { llmProvider = provider
-    , llmModel = model
-    , llmApiKey = key
-    , llmBaseUrl = baseUrl
-    , llmMaxTokens = 4096
-    , llmTemperature = 0.7
-    }
+  return $
+    LLMConfig
+      { llmProvider = provider,
+        llmModel = model,
+        llmApiKey = key,
+        llmBaseUrl = baseUrl,
+        llmMaxTokens = 4096,
+        llmTemperature = 0.7
+      }
 
 main :: IO ()
 main = do
