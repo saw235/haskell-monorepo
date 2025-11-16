@@ -3,6 +3,7 @@ name: Prettier Formatting
 # This action works with pull requests and pushes
 on:
   pull_request:
+    types: [opened, synchronize, reopened]
   push:
     branches:
       - main
