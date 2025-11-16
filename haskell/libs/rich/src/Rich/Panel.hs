@@ -25,7 +25,7 @@ where
 import Data.Text (Text)
 import qualified Data.Text as T
 import Rich.Style
-import Rich.Table (Align (..), BorderStyle (..), getBorderChars)
+import Rich.Table (Align (..), BorderStyle (..))
 
 -- | Padding specification
 data Padding = Padding
