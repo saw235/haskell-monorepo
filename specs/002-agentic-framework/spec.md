@@ -146,6 +146,7 @@ A developer wants their agents to handle long-running conversations without hitt
 - What happens when an agent's context reaches token limit? → Automatic summarization at 90% threshold (FR-040, FR-041)
 - What happens if context summarization itself fails or times out? → Fallback to hard truncation with error logging (FR-044)
 - What happens when token counting library cannot determine token count for a model? → System should use conservative estimate or fail with clear error message
+- What happens when an agent produces output that exceeds memory or token limits?
 - How are concurrent agents handled if they try to modify the same shared resource?
 - What happens when skill files reference tools or other skills that don't exist?
 
@@ -244,6 +245,7 @@ A developer wants their agents to handle long-running conversations without hitt
 - **AgentContext**: Represents the execution state and environment for an agent including current task, conversation history, available tools, loaded skills, orchestration metadata, incoming HandoffObject (if receiving context from previous agent), and token usage metrics (current count, percentage used, limit).
 
 - **TokenMetrics**: Represents real-time token usage information for an agent's context. Contains: currentTokenCount (total tokens in current context), percentageUsed (0-100%), modelTokenLimit (max tokens for the selected model), and summarizationTriggered (boolean flag). Accessible via read-only API for monitoring and debugging.
+- **AgentContext**: Represents the execution state and environment for an agent including current task, conversation history, available tools, loaded skills, orchestration metadata, and incoming HandoffObject (if receiving context from previous agent).
 
 - **HandoffObject**: Represents structured context passed between agents in orchestration workflows. Contains: taskSummary (concise description of work completed), keyOutputs (important results/data from previous agent), metadata (sourceAgentId, timestamp, executionStatus, toolsUsed), and customFields (map for workflow-specific data). Serializable to JSON and text formats for agent prompt injection.
 
