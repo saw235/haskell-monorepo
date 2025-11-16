@@ -1,0 +1,13 @@
+load("@rules_haskell//haskell:defs.bzl", "haskell_test")
+
+haskell_test(
+    name = "rich-test",
+    srcs = glob(["**/*.hs"]),
+    deps = [
+        "//:base",
+        "//:text",
+        "//haskell/libs/rich",
+        "@stackage//:HUnit",
+        "@stackage//:QuickCheck",
+    ],
+)

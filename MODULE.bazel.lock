@@ -1061,7 +1061,7 @@
     "@@rules_haskell~//extensions:stack_snapshot.bzl%stack_snapshot": {
       "general": {
         "bzlTransitiveDigest": "I9dE/IPkeO/mkCmDvxjs6J9WP1Tf8kV6hE6XhXWYcuw=",
-        "usagesDigest": "6Mgbn1mVNO1cYP43ulvqI9NvoYVr6pHwh9h4GwM601E=",
+        "usagesDigest": "rpNpCMcQ7hUUe17+LC5SA65y5L/A8/AFpG7aAFh7MAM=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},
         "envVariables": {},
@@ -1117,6 +1117,9 @@
                 "tagsoup",
                 "directory",
                 "filepath",
+                "terminal-size",
+                "wcwidth",
+                "ansi-terminal",
                 "containers",
                 "stm",
                 "zlib",
@@ -1182,6 +1185,9 @@
                 "tagsoup",
                 "directory",
                 "filepath",
+                "terminal-size",
+                "wcwidth",
+                "ansi-terminal",
                 "containers",
                 "stm",
                 "zlib",

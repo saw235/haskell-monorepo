@@ -4,12 +4,21 @@ Rich is a Haskell library for creating beautiful, formatted terminal output. Ins
 
 ## Features
 
+### Core Features
 - **Styled Text**: Colors (16 standard + RGB), bold, italic, underline, strikethrough, and more
 - **Tables**: Beautiful tables with multiple border styles and automatic column sizing
 - **Panels**: Highlight content with bordered panels and boxes
 - **Trees**: Display hierarchical data with tree structures
 - **Progress Bars**: Animated progress bars with customizable styles
 - **Console Output**: Convenient console interface with success/error/warning/info messages
+
+### New: Terminal Detection & Smart Rendering ✨
+- **🎨 Auto Color Degradation**: RGB colors automatically adapt to terminal capabilities (TrueColor → Color256 → Color16 → NoColor)
+- **📐 Terminal Size Detection**: Query terminal dimensions for responsive rendering
+- **🌍 Unicode Width Calculation**: Correct handling of emoji, CJK characters, and combining characters
+- **🔍 Capability Detection**: Automatic detection of terminal color support
+
+**[📖 See QUICKSTART.md for detailed examples](./QUICKSTART.md)**
 
 ## Quick Start
 

@@ -27,17 +27,21 @@ import Data.Text (Text)
 import qualified Data.Text as T
 import qualified Data.Text.IO as TIO
 import Rich.Style
+import Rich.Terminal.Capability (ColorCapability, detectColorCapabilityFor)
 import qualified System.IO as IO
 import Prelude hiding (print, reverse)
 
--- | Console handle for output
+-- | Console handle for output with color capability detection
 data Console = Console
-  { consoleHandle :: IO.Handle
+  { consoleHandle :: IO.Handle,
+    consoleCapability :: ColorCapability
   }
 
--- | Create a new console using stdout
+-- | Create a new console using stdout with automatic capability detection
 newConsole :: IO Console
-newConsole = return $ Console IO.stdout
+newConsole = do
+  capability <- detectColorCapabilityFor IO.stdout
+  return $ Console IO.stdout capability
 
 -- | Print text without newline
 print :: Console -> Text -> IO ()
@@ -47,15 +51,15 @@ print console text = TIO.hPutStr (consoleHandle console) text
 printLn :: Console -> Text -> IO ()
 printLn console text = TIO.hPutStrLn (consoleHandle console) text
 
--- | Print styled text without newline
+-- | Print styled text without newline (with automatic capability detection)
 printStyled :: Console -> Style -> Text -> IO ()
 printStyled console s text =
-  TIO.hPutStr (consoleHandle console) (renderText s text)
+  TIO.hPutStr (consoleHandle console) (renderTextWithCapability (consoleCapability console) s text)
 
--- | Print styled text with newline
+-- | Print styled text with newline (with automatic capability detection)
 printStyledLn :: Console -> Style -> Text -> IO ()
 printStyledLn console s text =
-  TIO.hPutStrLn (consoleHandle console) (renderText s text)
+  TIO.hPutStrLn (consoleHandle console) (renderTextWithCapability (consoleCapability console) s text)
 
 -- | Print success message (green with checkmark)
 printSuccess :: Console -> Text -> IO ()
