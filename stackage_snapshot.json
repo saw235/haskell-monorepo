@@ -1,6 +1,6 @@
 {
-  "__GENERATED_FILE_DO_NOT_MODIFY_MANUALLY": -1655100071,
-  "all-cabal-hashes": "https://raw.githubusercontent.com/commercialhaskell/all-cabal-hashes/c84dce951d8329f9642660e66247aeb30977ec7f",
+  "__GENERATED_FILE_DO_NOT_MODIFY_MANUALLY": 1127045456,
+  "all-cabal-hashes": "https://raw.githubusercontent.com/commercialhaskell/all-cabal-hashes/130827f6f964bf21c69378ffa9ba4fe0c939a941",
   "resolved": {
     "Cabal": {"dependencies":[],"location":{"type":"core"},"name":"Cabal","version":"3.12.1.0"},
     "HUnit": {"dependencies":["base","call-stack","deepseq"],"location":{"type":"hackage","url":"https://hackage.haskell.org/package/HUnit-1.6.2.0/HUnit-1.6.2.0.tar.gz"},"name":"HUnit","pinned":{"cabal-sha256":"1a79174e8af616117ad39464cac9de205ca923da6582825e97c10786fda933a4","sha256":"b0b7538871ffc058486fc00740886d2f3172f8fa6869936bfe83a5e10bd744ab","url":["https://hackage.haskell.org/package/HUnit-1.6.2.0/HUnit-1.6.2.0.tar.gz","https://s3.amazonaws.com/hackage.fpcomplete.com/package/HUnit-1.6.2.0.tar.gz"]},"version":"1.6.2.0"},

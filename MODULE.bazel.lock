@@ -1055,7 +1055,7 @@
     "@@rules_haskell~//extensions:stack_snapshot.bzl%stack_snapshot": {
       "general": {
         "bzlTransitiveDigest": "y4BGoCRypgR5pPUjRTExOCNOVpjzkWAQpDUg+NVjvBM=",
-        "usagesDigest": "Bxn4qkB9OLkneGONPLyzT0uQKCJzUga81ox4PG053Oo=",
+        "usagesDigest": "MmFRtH8Z1vNOAUH1EP9662iPaJ/T6kIPfxzVCM4rGiM=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},
         "envVariables": {},
@@ -1112,7 +1112,6 @@
                 "directory",
                 "filepath",
                 "monad-logger",
-                "ansi-terminal",
                 "uuid",
                 "async",
                 "hashable",
@@ -1190,7 +1189,6 @@
                 "directory",
                 "filepath",
                 "monad-logger",
-                "ansi-terminal",
                 "uuid",
                 "async",
                 "hashable",
@@ -3251,7 +3249,7 @@
         "recordedFileInputs": {
           "@@//haskell/libs/agentic-framework/rust-ffi/Cargo.toml": "86fe58049c8450f95085b1201af30fd0978e2ce707d12a94d98e47ca84a3db26",
           "@@//haskell/libs/agentic-framework/rust-ffi/Cargo.lock": "14b36171311c4301d398d0c835b70a06d2b53cdc03055e3c5d8c16496497f4de",
-          "@@//MODULE.bazel": "ae0bba1a0f457402841d68ca1d4b1633c4b36dc7a83b1ec1ef2e8aabb6f39025",
+          "@@//MODULE.bazel": "f49981d81627e84109bbff906816870d10fa2ba2a548e3cc724eb1cf7e98ff0b",
           "@@rules_rust~~rust_host_tools~rust_host_tools//rust_host_tools": "ENOENT"
         },
         "recordedDirentsInputs": {},

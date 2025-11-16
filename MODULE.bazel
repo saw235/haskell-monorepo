@@ -78,7 +78,6 @@ _SIMPLE_PACKAGES = [
     "filepath",
     # Agentic Framework dependencies
     "monad-logger",
-    "ansi-terminal",
     "uuid",
     "async",
     "hashable",
