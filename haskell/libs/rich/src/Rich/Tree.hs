@@ -101,9 +101,10 @@ renderTreeInternal prefix isLast t =
 
       -- Render children
       children = treeChildren t
-      childPrefix = prefix <> case guideStyle of
-        Nothing -> extension
-        Just s -> renderText s extension
+      childPrefix =
+        prefix <> case guideStyle of
+          Nothing -> extension
+          Just s -> renderText s extension
 
       childLines =
         zipWith

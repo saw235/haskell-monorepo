@@ -142,18 +142,18 @@ main = do
   emptyLine console
 
   let fileTree =
-        addChild (leaf "README.md") $
-          addChild (leaf "LICENSE") $
-            addChild
-              ( addChild (leaf "Main.hs") $
-                  addChild (leaf "Utils.hs") $
-                    tree "src"
-              )
-              $ addChild
-                ( addChild (leaf "main_test.hs") $
-                    tree "test"
-                )
-              $ tree "project"
+        addChild (leaf "README.md")
+          $ addChild (leaf "LICENSE")
+          $ addChild
+            ( addChild (leaf "Main.hs") $
+                addChild (leaf "Utils.hs") $
+                  tree "src"
+            )
+          $ addChild
+            ( addChild (leaf "main_test.hs") $
+                tree "test"
+            )
+          $ tree "project"
 
   TIO.putStrLn (renderTree fileTree)
   emptyLine console
