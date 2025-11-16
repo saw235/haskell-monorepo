@@ -34,26 +34,26 @@ spec = describe "Context Summarization Properties" $ do
   describe "[SC-012,FR-003] Token Reduction" $ do
     it "summarization reduces token count by at least 50%" $
       pending
-      -- This test requires the summarization implementation
-      -- Will be implemented after T036 (summarization module)
+    -- This test requires the summarization implementation
+    -- Will be implemented after T036 (summarization module)
 
     it "summarization preserves non-empty content" $
       pending
-      -- Verify summarized text is not empty for non-empty input
+  -- Verify summarized text is not empty for non-empty input
 
   describe "[FR-003] Information Preservation" $ do
     it "summary preserves key decisions" $
       pending
-      -- Verify that important decisions are retained
+    -- Verify that important decisions are retained
 
     it "summary preserves tool outputs" $
       pending
-      -- Verify that tool results are retained
+  -- Verify that tool results are retained
 
   describe "[FR-003] Consistency" $ do
     it "similar conversations produce similar summary lengths" $
       pending
-      -- Verify consistent compression ratios
+  -- Verify consistent compression ratios
 
   describe "[FR-003] Edge Cases" $ do
     it "handles empty conversation gracefully" $
@@ -68,7 +68,8 @@ spec = describe "Context Summarization Properties" $ do
 
     it "handles very long conversations" $
       pending
-      -- Test with 100+ messages
+
+-- Test with 100+ messages
 
 --------------------------------------------------------------------------------
 -- Test Data Generators

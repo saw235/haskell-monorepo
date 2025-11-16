@@ -5,10 +5,10 @@ module Integration.ContextManagementSpec (spec) where
 import AgenticFramework.Agent
 import AgenticFramework.Context
 import AgenticFramework.Types
-import qualified Data.Text as T
-import Test.Hspec
-import System.Environment (lookupEnv)
 import Data.Maybe (fromMaybe)
+import qualified Data.Text as T
+import System.Environment (lookupEnv)
+import Test.Hspec
 
 -- | Create LLM config based on environment variables
 -- Environment variables:
@@ -23,8 +23,7 @@ createTestLLMConfig maxTokens = do
 
   let provider = case providerStr of
         Just "kimi" -> Kimi
-        _ -> Ollama  -- Default to Ollama
-
+        _ -> Ollama -- Default to Ollama
   let (defaultModel, baseUrl, key) = case provider of
         Kimi -> ("moonshot-v1-8k", Just "https://api.moonshot.ai/v1", fmap T.pack apiKey)
         Ollama -> ("qwen3", Just "http://localhost:11434", Nothing)
@@ -32,14 +31,15 @@ createTestLLMConfig maxTokens = do
 
   let model = T.pack $ fromMaybe defaultModel modelName
 
-  return $ LLMConfig
-    { llmProvider = provider
-    , llmModel = model
-    , llmApiKey = key
-    , llmBaseUrl = baseUrl
-    , llmMaxTokens = maxTokens
-    , llmTemperature = 0.7
-    }
+  return $
+    LLMConfig
+      { llmProvider = provider,
+        llmModel = model,
+        llmApiKey = key,
+        llmBaseUrl = baseUrl,
+        llmMaxTokens = maxTokens,
+        llmTemperature = 0.7
+      }
 
 -- | Integration test for token management and context summarization
 -- These tests verify that agents properly track tokens and trigger summarization
@@ -72,8 +72,7 @@ spec _llmConfig = do
 
     it "triggers summarization at 90% threshold" $ do
       -- Create a config with small token limit to easily trigger summarization
-      llmConfig <- createTestLLMConfig 400  -- Small limit to trigger summarization
-
+      llmConfig <- createTestLLMConfig 400 -- Small limit to trigger summarization
       let agentConfig =
             AgentConfig
               { configName = "summarization-test-agent",
@@ -90,7 +89,7 @@ spec _llmConfig = do
       -- Create a context and manually set it to ~85% capacity to minimize LLM calls
       -- This way we only need ONE more LLM interaction to cross the 90% threshold
       let initialCtx = createContext (agentId agent) llmConfig
-          targetTokens = floor (0.85 * fromIntegral (llmMaxTokens llmConfig))  -- 85% of 400 = 340 tokens
+          targetTokens = floor (0.85 * fromIntegral (llmMaxTokens llmConfig)) -- 85% of 400 = 340 tokens
 
       -- Manually add messages to reach 85% without calling LLM
       -- Token estimation: ~4 chars = 1 token
@@ -100,10 +99,10 @@ spec _llmConfig = do
             let baseMsg = "Message " <> T.pack (show n) <> " "
                 padding = T.replicate (charCount - T.length baseMsg) "x"
                 content = baseMsg <> padding
-            in UserMessage
-                { messageContent = content,
-                  messageTimestamp = undefined
-                }
+             in UserMessage
+                  { messageContent = content,
+                    messageTimestamp = undefined
+                  }
 
       -- Add 5 messages totaling ~1760 chars (440 tokens, ~110% of 400 = already over!)
       -- But we'll stay under 90% initially by using smaller messages
@@ -137,15 +136,15 @@ spec _llmConfig = do
       --   - Truncation fallback: 5 messages (just the 5 most recent)
       -- Both are acceptable outcomes when context reduction is triggered
       let messageCount = length finalMessages
-      messageCount `shouldSatisfy` (<= 6)  -- Should be reduced from 7 to either 6 or 5
-      messageCount `shouldSatisfy` (>= 5)  -- Should have at least 5 recent messages
+      messageCount `shouldSatisfy` (<= 6) -- Should be reduced from 7 to either 6 or 5
+      messageCount `shouldSatisfy` (>= 5) -- Should have at least 5 recent messages
 
-      -- Note: We don't verify token reduction percentage because:
-      -- 1. The LLM summary might be as long or longer than the original (realistic scenario)
-      -- 2. What matters is that the mechanism triggered and reduced message count
-      -- The key success criteria are:
-      --   - summarizationTriggered flag is True
-      --   - Message count was reduced from 7 to 5-6
+    -- Note: We don't verify token reduction percentage because:
+    -- 1. The LLM summary might be as long or longer than the original (realistic scenario)
+    -- 2. What matters is that the mechanism triggered and reduced message count
+    -- The key success criteria are:
+    --   - summarizationTriggered flag is True
+    --   - Message count was reduced from 7 to 5-6
 
     it "updates token metrics after each message" $ do
       llmConfig <- createTestLLMConfig 4096
@@ -176,8 +175,8 @@ spec _llmConfig = do
       -- Token count should increase
       count2 `shouldSatisfy` (> count1)
 
-  -- Note: The "triggers summarization at 90% threshold" test in the
-  -- "[FR-002b,FR-003] Token Management" section above already validates
-  -- that summarization is working correctly (FR-003, FR-042, FR-044).
-  -- Additional tests for token reduction percentage, information preservation,
-  -- and logging would require more complex test infrastructure.
+-- Note: The "triggers summarization at 90% threshold" test in the
+-- "[FR-002b,FR-003] Token Management" section above already validates
+-- that summarization is working correctly (FR-003, FR-042, FR-044).
+-- Additional tests for token reduction percentage, information preservation,
+-- and logging would require more complex test infrastructure.
