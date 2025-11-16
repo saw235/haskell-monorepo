@@ -14,6 +14,11 @@
 - Q: What structure should skill markdown files follow? → A: Structured headers with label and description at top (loaded initially for discovery), full content (## Purpose, ## Methodology, ## Examples) loaded on-demand to save context. Template generation tool provided.
 - Q: When a tool call fails, how should the agent respond? → A: Retry with reasoning (agent receives error, can retry with modified parameters, max 3 attempts)
 - Q: Where should the library write execution logs? → A: Pluggable handlers with default monad-logger integration; colorized stdout support; developers can provide custom handlers
+- Q: How should the library handle token counting/estimation for context management? → A: Haskell tokenizer library (equivalent to tiktoken) with model-specific tokenizers
+- Q: When an agent's context approaches the model's token limit, what should happen? → A: Summarize-and-continue (automatically summarize older context, log warning, continue execution)
+- Q: At what percentage of the model's token limit should context summarization be triggered? → A: 90%
+- Q: Should the library expose current token counts to developers during agent execution? → A: Read-only metrics (current count, percentage used, limit via API)
+- Q: How should the Haskell tokenizer library be implemented? → A: FFI to Rust tokenizers (tiktoken-rs or HuggingFace tokenizers)
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -114,13 +119,33 @@ A developer wants to understand what their agents are doing internally - which t
 
 ---
 
+### User Story 7 - Context Window Management and Token Tracking (Priority: P2)
+
+A developer wants their agents to handle long-running conversations without hitting context window limits, while being able to monitor token usage for cost and performance optimization.
+
+**Why this priority**: Essential for production use where agents may have extended interactions; prevents catastrophic failures from context overflow. Should be implemented early to avoid refactoring core context handling later.
+
+**Independent Test**: Can be tested by: (1) running an agent through a task that generates context exceeding 90% of token limit and verifying automatic summarization occurs, (2) querying token metrics API during execution and verifying accurate counts, (3) intentionally triggering summarization failure and verifying graceful fallback.
+
+**Acceptance Scenarios**:
+
+1. **Given** an agent's conversation reaches 90% of its context window, **When** the next interaction occurs, **Then** the system automatically summarizes older context and logs a warning with token statistics
+2. **Given** an agent is executing, **When** a developer queries the token metrics API, **Then** accurate current token count, percentage used, and model limit are returned
+3. **Given** context summarization is triggered, **When** summarization completes, **Then** the agent continues execution with reduced context while preserving key information (decisions, facts, task state)
+4. **Given** context summarization fails or times out, **When** the failure occurs, **Then** the system falls back to hard truncation, logs an error, and continues execution
+5. **Given** token counting for a model, **When** compared to actual model behavior, **Then** token counts are accurate within 5% margin
+
+---
+
 ### Edge Cases
 
 - What happens when an agent requests a tool that doesn't exist or isn't authorized?
 - How does the system handle circular agent dependencies (agent A calls agent B which calls agent A)?
 - What happens when a skill markdown file is malformed or contains conflicting instructions?
 - How does orchestration handle timeout scenarios when one agent in a sequence takes too long?
-- What happens when an agent produces output that exceeds memory or token limits?
+- What happens when an agent's context reaches token limit? → Automatic summarization at 90% threshold (FR-040, FR-041)
+- What happens if context summarization itself fails or times out? → Fallback to hard truncation with error logging (FR-044)
+- What happens when token counting library cannot determine token count for a model? → System should use conservative estimate or fail with clear error message
 - How are concurrent agents handled if they try to modify the same shared resource?
 - What happens when skill files reference tools or other skills that don't exist?
 
@@ -132,6 +157,8 @@ A developer wants to understand what their agents are doing internally - which t
 
 - **FR-001**: System MUST allow defining an agent with a unique identifier, system prompt, and list of available tools
 - **FR-002**: System MUST support configuring agent-specific parameters such as temperature, maximum tokens, and model selection
+- **FR-002a**: System MUST track token usage in real-time using model-specific tokenizers (via FFI to Rust tokenizers like tiktoken-rs or HuggingFace tokenizers)
+- **FR-002b**: System MUST expose read-only token metrics API providing: current token count, percentage of context window used, and model's token limit
 - **FR-003**: System MUST allow specifying which tools an agent is authorized to access
 - **FR-004**: System MUST prevent agents from accessing tools they aren't explicitly authorized to use
 - **FR-005**: System MUST support defining agent input prompts dynamically at execution time
@@ -193,6 +220,15 @@ A developer wants to understand what their agents are doing internally - which t
 - **FR-037a**: System MUST log each retry attempt with reasoning and parameter modifications for observability
 - **FR-038**: System MUST detect and prevent circular agent call dependencies
 
+#### Context Window Management
+
+- **FR-039**: System MUST monitor agent context size (system prompt + conversation history + tool outputs + skills) continuously using accurate token counting
+- **FR-040**: System MUST automatically trigger context summarization when token usage reaches 90% of the model's context window limit
+- **FR-041**: System MUST use the agent itself to summarize older conversation history into condensed form, preserving: key decisions made, important facts discovered, current task state, and relevant tool outputs
+- **FR-042**: System MUST log a WARNING when context summarization occurs, including: original token count, summarized token count, and what portions of context were summarized
+- **FR-043**: System MUST preserve the most recent messages and tool outputs during summarization (summarize only older history)
+- **FR-044**: System MUST handle summarization failures gracefully by falling back to hard truncation with ERROR logging if summarization itself fails or times out
+
 ### Key Entities
 
 - **Agent**: Represents an autonomous reasoning entity with a system prompt, available tools, configuration parameters, and execution capabilities. Each agent has a unique identifier and maintains state during execution.
@@ -205,7 +241,9 @@ A developer wants to understand what their agents are doing internally - which t
 
 - **ExecutionLog**: Represents a record of agent activity including tool calls, reasoning steps, decisions, errors, and timing information. Logs are structured for querying and analysis.
 
-- **AgentContext**: Represents the execution state and environment for an agent including current task, conversation history, available tools, loaded skills, orchestration metadata, and incoming HandoffObject (if receiving context from previous agent).
+- **AgentContext**: Represents the execution state and environment for an agent including current task, conversation history, available tools, loaded skills, orchestration metadata, incoming HandoffObject (if receiving context from previous agent), and token usage metrics (current count, percentage used, limit).
+
+- **TokenMetrics**: Represents real-time token usage information for an agent's context. Contains: currentTokenCount (total tokens in current context), percentageUsed (0-100%), modelTokenLimit (max tokens for the selected model), and summarizationTriggered (boolean flag). Accessible via read-only API for monitoring and debugging.
 
 - **HandoffObject**: Represents structured context passed between agents in orchestration workflows. Contains: taskSummary (concise description of work completed), keyOutputs (important results/data from previous agent), metadata (sourceAgentId, timestamp, executionStatus, toolsUsed), and customFields (map for workflow-specific data). Serializable to JSON and text formats for agent prompt injection.
 
@@ -223,6 +261,8 @@ A developer wants to understand what their agents are doing internally - which t
 - **SC-008**: Agent-as-tool patterns support nesting up to 5 levels deep without stack overflow
 - **SC-009**: Error recovery mechanisms prevent complete workflow failure in 80% of partial failure scenarios
 - **SC-010**: Developers can locate specific agent actions in logs within 2 minutes using filtering capabilities
+- **SC-011**: Token counting accuracy is within 5% of actual model token count for supported models (GPT-4, Claude, etc.)
+- **SC-012**: Context summarization reduces token usage by at least 50% while preserving key information (validated through test scenarios)
 
 ## Out of Scope *(optional)*
 
@@ -250,6 +290,8 @@ The following are explicitly NOT part of this initial library release:
 - **A-008**: Agent execution is synchronous (blocking) unless explicitly using parallel orchestration
 - **A-009**: Library provides default log handlers (colorized stdout, file-based with rotation) via monad-logger; developers can customize log destinations using monad-logger configuration or implement custom handlers
 - **A-010**: Tool execution happens in the same process as the agent for initial implementation
+- **A-011**: Token counting via Rust FFI (tiktoken-rs or HuggingFace tokenizers) provides accurate model-specific counts; developers accept the FFI dependency for production-quality tokenization
+- **A-012**: Context summarization at 90% threshold prevents hard limit failures; agents are capable of producing coherent summaries of their own conversation history
 
 ## Dependencies *(optional)*
 
@@ -262,6 +304,7 @@ The following are explicitly NOT part of this initial library release:
 - **http-conduit**: HTTP client for web search tool implementation
 - **monad-logger**: Default logging backend with pluggable handler support
 - **ansi-terminal**: Terminal color support for colorized stdout logging
+- **Rust tokenizer (FFI)**: tiktoken-rs or HuggingFace tokenizers via Haskell FFI for accurate, model-specific token counting
 
 ### Integration Points
 
