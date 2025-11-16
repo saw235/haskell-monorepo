@@ -1,60 +1,58 @@
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-{- |
-Module      : AgenticFramework.Tool
-Description : Tool system for agent capabilities
-Copyright   : (c) 2025
-License     : MIT
-
-This module provides the tool system that allows agents to interact with
-external systems, perform calculations, search the web, and more.
-
-= Usage
-
-@
-import AgenticFramework.Tool
-import qualified Data.HashMap.Strict as HM
-import qualified Data.Aeson as A
-
--- Define a custom tool
-weatherTool :: Tool
-weatherTool = createTool ToolConfig
-  { toolConfigName = "get_weather"
-  , toolConfigDescription = "Get weather for a city"
-  , toolConfigInputSchema = ...
-  , toolConfigOutputSchema = ...
-  , toolConfigExecute = \\input -> do
-      -- Tool implementation
-      return $ Right $ ToolOutput $ HM.fromList [...]
-  , toolConfigTimeout = Just 5_000_000  -- 5 seconds
-  , toolConfigRetryable = True
-  }
-@
--}
-
+-- |
+-- Module      : AgenticFramework.Tool
+-- Description : Tool system for agent capabilities
+-- Copyright   : (c) 2025
+-- License     : MIT
+--
+-- This module provides the tool system that allows agents to interact with
+-- external systems, perform calculations, search the web, and more.
+--
+-- = Usage
+--
+-- @
+-- import AgenticFramework.Tool
+-- import qualified Data.HashMap.Strict as HM
+-- import qualified Data.Aeson as A
+--
+-- -- Define a custom tool
+-- weatherTool :: Tool
+-- weatherTool = createTool ToolConfig
+--   { toolConfigName = "get_weather"
+--   , toolConfigDescription = "Get weather for a city"
+--   , toolConfigInputSchema = ...
+--   , toolConfigOutputSchema = ...
+--   , toolConfigExecute = \\input -> do
+--       -- Tool implementation
+--       return $ Right $ ToolOutput $ HM.fromList [...]
+--   , toolConfigTimeout = Just 5_000_000  -- 5 seconds
+--   , toolConfigRetryable = True
+--   }
+-- @
 module AgenticFramework.Tool
   ( -- * Tool Creation and Execution
-    createTool
-  , executeTool
+    createTool,
+    executeTool,
 
     -- * Built-in Tools (re-exported from sub-modules)
-  , module AgenticFramework.Tool.File
-  , module AgenticFramework.Tool.LangChain
-  , module AgenticFramework.Tool.WebSearch
+    module AgenticFramework.Tool.File,
+    module AgenticFramework.Tool.LangChain,
+    module AgenticFramework.Tool.WebSearch,
+  )
+where
 
-  ) where
-
-import AgenticFramework.Types
 import AgenticFramework.Tool.File
 import AgenticFramework.Tool.LangChain
 import AgenticFramework.Tool.WebSearch
-import Data.Text (Text)
+import AgenticFramework.Types
+import Control.Exception (SomeException, try)
 import Data.Aeson (Value)
-import GHC.Generics (Generic)
-import Control.Exception (try, SomeException)
-import System.Timeout (timeout)
+import Data.Text (Text)
 import qualified Data.Text as T
+import GHC.Generics (Generic)
+import System.Timeout (timeout)
 
 --------------------------------------------------------------------------------
 -- Tool Creation and Execution
@@ -67,17 +65,19 @@ createTool :: ToolConfig -> Tool
 createTool config
   | T.null (toolConfigName config) = error "createTool: tool name cannot be empty"
   | T.null (toolConfigDescription config) = error "createTool: tool description cannot be empty"
-  | otherwise = Tool
-      { toolName = toolConfigName config
-      , toolDescription = toolConfigDescription config
-      , toolSchema = ToolSchema
-          { inputSchema = toolConfigInputSchema config
-          , outputSchema = toolConfigOutputSchema config
-          }
-      , toolExecute = toolConfigExecute config
-      , toolTimeout = toolConfigTimeout config
-      , toolRetryable = toolConfigRetryable config
-      }
+  | otherwise =
+      Tool
+        { toolName = toolConfigName config,
+          toolDescription = toolConfigDescription config,
+          toolSchema =
+            ToolSchema
+              { inputSchema = toolConfigInputSchema config,
+                outputSchema = toolConfigOutputSchema config
+              },
+          toolExecute = toolConfigExecute config,
+          toolTimeout = toolConfigTimeout config,
+          toolRetryable = toolConfigRetryable config
+        }
 
 -- | Execute a tool with timeout and retry logic.
 --   Returns Left ToolError on failure, Right ToolOutput on success.
@@ -100,8 +100,8 @@ executeTool tool input = executeWithRetry 3
             Right output -> return $ Right output
             Left err ->
               if toolRetryable tool && attemptsLeft > 1
-              then executeWithRetry (attemptsLeft - 1)
-              else return $ Left err
+                then executeWithRetry (attemptsLeft - 1)
+                else return $ Left err
 
     -- Execute tool once with timeout
     executeOnce :: IO (Either ToolError ToolOutput)

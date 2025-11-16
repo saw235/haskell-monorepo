@@ -1,8 +1,8 @@
 module Main (main) where
 
-import Test.Hspec
-import qualified AgenticFramework.LoggingSpec as LoggingSpec
 import qualified AgenticFramework.AgentSpec as AgentSpec
+import qualified AgenticFramework.LoggingSpec as LoggingSpec
+import Test.Hspec
 
 main :: IO ()
 main = hspec $ do

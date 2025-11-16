@@ -1,25 +1,23 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-{- |
-Module      : SimpleAgent
-Description : Example demonstrating a simple agent with tools
-Copyright   : (c) 2025
-License     : MIT
-
-This example demonstrates creating and executing a simple agent with
-calculator and file reader tools.
-
-= Usage
-
-@
-bazel run //haskell/libs/agentic-framework/examples:simple-agent
-@
-
--}
-
+-- |
+-- Module      : SimpleAgent
+-- Description : Example demonstrating a simple agent with tools
+-- Copyright   : (c) 2025
+-- License     : MIT
+--
+-- This example demonstrates creating and executing a simple agent with
+-- calculator and file reader tools.
+--
+-- = Usage
+--
+-- @
+-- bazel run //haskell/libs/agentic-framework/examples:simple-agent
+-- @
 module Main (main) where
 
 import AgenticFramework.Agent
+import AgenticFramework.Context (AgentContext (..))
 import AgenticFramework.Tool
 import AgenticFramework.Tool.File
 import AgenticFramework.Tool.LangChain
@@ -84,15 +82,16 @@ createSimpleAgent = do
         , llmTemperature = 0.7
         }
 
-  let config = AgentConfig
-        { configName = "simple-agent"
-        , configSystemPrompt = "You are a helpful assistant with access to a calculator and file reader. Help users with calculations and reading files."
-        , configTools = [calculatorTool, readFileTool, listDirectoryTool]
-        , configLLM = llmCfg
-        , configSkillsDir = Nothing
-        , configMaxTokens = Nothing
-        , configTemperature = Nothing
-        }
+  let config =
+        AgentConfig
+          { configName = "simple-agent",
+            configSystemPrompt = "You are a helpful assistant with access to a calculator and file reader. Help users with calculations and reading files.",
+            configTools = [calculatorTool, readFileTool, listDirectoryTool],
+            configLLM = llmCfg,
+            configSkillsDir = Nothing,
+            configMaxTokens = Nothing,
+            configTemperature = Nothing
+          }
 
   createAgent config
 

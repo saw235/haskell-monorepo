@@ -1,57 +1,57 @@
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-{- |
-Module      : AgenticFramework.Agent
-Description : Core agent functionality for autonomous reasoning and tool execution
-Copyright   : (c) 2025
-License     : MIT
-
-This module provides the core Agent functionality, including agent creation,
-configuration, and execution. Agents are autonomous reasoning entities that
-can use tools to accomplish tasks.
-
-= Usage
-
-@
-import AgenticFramework.Agent
-import AgenticFramework.Tool
-
-main :: IO ()
-main = do
-  let agentConfig = AgentConfig
-        { configName = "assistant"
-        , configSystemPrompt = "You are a helpful assistant"
-        , configTools = [calculatorTool]
-        , configLLM = llmConfig
-        , configSkillsDir = Nothing
-        , configMaxTokens = Nothing
-        , configTemperature = Nothing
-        }
-
-  agent <- createAgent agentConfig
-  result <- executeAgent agent "What is 2 + 2?"
-  print (resultOutput result)
-@
--}
-
+-- |
+-- Module      : AgenticFramework.Agent
+-- Description : Core agent functionality for autonomous reasoning and tool execution
+-- Copyright   : (c) 2025
+-- License     : MIT
+--
+-- This module provides the core Agent functionality, including agent creation,
+-- configuration, and execution. Agents are autonomous reasoning entities that
+-- can use tools to accomplish tasks.
+--
+-- = Usage
+--
+-- @
+-- import AgenticFramework.Agent
+-- import AgenticFramework.Tool
+--
+-- main :: IO ()
+-- main = do
+--   let agentConfig = AgentConfig
+--         { configName = "assistant"
+--         , configSystemPrompt = "You are a helpful assistant"
+--         , configTools = [calculatorTool]
+--         , configLLM = llmConfig
+--         , configSkillsDir = Nothing
+--         , configMaxTokens = Nothing
+--         , configTemperature = Nothing
+--         }
+--
+--   agent <- createAgent agentConfig
+--   result <- executeAgent agent "What is 2 + 2?"
+--   print (resultOutput result)
+-- @
 module AgenticFramework.Agent
   ( -- * Agent Types
-    Agent (..)
-  , AgentConfig (..)
-  , AgentResult (..)
+    Agent (..),
+    AgentConfig (..),
+    AgentResult (..),
 
     -- * Agent Creation and Execution
-  , createAgent
-  , executeAgent
-  , executeAgentWithContext
+    createAgent,
+    executeAgent,
+    executeAgentWithContext,
 
     -- * Result Constructors
-  , successResult
-  , failureResult
+    successResult,
+    failureResult,
+  )
+where
 
-  ) where
-
+import AgenticFramework.Context (AgentContext (..), addMessage, createContext)
+import AgenticFramework.Logging (ExecutionLog (..))
 import AgenticFramework.Types
 import AgenticFramework.Context (AgentContext(..), createContext, addMessage)
 import AgenticFramework.Logging (ExecutionLog(..), logAgentReasoning)
@@ -59,13 +59,12 @@ import AgenticFramework.LLM.Ollama (OllamaLLM, createOllamaLLM, defaultOllamaPar
 import AgenticFramework.LLM.Kimi (KimiLLM, createKimiLLM, defaultKimiParams)
 import qualified Langchain.LLM.Core as LLM
 import Data.Text (Text)
-import Data.UUID (UUID)
-import Data.Time (getCurrentTime)
-import GHC.Generics (Generic)
 import qualified Data.Text as T
+import Data.Time (getCurrentTime)
+import Data.UUID (UUID)
 import qualified Data.UUID as UUID
 import qualified Data.UUID.V4 as UUID4
-import qualified Data.Sequence as Seq
+import GHC.Generics (Generic)
 
 --------------------------------------------------------------------------------
 -- Agent Data Types
@@ -73,37 +72,40 @@ import qualified Data.Sequence as Seq
 
 -- | An autonomous agent that can reason and use tools.
 data Agent = Agent
-  { agentId :: AgentId
-  , agentName :: Text
-  , systemPrompt :: Text
-  , availableTools :: [Tool]
-  , llmConfig :: LLMConfig
-  , skillsDirectory :: Maybe FilePath
-  , maxTokens :: Maybe Int
-  , temperature :: Maybe Double
-  , contextThreshold :: Double  -- Default 0.9 (90%)
-  } deriving (Show, Generic)
+  { agentId :: AgentId,
+    agentName :: Text,
+    systemPrompt :: Text,
+    availableTools :: [Tool],
+    llmConfig :: LLMConfig,
+    skillsDirectory :: Maybe FilePath,
+    maxTokens :: Maybe Int,
+    temperature :: Maybe Double,
+    contextThreshold :: Double -- Default 0.9 (90%)
+  }
+  deriving (Show, Generic)
 
 -- | Configuration for creating a new agent.
 data AgentConfig = AgentConfig
-  { configName :: Text
-  , configSystemPrompt :: Text
-  , configTools :: [Tool]
-  , configLLM :: LLMConfig
-  , configSkillsDir :: Maybe FilePath
-  , configMaxTokens :: Maybe Int
-  , configTemperature :: Maybe Double
-  } deriving (Show, Generic)
+  { configName :: Text,
+    configSystemPrompt :: Text,
+    configTools :: [Tool],
+    configLLM :: LLMConfig,
+    configSkillsDir :: Maybe FilePath,
+    configMaxTokens :: Maybe Int,
+    configTemperature :: Maybe Double
+  }
+  deriving (Show, Generic)
 
 -- | Result from agent execution.
 data AgentResult = AgentResult
-  { resultOutput :: Text
-  , resultContext :: AgentContext
-  , resultLog :: ExecutionLog
-  , resultToolsUsed :: [ToolExecution]
-  , resultSuccess :: Bool
-  , resultError :: Maybe Text
-  } deriving (Show, Generic)
+  { resultOutput :: Text,
+    resultContext :: AgentContext,
+    resultLog :: ExecutionLog,
+    resultToolsUsed :: [ToolExecution],
+    resultSuccess :: Bool,
+    resultError :: Maybe Text
+  }
+  deriving (Show, Generic)
 
 --------------------------------------------------------------------------------
 -- Agent Creation and Execution
@@ -117,17 +119,18 @@ createAgent config = do
   agentUUID <- generateUUID
   let aid = AgentId agentUUID
 
-  return Agent
-    { agentId = aid
-    , agentName = configName config
-    , systemPrompt = configSystemPrompt config
-    , availableTools = configTools config
-    , llmConfig = configLLM config
-    , skillsDirectory = configSkillsDir config
-    , maxTokens = configMaxTokens config
-    , temperature = configTemperature config
-    , contextThreshold = 0.9  -- 90% default threshold
-    }
+  return
+    Agent
+      { agentId = aid,
+        agentName = configName config,
+        systemPrompt = configSystemPrompt config,
+        availableTools = configTools config,
+        llmConfig = configLLM config,
+        skillsDirectory = configSkillsDir config,
+        maxTokens = configMaxTokens config,
+        temperature = configTemperature config,
+        contextThreshold = 0.9 -- 90% default threshold
+      }
   where
     -- Generate a random UUID v4
     generateUUID :: IO UUID
@@ -149,10 +152,11 @@ executeAgentWithContext :: Agent -> AgentContext -> Text -> IO AgentResult
 executeAgentWithContext agent ctx input = do
   -- Create initial user message
   timestamp <- getCurrentTime
-  let userMsg = UserMessage
-        { messageContent = input
-        , messageTimestamp = timestamp
-        }
+  let userMsg =
+        UserMessage
+          { messageContent = input,
+            messageTimestamp = timestamp
+          }
 
   -- Add user message to context
   let ctx' = addMessage userMsg ctx
@@ -160,13 +164,14 @@ executeAgentWithContext agent ctx input = do
   -- Create execution log
   startTime <- getCurrentTime
   logId <- UUID4.nextRandom
-  let execLog = ExecutionLog
-        { execLogId = logId
-        , execLogAgentId = agentId agent
-        , execLogEntries = Seq.empty
-        , execLogStartTime = startTime
-        , execLogEndTime = Nothing
-        }
+  let execLog =
+        ExecutionLog
+          { execLogId = logId,
+            execLogAgentId = agentId agent,
+            execLogEntries = Seq.empty,
+            execLogStartTime = startTime,
+            execLogEndTime = Nothing
+          }
 
   -- Build prompt with system prompt and user input
   let fullPrompt = systemPrompt agent <> "\n\nUser: " <> input
@@ -214,22 +219,24 @@ executeAgentWithContext agent ctx input = do
 
 -- | Create a successful agent result.
 successResult :: Text -> AgentContext -> ExecutionLog -> AgentResult
-successResult output ctx log = AgentResult
-  { resultOutput = output
-  , resultContext = ctx
-  , resultLog = log
-  , resultToolsUsed = contextToolHistory ctx
-  , resultSuccess = True
-  , resultError = Nothing
-  }
+successResult output ctx log =
+  AgentResult
+    { resultOutput = output,
+      resultContext = ctx,
+      resultLog = log,
+      resultToolsUsed = contextToolHistory ctx,
+      resultSuccess = True,
+      resultError = Nothing
+    }
 
 -- | Create a failed agent result.
 failureResult :: Text -> AgentContext -> ExecutionLog -> AgentResult
-failureResult err ctx log = AgentResult
-  { resultOutput = ""
-  , resultContext = ctx
-  , resultLog = log
-  , resultToolsUsed = contextToolHistory ctx
-  , resultSuccess = False
-  , resultError = Just err
-  }
+failureResult err ctx log =
+  AgentResult
+    { resultOutput = "",
+      resultContext = ctx,
+      resultLog = log,
+      resultToolsUsed = contextToolHistory ctx,
+      resultSuccess = False,
+      resultError = Just err
+    }
