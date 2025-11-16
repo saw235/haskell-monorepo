@@ -44,6 +44,7 @@ import AgenticFramework.Types
 import Data.HashMap.Strict (HashMap)
 import qualified Data.HashMap.Strict as HM
 import Data.Text (Text)
+import qualified Data.Text as T
 import Data.Time (UTCTime)
 import GHC.Generics (Generic)
 
@@ -102,10 +103,27 @@ updateContext :: AgentContext -> AgentContext
 updateContext ctx = ctx -- TODO: Implement
 
 -- | Add a message to the conversation history.
+--   Also updates token metrics based on message content.
 addMessage :: Message -> AgentContext -> AgentContext
 addMessage msg ctx =
-  ctx
-    { contextConversation = contextConversation ctx ++ [msg]
+  let newConversation = contextConversation ctx ++ [msg]
+      -- Simple approximation: ~4 characters per token (GPT-style tokenization)
+      -- TODO: Replace with actual tokenizer FFI call (tiktoken-rs)
+      msgText = case msg of
+        UserMessage {messageContent = content} -> content
+        AssistantMessage {messageContent = content} -> content
+        SystemMessage {messageContent = content} -> content
+      estimatedTokens = fromIntegral (T.length msgText) `div` 4
+      oldMetrics = contextTokenMetrics ctx
+      newTokenCount = currentTokenCount oldMetrics + estimatedTokens
+      newPercentage = fromIntegral newTokenCount / fromIntegral (modelTokenLimit oldMetrics)
+      newMetrics = oldMetrics
+        { currentTokenCount = newTokenCount
+        , percentageUsed = newPercentage
+        }
+  in ctx
+    { contextConversation = newConversation
+    , contextTokenMetrics = newMetrics
     }
 
 -- | Add a tool execution record to the history.

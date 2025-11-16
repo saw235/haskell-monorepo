@@ -29,7 +29,7 @@ import Test.QuickCheck
 
 spec :: Spec
 spec = describe "Tokenizer Properties" $ do
-  describe "Accuracy (SC-011)" $ do
+  describe "[SC-011,FR-002b] Accuracy" $ do
     it "token count is reasonable for short texts" $
       withMaxSuccess 10 $
         property $
@@ -57,7 +57,7 @@ spec = describe "Tokenizer Properties" $ do
                       maxTokens = charLen + 1
                   return $ count >= minTokens && count <= maxTokens
 
-  describe "Consistency" $ do
+  describe "[FR-002b] Consistency" $ do
     it "same input produces same token count" $
       withMaxSuccess 10 $
         property $
@@ -68,7 +68,7 @@ spec = describe "Tokenizer Properties" $ do
                   count2 <- countTokens modelName text
                   return $ count1 == count2
 
-  describe "Proportionality" $ do
+  describe "[FR-002b] Proportionality" $ do
     it "significantly longer text has more tokens" $
       withMaxSuccess 10 $
         property $
@@ -85,7 +85,7 @@ spec = describe "Tokenizer Properties" $ do
                     -- Adding more text should always increase token count
                     return $ count2 > count1
 
-  describe "Edge Cases" $ do
+  describe "[FR-002b] Edge Cases" $ do
     it "empty string has zero tokens" $
       let modelName = "gpt-4"
        in do
@@ -105,7 +105,7 @@ spec = describe "Tokenizer Properties" $ do
             count <- countTokens modelName unicodeText
             count `shouldSatisfy` (> 0)
 
-  describe "Model Support" $ do
+  describe "[FR-002b] Model Support" $ do
     it "supports GPT-4 models" $
       let text = "Hello, world!"
        in do

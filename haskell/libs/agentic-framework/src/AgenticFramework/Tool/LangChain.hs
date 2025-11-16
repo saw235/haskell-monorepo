@@ -237,10 +237,64 @@ extractSelector (Aeson.Object obj) = case KM.lookup "selector" obj of
   _ -> Nothing
 extractSelector _ = Nothing
 
--- | Simple expression evaluator for basic arithmetic (stub)
---   TODO: Replace with proper expression parser or langchain-hs calculator
+-- | Simple expression evaluator for basic arithmetic
+--   Supports +, -, *, / operations with operator precedence
+--   TODO: Replace with proper expression parser or langchain-hs calculator for complex expressions
 evaluateSimpleExpression :: Text -> IO Double
 evaluateSimpleExpression expr = do
-  -- Very basic implementation - just return 42 as placeholder
-  -- TODO: Implement proper arithmetic evaluation
-  return 42.0
+  let cleanExpr = T.filter (/= ' ') expr  -- Remove spaces
+  case parseAndEval (T.unpack cleanExpr) of
+    Just result -> return result
+    Nothing -> error $ "Cannot evaluate expression: " <> T.unpack expr
+
+-- Simple recursive descent parser for arithmetic expressions
+parseAndEval :: String -> Maybe Double
+parseAndEval str = case parseExpr str of
+  Just (result, "") -> Just result
+  _ -> Nothing
+
+-- Parse expression (handles + and -)
+parseExpr :: String -> Maybe (Double, String)
+parseExpr str = do
+  (left, rest1) <- parseTerm str
+  parseExpr' left rest1
+  where
+    parseExpr' acc ('+':rest) = do
+      (right, rest') <- parseTerm rest
+      parseExpr' (acc + right) rest'
+    parseExpr' acc ('-':rest) = do
+      (right, rest') <- parseTerm rest
+      parseExpr' (acc - right) rest'
+    parseExpr' acc rest = Just (acc, rest)
+
+-- Parse term (handles * and /)
+parseTerm :: String -> Maybe (Double, String)
+parseTerm str = do
+  (left, rest1) <- parseFactor str
+  parseTerm' left rest1
+  where
+    parseTerm' acc ('*':rest) = do
+      (right, rest') <- parseFactor rest
+      parseTerm' (acc * right) rest'
+    parseTerm' acc ('/':rest) = do
+      (right, rest') <- parseFactor rest
+      if right == 0
+        then Nothing  -- Division by zero
+        else parseTerm' (acc / right) rest'
+    parseTerm' acc rest = Just (acc, rest)
+
+-- Parse factor (handles numbers and parentheses)
+parseFactor :: String -> Maybe (Double, String)
+parseFactor ('(':rest) = do
+  (result, rest') <- parseExpr rest
+  case rest' of
+    (')':rest'') -> Just (result, rest'')
+    _ -> Nothing
+parseFactor str = parseNumber str
+
+-- Parse a number
+parseNumber :: String -> Maybe (Double, String)
+parseNumber str =
+  case TR.double (T.pack str) of
+    Right (num, remaining) -> Just (num, T.unpack remaining)
+    Left _ -> Nothing

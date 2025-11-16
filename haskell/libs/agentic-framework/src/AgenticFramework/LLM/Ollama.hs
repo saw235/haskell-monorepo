@@ -30,6 +30,9 @@ import qualified Data.Text.Encoding as TE
 import qualified Data.Vector as Vector
 import qualified Langchain.LLM.Core as LLM
 import Network.HTTP.Simple
+import Network.HTTP.Conduit (responseTimeoutMicro)
+import Data.Maybe (fromMaybe)
+import qualified Data.List.NonEmpty as NE
 
 -- | Ollama LLM implementation
 data OllamaLLM = OllamaLLM
@@ -91,11 +94,11 @@ instance LLM.LLM OllamaLLM where
         endpoint = T.unpack ollamaBaseUrl <> "/api/generate"
 
     request <- parseRequest endpoint
-    let req =
-          setRequestMethod "POST" $
-            setRequestHeader "Content-Type" ["application/json"] $
-              setRequestBodyLBS (encode reqBody) $
-                request
+    let req = setRequestMethod "POST"
+            $ setRequestHeader "Content-Type" ["application/json"]
+            $ setRequestBodyLBS (encode reqBody)
+            $ setRequestResponseTimeout (responseTimeoutMicro (5 * 60 * 1000000)) -- 5 minute timeout
+            $ request
 
     response <- httpLBS req
     let status = getResponseStatusCode response

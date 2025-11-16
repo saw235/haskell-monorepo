@@ -12,12 +12,12 @@ import Test.Hspec
 -- | Test specification for Agent API
 spec :: Spec
 spec = do
-  describe "Agent Creation" $ do
+  describe "[FR-001] Agent Creation" $ do
     it "creates an agent with valid configuration" $ do
       let llmCfg =
             LLMConfig
               { llmProvider = Ollama,
-                llmModel = "test-model",
+                llmModel = "qwen3",
                 llmApiKey = Nothing,
                 llmBaseUrl = Just "http://localhost:11434",
                 llmMaxTokens = 4096,
@@ -60,7 +60,7 @@ spec = do
       -- Agent IDs should be different
       agentId agent1 `shouldNotBe` agentId agent2
 
-  describe "Agent Execution" $ do
+  describe "[FR-004] Agent Execution" $ do
     it "executes agent with simple task" $ do
       agent <- createTestAgent
       result <- executeAgent agent "Hello, agent!"
@@ -100,7 +100,7 @@ spec = do
       -- Log should reference correct agent
       execLogAgentId log `shouldBe` agentId agent
 
-  describe "Result Constructors" $ do
+  describe "[FR-004] Result Constructors" $ do
     it "successResult creates successful result" $ do
       agent <- createTestAgent
       let ctx = createContext (agentId agent) (llmConfig agent)
@@ -144,7 +144,7 @@ testLLMConfig :: LLMConfig
 testLLMConfig =
   LLMConfig
     { llmProvider = Ollama,
-      llmModel = "test-model",
+      llmModel = "qwen3",
       llmApiKey = Nothing,
       llmBaseUrl = Just "http://localhost:11434",
       llmMaxTokens = 4096,

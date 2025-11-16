@@ -12,11 +12,22 @@ description: "Task list template for feature implementation"
 
 **Organization**: Tasks are grouped by user story to enable independent implementation and testing of each story.
 
-## Format: `[ID] [P?] [Story] Description`
+## Format: `[ID] [P?] [Story] Description (FR-XXX)`
 
 - **[P]**: Can run in parallel (different files, no dependencies)
 - **[Story]**: Which user story this task belongs to (e.g., US1, US2, US3)
+- **FR-XXX**: Functional requirement(s) this task implements (REQUIRED per Constitution VI)
+  - Use single FR (e.g., `FR-001`) when task implements one requirement
+  - Use multiple FRs (e.g., `FR-001, FR-002`) when task implements several requirements
+  - Use `SC-XXX` for success criteria in test tasks
+  - Use `Infrastructure` for setup tasks without specific FRs
+  - Use `Documentation` or `Code Quality` for polish tasks without specific FRs
 - Include exact file paths in descriptions
+
+**FR Traceability Requirements** (Constitution VI):
+- Every implementation task MUST reference at least one FR from spec.md
+- Every test task MUST reference the FR(s) and/or SC(s) it validates
+- This enables: impact analysis, coverage tracking, requirement verification
 
 ## Path Conventions
 
@@ -48,9 +59,9 @@ description: "Task list template for feature implementation"
 
 **Purpose**: Project initialization and basic structure
 
-- [ ] T001 Create project structure per implementation plan
-- [ ] T002 Initialize [language] project with [framework] dependencies
-- [ ] T003 [P] Configure linting and formatting tools
+- [ ] T001 Create project structure per implementation plan (Infrastructure)
+- [ ] T002 Initialize [language] project with [framework] dependencies (Infrastructure)
+- [ ] T003 [P] Configure linting and formatting tools (Infrastructure)
 
 ---
 
@@ -62,12 +73,12 @@ description: "Task list template for feature implementation"
 
 Examples of foundational tasks (adjust based on your project):
 
-- [ ] T004 Setup database schema and migrations framework
-- [ ] T005 [P] Implement authentication/authorization framework
-- [ ] T006 [P] Setup API routing and middleware structure
-- [ ] T007 Create base models/entities that all stories depend on
-- [ ] T008 Configure error handling and logging infrastructure
-- [ ] T009 Setup environment configuration management
+- [ ] T004 Setup database schema and migrations framework (FR-XXX)
+- [ ] T005 [P] Implement authentication/authorization framework (FR-XXX)
+- [ ] T006 [P] Setup API routing and middleware structure (FR-XXX)
+- [ ] T007 Create base models/entities that all stories depend on (FR-XXX)
+- [ ] T008 Configure error handling and logging infrastructure (FR-XXX)
+- [ ] T009 Setup environment configuration management (FR-XXX)
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
@@ -83,17 +94,17 @@ Examples of foundational tasks (adjust based on your project):
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T010 [P] [US1] Contract test for [endpoint] in tests/contract/test_[name].py
-- [ ] T011 [P] [US1] Integration test for [user journey] in tests/integration/test_[name].py
+- [ ] T010 [P] [US1] Contract test for [endpoint] in tests/contract/test_[name].py (FR-XXX)
+- [ ] T011 [P] [US1] Integration test for [user journey] in tests/integration/test_[name].py (FR-XXX, SC-XXX)
 
 ### Implementation for User Story 1
 
-- [ ] T012 [P] [US1] Create [Entity1] model in src/models/[entity1].py
-- [ ] T013 [P] [US1] Create [Entity2] model in src/models/[entity2].py
-- [ ] T014 [US1] Implement [Service] in src/services/[service].py (depends on T012, T013)
-- [ ] T015 [US1] Implement [endpoint/feature] in src/[location]/[file].py
-- [ ] T016 [US1] Add validation and error handling
-- [ ] T017 [US1] Add logging for user story 1 operations
+- [ ] T012 [P] [US1] Create [Entity1] model in src/models/[entity1].py (FR-XXX)
+- [ ] T013 [P] [US1] Create [Entity2] model in src/models/[entity2].py (FR-XXX)
+- [ ] T014 [US1] Implement [Service] in src/services/[service].py (depends on T012, T013) (FR-XXX)
+- [ ] T015 [US1] Implement [endpoint/feature] in src/[location]/[file].py (FR-XXX)
+- [ ] T016 [US1] Add validation and error handling (FR-XXX)
+- [ ] T017 [US1] Add logging for user story 1 operations (FR-XXX)
 
 **Checkpoint**: At this point, User Story 1 should be fully functional and testable independently
 
@@ -107,15 +118,15 @@ Examples of foundational tasks (adjust based on your project):
 
 ### Tests for User Story 2 (OPTIONAL - only if tests requested) ⚠️
 
-- [ ] T018 [P] [US2] Contract test for [endpoint] in tests/contract/test_[name].py
-- [ ] T019 [P] [US2] Integration test for [user journey] in tests/integration/test_[name].py
+- [ ] T018 [P] [US2] Contract test for [endpoint] in tests/contract/test_[name].py (FR-XXX)
+- [ ] T019 [P] [US2] Integration test for [user journey] in tests/integration/test_[name].py (FR-XXX, SC-XXX)
 
 ### Implementation for User Story 2
 
-- [ ] T020 [P] [US2] Create [Entity] model in src/models/[entity].py
-- [ ] T021 [US2] Implement [Service] in src/services/[service].py
-- [ ] T022 [US2] Implement [endpoint/feature] in src/[location]/[file].py
-- [ ] T023 [US2] Integrate with User Story 1 components (if needed)
+- [ ] T020 [P] [US2] Create [Entity] model in src/models/[entity].py (FR-XXX)
+- [ ] T021 [US2] Implement [Service] in src/services/[service].py (FR-XXX)
+- [ ] T022 [US2] Implement [endpoint/feature] in src/[location]/[file].py (FR-XXX)
+- [ ] T023 [US2] Integrate with User Story 1 components (if needed) (FR-XXX)
 
 **Checkpoint**: At this point, User Stories 1 AND 2 should both work independently
 
@@ -129,14 +140,14 @@ Examples of foundational tasks (adjust based on your project):
 
 ### Tests for User Story 3 (OPTIONAL - only if tests requested) ⚠️
 
-- [ ] T024 [P] [US3] Contract test for [endpoint] in tests/contract/test_[name].py
-- [ ] T025 [P] [US3] Integration test for [user journey] in tests/integration/test_[name].py
+- [ ] T024 [P] [US3] Contract test for [endpoint] in tests/contract/test_[name].py (FR-XXX)
+- [ ] T025 [P] [US3] Integration test for [user journey] in tests/integration/test_[name].py (FR-XXX, SC-XXX)
 
 ### Implementation for User Story 3
 
-- [ ] T026 [P] [US3] Create [Entity] model in src/models/[entity].py
-- [ ] T027 [US3] Implement [Service] in src/services/[service].py
-- [ ] T028 [US3] Implement [endpoint/feature] in src/[location]/[file].py
+- [ ] T026 [P] [US3] Create [Entity] model in src/models/[entity].py (FR-XXX)
+- [ ] T027 [US3] Implement [Service] in src/services/[service].py (FR-XXX)
+- [ ] T028 [US3] Implement [endpoint/feature] in src/[location]/[file].py (FR-XXX)
 
 **Checkpoint**: All user stories should now be independently functional
 
@@ -150,12 +161,12 @@ Examples of foundational tasks (adjust based on your project):
 
 **Purpose**: Improvements that affect multiple user stories
 
-- [ ] TXXX [P] Documentation updates in docs/
-- [ ] TXXX Code cleanup and refactoring
-- [ ] TXXX Performance optimization across all stories
-- [ ] TXXX [P] Additional unit tests (if requested) in tests/unit/
-- [ ] TXXX Security hardening
-- [ ] TXXX Run quickstart.md validation
+- [ ] TXXX [P] Documentation updates in docs/ (Documentation)
+- [ ] TXXX Code cleanup and refactoring (Code Quality)
+- [ ] TXXX Performance optimization across all stories (FR-XXX if performance requirement exists)
+- [ ] TXXX [P] Additional unit tests (if requested) in tests/unit/ (FR-XXX, SC-XXX)
+- [ ] TXXX Security hardening (FR-XXX if security requirement exists)
+- [ ] TXXX Run quickstart.md validation (Documentation)
 
 ---
 
@@ -244,8 +255,9 @@ With multiple developers:
 
 - [P] tasks = different files, no dependencies
 - [Story] label maps task to specific user story for traceability
+- (FR-XXX) tags link task to functional requirements from spec.md (REQUIRED per Constitution VI)
 - Each user story should be independently completable and testable
 - Verify tests fail before implementing
 - Commit after each task or logical group
 - Stop at any checkpoint to validate story independently
-- Avoid: vague tasks, same file conflicts, cross-story dependencies that break independence
+- Avoid: vague tasks, same file conflicts, cross-story dependencies that break independence, tasks without FR tags

@@ -50,11 +50,18 @@ module AgenticFramework.Agent
   )
 where
 
-import AgenticFramework.Context (AgentContext (..), addMessage, createContext)
+import AgenticFramework.Context (AgentContext (..), addMessage, addToolExecution, createContext)
+import qualified AgenticFramework.Context.Summarization as Sum
+import AgenticFramework.Logging (ExecutionLog (..), logAgentReasoning)
 import AgenticFramework.LLM.Kimi (KimiLLM, createKimiLLM, defaultKimiParams)
 import AgenticFramework.LLM.Ollama (OllamaLLM, createOllamaLLM, defaultOllamaParams)
-import AgenticFramework.Logging (ExecutionLog (..), logAgentReasoning)
+import AgenticFramework.Tool (executeTool)
 import AgenticFramework.Types
+import Data.Aeson (Value, object, (.=))
+import qualified Data.Aeson as Aeson
+import qualified Data.Aeson.KeyMap as KM
+import qualified Data.List as List
+import qualified Data.Sequence as Seq
 import Data.Text (Text)
 import qualified Data.Text as T
 import Data.Time (getCurrentTime)
@@ -146,8 +153,14 @@ executeAgent agent input = do
 
 -- | Execute an agent with existing context (for multi-turn conversations).
 --   Preserves conversation history and token metrics from previous execution.
+--   Automatically triggers context summarization if token usage exceeds 90% threshold.
 executeAgentWithContext :: Agent -> AgentContext -> Text -> IO AgentResult
 executeAgentWithContext agent ctx input = do
+  -- Check if we need to summarize context before proceeding (FR-042, T037)
+  ctx' <- if Sum.shouldTriggerSummarization Sum.defaultSummarizationConfig ctx
+    then Sum.summarizeContext (llmConfig agent) Sum.defaultSummarizationConfig ctx
+    else return ctx
+
   -- Create initial user message
   timestamp <- getCurrentTime
   let userMsg =
@@ -157,7 +170,7 @@ executeAgentWithContext agent ctx input = do
           }
 
   -- Add user message to context
-  let ctx' = addMessage userMsg ctx
+  let ctx'' = addMessage userMsg ctx'
 
   -- Create execution log
   startTime <- getCurrentTime
@@ -171,43 +184,98 @@ executeAgentWithContext agent ctx input = do
             execLogEndTime = Nothing
           }
 
-  -- Build prompt with system prompt and user input
-  let fullPrompt = systemPrompt agent <> "\n\nUser: " <> input
+  -- Check if this is a simple tool request that we can handle directly
+  -- For now, implement basic pattern matching for calculator tool
+  case tryDirectToolExecution agent input of
+    Just (toolName, toolInput) -> do
+      -- Direct tool execution path
+      case findTool (availableTools agent) toolName of
+        Nothing -> do
+          endTime <- getCurrentTime
+          let finalLog = execLog { execLogEndTime = Just endTime }
+          return $ failureResult ("Tool not found: " <> toolName) ctx'' finalLog
 
-  -- Call LLM based on provider type
-  -- TODO: Implement full ReAct loop with tool selection and execution
-  -- TODO: Implement iterative reasoning loop
-  llmResult <- case llmProvider (llmConfig agent) of
-    Ollama -> do
-      let ollamaLLM = createOllamaLLM (llmConfig agent)
-      LLM.generate ollamaLLM fullPrompt (Just defaultOllamaParams)
-    Kimi -> do
-      case createKimiLLM (llmConfig agent) of
-        Nothing -> return $ Left "Kimi API key not provided in LLMConfig"
-        Just kimiLLM -> LLM.generate kimiLLM fullPrompt (Just defaultKimiParams)
-    _ -> return $ Left "LLM provider not yet implemented"
+        Just tool -> do
+          -- Execute the tool
+          toolResult <- executeTool tool toolInput
 
-  case llmResult of
-    Left err -> do
-      -- Handle LLM error
-      endTime <- getCurrentTime
-      let finalLog = execLog {execLogEndTime = Just endTime}
-      return $ failureResult (T.pack err) ctx' finalLog
-    Right response -> do
-      -- Success - add assistant message to context
-      assistantTimestamp <- getCurrentTime
-      let assistantMsg =
-            AssistantMessage
-              { messageContent = response,
-                messageTimestamp = assistantTimestamp
-              }
+          case toolResult of
+            Left toolErr -> do
+              endTime <- getCurrentTime
+              let finalLog = execLog { execLogEndTime = Just endTime }
+              let errMsg = case toolErr of
+                    ToolExecutionError msg -> "Tool execution error: " <> msg
+                    ToolTimeoutError -> "Tool execution timed out"
+              return $ failureResult errMsg ctx'' finalLog
 
-      let finalCtx = addMessage assistantMsg ctx'
+            Right toolOutputResult -> do
+              -- Record tool execution
+              toolExecTime <- getCurrentTime
+              let toolExec = ToolExecution
+                    { toolExecName = toolName
+                    , toolExecInput = toolInput
+                    , toolExecOutput = Right toolOutputResult
+                    , toolExecTimestamp = toolExecTime
+                    , toolExecDuration = 0 -- TODO: track actual duration
+                    }
 
-      endTime <- getCurrentTime
-      let finalLog = execLog {execLogEndTime = Just endTime}
+              let ctx''' = addToolExecution toolExec ctx''
 
-      return $ successResult response finalCtx finalLog
+              -- Extract output value
+              let (ToolOutput output) = toolOutputResult
+
+              -- Format response with tool result
+              let response = formatToolResponse toolName output
+
+              assistantTimestamp <- getCurrentTime
+              let assistantMsg = AssistantMessage
+                    { messageContent = response
+                    , messageTimestamp = assistantTimestamp
+                    }
+
+              let finalCtx = addMessage assistantMsg ctx'''
+
+              endTime <- getCurrentTime
+              let finalLog = execLog { execLogEndTime = Just endTime }
+
+              return $ successResult response finalCtx finalLog
+
+    Nothing -> do
+      -- Fall back to LLM-only execution (no tool use)
+      -- TODO: Implement full ReAct loop with LLM-driven tool selection
+      let fullPrompt = systemPrompt agent <> "\n\nUser: " <> input
+
+      llmResult <- case llmProvider (llmConfig agent) of
+        Ollama -> do
+          let ollamaLLM = createOllamaLLM (llmConfig agent)
+          LLM.generate ollamaLLM fullPrompt (Just defaultOllamaParams)
+
+        Kimi -> do
+          case createKimiLLM (llmConfig agent) of
+            Nothing -> return $ Left "Kimi API key not provided in LLMConfig"
+            Just kimiLLM -> LLM.generate kimiLLM fullPrompt (Just defaultKimiParams)
+
+        _ -> return $ Left "LLM provider not yet implemented"
+
+      case llmResult of
+        Left err -> do
+          endTime <- getCurrentTime
+          let finalLog = execLog { execLogEndTime = Just endTime }
+          return $ failureResult (T.pack err) ctx'' finalLog
+
+        Right response -> do
+          assistantTimestamp <- getCurrentTime
+          let assistantMsg = AssistantMessage
+                { messageContent = response
+                , messageTimestamp = assistantTimestamp
+                }
+
+          let finalCtx = addMessage assistantMsg ctx''
+
+          endTime <- getCurrentTime
+          let finalLog = execLog { execLogEndTime = Just endTime }
+
+          return $ successResult response finalCtx finalLog
 
 --------------------------------------------------------------------------------
 -- Result Constructors
@@ -236,3 +304,71 @@ failureResult err ctx log =
       resultSuccess = False,
       resultError = Just err
     }
+
+--------------------------------------------------------------------------------
+-- Helper Functions for Tool Execution
+--------------------------------------------------------------------------------
+
+-- | Try to parse user input as a direct tool invocation
+--   Returns (toolName, toolInput) if successful
+tryDirectToolExecution :: Agent -> Text -> Maybe (Text, ToolInput)
+tryDirectToolExecution agent input =
+  -- Pattern match for calculator tool: "Calculate X * Y" or "Calculate X + Y" etc.
+  if "calculate" `T.isInfixOf` T.toLower input then
+    let expr = extractExpression input
+    in if T.null expr
+         then Nothing
+         else Just ("calculator", ToolInput $ object ["expression" .= expr])
+
+  -- Pattern match for file reader: "Read the file at X" or "Read X"
+  else if "read" `T.isInfixOf` T.toLower input && ("file" `T.isInfixOf` T.toLower input || "path" `T.isInfixOf` T.toLower input) then
+    case extractFilePath input of
+      Nothing -> Nothing
+      Just path -> Just ("read_file", ToolInput $ object ["path" .= path])
+
+  else
+    Nothing
+
+-- | Extract mathematical expression from text
+--   "Calculate 15 * 23" -> "15 * 23"
+extractExpression :: Text -> Text
+extractExpression input =
+  let lower = T.toLower input
+      -- Find "calculate" and take everything after it
+      afterCalculate = case T.breakOn "calculate" lower of
+        (_, rest) -> T.drop (T.length "calculate") rest
+  in T.strip afterCalculate
+
+-- | Extract file path from text
+--   "Read the file at /path/to/file" -> Just "/path/to/file"
+extractFilePath :: Text -> Maybe Text
+extractFilePath input =
+  let lower = T.toLower input
+      -- Look for common patterns
+      patterns = ["at path:", "at:", "path:", "file:"]
+      tryPattern pattern = case T.breakOn pattern lower of
+        (_, "") -> Nothing
+        (_, rest) -> Just $ T.strip $ T.drop (T.length pattern) rest
+  in List.find (not . T.null . T.strip) $ map (maybe "" id . tryPattern) patterns
+
+-- | Find a tool by name in the agent's available tools
+findTool :: [Tool] -> Text -> Maybe Tool
+findTool tools name = List.find (\t -> toolName t == name) tools
+
+-- | Format tool response for the user
+formatToolResponse :: Text -> Value -> Text
+formatToolResponse "calculator" output =
+  case KM.lookup "result" (getObject output) of
+    Just (Aeson.Number result) -> "The result is: " <> T.pack (show result)
+    _ -> "Calculation completed: " <> T.pack (show output)
+formatToolResponse "read_file" output =
+  case KM.lookup "content" (getObject output) of
+    Just (Aeson.String content) -> "File contents:\n" <> content
+    _ -> "File read completed: " <> T.pack (show output)
+formatToolResponse toolName output =
+  "Tool " <> toolName <> " executed successfully. Result: " <> T.pack (show output)
+
+-- | Extract object from Aeson Value
+getObject :: Value -> KM.KeyMap Value
+getObject (Aeson.Object obj) = obj
+getObject _ = KM.empty

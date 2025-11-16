@@ -1,11 +1,14 @@
 <!--
 Sync Impact Report:
-- Version change: [CONSTITUTION_VERSION] → 1.0.0 (Initial constitution creation from template)
-- Modified principles: N/A (initial creation)
-- Added sections: All core principles, Architecture Standards, Development Workflow, Governance
+- Version change: 1.0.0 → 1.1.0 (MINOR - new principle added)
+- Modified principles: None
+- Added sections: VI. Requirements Traceability
 - Removed sections: None
-- Templates requiring updates: ✅ All templates reviewed for consistency
-- Follow-up TODOs: Monitor BUILD.bazel compliance across all future components
+- Templates requiring updates:
+  ✅ tasks-template.md - updated task format and examples to include FR tags
+  ✅ spec-template.md - already has FR definitions (no changes needed)
+  ✅ plan-template.md - reviewed, no updates needed (constitution check references updated constitution)
+- Follow-up TODOs: None - all placeholders resolved
 -->
 
 # Haskell Monorepo Constitution
@@ -37,6 +40,11 @@ Code formatting MUST be enforced across all languages: Ormolu for Haskell, Prett
 
 **Rationale**: Eliminates bikeshedding, ensures consistent code style across the polyglot codebase, and reduces cognitive load during code reviews.
 
+### VI. Requirements Traceability
+Every task in tasks.md MUST be tagged with the specific Functional Requirement(s) (FR-XXX) it implements. Every test task MUST reference the FR(s) it validates. This bidirectional traceability links requirements → tasks → tests → implementation, enabling impact analysis, coverage tracking, and requirement verification.
+
+**Rationale**: Ensures complete requirement coverage, enables quick impact assessment when requirements change, facilitates test-to-requirement mapping for compliance and auditing, and prevents orphaned tasks or untested requirements. Clear traceability is essential for maintainability and understanding the purpose of every code change.
+
 ## Architecture Standards
 
 All applications reside in `haskell/app/` as standalone executables with clear separation from shared libraries. Electron applications integrate with Haskell backends via well-defined interfaces (WebSocket, CLI). Docker environment available for web scraping with Chrome/Selenium pre-installed. External dependencies managed through Bazel's external directory structure.
@@ -49,4 +57,4 @@ Format code before committing (enforced in CI). Use Docker environment for web s
 
 This Constitution supersedes all other development practices. Amendments require documentation, approval, and migration plan. All PRs and reviews MUST verify compliance with these principles. Complexity MUST be justified against the architectural standards. CLAUDE.md provides runtime development guidance that complements these constitutional requirements.
 
-**Version**: 1.0.0 | **Ratified**: 2025-11-14 | **Last Amended**: 2025-11-14
+**Version**: 1.1.0 | **Ratified**: 2025-11-14 | **Last Amended**: 2025-11-15
