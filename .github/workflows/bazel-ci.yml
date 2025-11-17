@@ -24,6 +24,8 @@ jobs:
 
   build-and-test:
     runs-on: [self-hosted]
+    container:
+      image: ubuntu:22.04
     needs: ormolu
     steps:
       - name: Checkout
