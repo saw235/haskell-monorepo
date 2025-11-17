@@ -26,7 +26,7 @@ jobs:
     runs-on: [self-hosted]
     container:
       image: ubuntu:24.04
-      options: --user xsaw
+      options: --user root
     needs: ormolu
     steps:
       - name: Checkout
@@ -66,6 +66,8 @@ jobs:
           apt install -y alex happy
 
       - name: Build all targets
+        env:
+          STACK_ROOT: ${{ github.workspace }}/.stack
         run: ./bazelisk build //...
 
       - name: Test all targets
