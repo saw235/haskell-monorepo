@@ -25,7 +25,7 @@ jobs:
   build-and-test:
     runs-on: [self-hosted]
     container:
-      image: ubuntu:24.04
+      image: saw235/haskell-monorepo-ci:latest
       options: --user 1000:1000
     needs: ormolu
     steps:
@@ -39,33 +39,7 @@ jobs:
           disk-cache: true
           repository-cache: true
           external-cache: true
-
-      - name: Install dependencies
-        run: |
-          apt-get update
-          apt-get install -y wget
-          apt-get install -y python3
-          apt-get install -y 
-          apt-get install -y
-          apt-get install -y curl
-          apt-get install -y wget
-          apt-get install -y unzip
-          apt-get install -y gnupg
-          apt-get install -y jq
-          apt-get install -y default-jre
-          apt-get install -y python3
-          apt-get install -y python3-pip
-          apt-get install -y pkg-config
-          apt-get install -y libgmp-dev
-          apt-get install -y libffi-dev
-          apt-get install -y zlib1g-dev
-          apt-get install -y build-essential
-          apt-get install -y libtinfo-dev
-          wget http://security.ubuntu.com/ubuntu/pool/universe/n/ncurses/libtinfo5_6.3-2ubuntu0.1_amd64.deb
-          apt install -y ./libtinfo5_6.3-2ubuntu0.1_amd64.deb
-          apt install -y alex happy
-          id
-
+          
       - name: Build all targets
         run: ./bazelisk build //...
 
