@@ -26,7 +26,6 @@ jobs:
     runs-on: [self-hosted]
     container:
       image: ubuntu:24.04
-      options: --user root
     needs: ormolu
     steps:
       - name: Checkout
