@@ -2,8 +2,42 @@
 bazel-bin
 bazel-out
 bazel-testlogs
-bazel-haskell-monorepo 
+bazel-haskell-monorepo
 
+# Node.js
 **/node_modules
 
+# Environment
 .env
+.env*
+
+# Haskell
+dist/
+dist-newstyle/
+.stack-work/
+*.hi
+*.o
+*.prof
+*.aux
+*.hp
+*.eventlog
+.HTF/
+.ghc.environment.*
+*.cabal.project.local*
+cabal.sandbox.config
+cabal.config
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+*.tmp
+
+# Logs
+*.log

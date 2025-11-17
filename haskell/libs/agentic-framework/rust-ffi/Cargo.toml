@@ -1,0 +1,12 @@
+[package]
+name = "agentic-tokenizer-ffi"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+tiktoken-rs = "0.5"
+
+[lib]
+name = "agentic_tokenizer_ffi"
+crate-type = ["staticlib", "cdylib"]
+path = "src/lib.rs"
