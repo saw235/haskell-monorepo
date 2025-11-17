@@ -48,7 +48,7 @@ jobs:
           apt install -y alex happy
 
       - name: Build all targets
-        run: bazel build //...
+        run: ./bazelisk build //...
 
       - name: Test all targets
-        run: bazel test //... --test_tag_filters=-llm
+        run: ./bazelisk test //... --test_tag_filters=-llm
