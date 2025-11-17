@@ -8,7 +8,7 @@ on:
 
 jobs:
   ormolu:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted]
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -23,7 +23,7 @@ jobs:
           commit_message: automated ormolu commit
 
   build-and-test:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted]
     needs: ormolu
     steps:
       - name: Checkout
