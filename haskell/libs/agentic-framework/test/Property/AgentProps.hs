@@ -244,14 +244,14 @@ createAgentWithTools =
         configTemperature = Nothing
       }
 
--- | Test LLM configuration using Ollama (stub/mock)
+-- | Test LLM configuration using Kimi
 testLLMConfig :: LLMConfig
 testLLMConfig =
   LLMConfig
-    { llmProvider = Ollama,
-      llmModel = "tinyllama",
+    { llmProvider = Kimi,
+      llmModel = "moonshot-v1-8k",
       llmApiKey = Nothing,
-      llmBaseUrl = Just "http://localhost:11434",
+      llmBaseUrl = Just "https://api.moonshot.ai/v1",
       llmMaxTokens = 4096,
       llmTemperature = 0.7
     }

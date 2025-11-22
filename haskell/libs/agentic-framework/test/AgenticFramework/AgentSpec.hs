@@ -16,10 +16,10 @@ spec = do
     it "creates an agent with valid configuration" $ do
       let llmCfg =
             LLMConfig
-              { llmProvider = Ollama,
-                llmModel = "qwen3",
+              { llmProvider = Kimi,
+                llmModel = "moonshot-v1-8k",
                 llmApiKey = Nothing,
-                llmBaseUrl = Just "http://localhost:11434",
+                llmBaseUrl = Just "https://api.moonshot.ai/v1",
                 llmMaxTokens = 4096,
                 llmTemperature = 0.7
               }
@@ -136,17 +136,19 @@ createTestAgent =
         configLLM = testLLMConfig,
         configSkillsDir = Nothing,
         configMaxTokens = Nothing,
-        configTemperature = Nothing
+        configTemperature = Nothing,
+        configCapabilities = [],
+        configWorkflow = Nothing
       }
 
 -- | Test LLM configuration
 testLLMConfig :: LLMConfig
 testLLMConfig =
   LLMConfig
-    { llmProvider = Ollama,
-      llmModel = "qwen3",
+    { llmProvider = Kimi,
+      llmModel = "moonshot-v1-8k",
       llmApiKey = Nothing,
-      llmBaseUrl = Just "http://localhost:11434",
+      llmBaseUrl = Just "https://api.moonshot.ai/v1",
       llmMaxTokens = 4096,
       llmTemperature = 0.7
     }

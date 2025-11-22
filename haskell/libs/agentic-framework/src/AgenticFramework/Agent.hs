@@ -56,7 +56,12 @@ import AgenticFramework.LLM.Kimi (KimiLLM, createKimiLLM, defaultKimiParams)
 import AgenticFramework.LLM.Ollama (OllamaLLM, createOllamaLLM, defaultOllamaParams)
 import AgenticFramework.Logging (ExecutionLog (..), logAgentReasoning)
 import AgenticFramework.Tool (executeTool)
+
 import AgenticFramework.Types
+import AgenticFramework.Workflow (runWorkflow)
+import qualified AgenticFramework.Workflow.Types as WF
+import AgenticFramework.Workflow.Types (Capability, Workflow)
+import Data.IORef (newIORef)
 import Data.Aeson (Value, object, (.=))
 import qualified Data.Aeson as Aeson
 import qualified Data.Aeson.KeyMap as KM
@@ -85,9 +90,11 @@ data Agent = Agent
     skillsDirectory :: Maybe FilePath,
     maxTokens :: Maybe Int,
     temperature :: Maybe Double,
-    contextThreshold :: Double -- Default 0.9 (90%)
+    contextThreshold :: Double, -- Default 0.9 (90%)
+    agentCapabilities :: [Capability],
+    agentWorkflow :: Maybe (Workflow Text)
   }
-  deriving (Show, Generic)
+  deriving (Generic)
 
 -- | Configuration for creating a new agent.
 data AgentConfig = AgentConfig
@@ -97,9 +104,11 @@ data AgentConfig = AgentConfig
     configLLM :: LLMConfig,
     configSkillsDir :: Maybe FilePath,
     configMaxTokens :: Maybe Int,
-    configTemperature :: Maybe Double
+    configTemperature :: Maybe Double,
+    configCapabilities :: [Capability],
+    configWorkflow :: Maybe (Workflow Text)
   }
-  deriving (Show, Generic)
+  deriving (Generic)
 
 -- | Result from agent execution.
 data AgentResult = AgentResult
@@ -110,7 +119,7 @@ data AgentResult = AgentResult
     resultSuccess :: Bool,
     resultError :: Maybe Text
   }
-  deriving (Show, Generic)
+  deriving (Generic)
 
 --------------------------------------------------------------------------------
 -- Agent Creation and Execution
@@ -134,7 +143,9 @@ createAgent config = do
         skillsDirectory = configSkillsDir config,
         maxTokens = configMaxTokens config,
         temperature = configTemperature config,
-        contextThreshold = 0.9 -- 90% default threshold
+        contextThreshold = 0.9, -- 90% default threshold
+        agentCapabilities = configCapabilities config,
+        agentWorkflow = configWorkflow config
       }
   where
     -- Generate a random UUID v4
@@ -154,6 +165,7 @@ executeAgent agent input = do
 -- | Execute an agent with existing context (for multi-turn conversations).
 --   Preserves conversation history and token metrics from previous execution.
 --   Automatically triggers context summarization if token usage exceeds 90% threshold.
+--   FR-005: Supports both workflow-based and traditional ReAct execution modes.
 executeAgentWithContext :: Agent -> AgentContext -> Text -> IO AgentResult
 executeAgentWithContext agent ctx input = do
   -- Check if we need to summarize context before proceeding (FR-042, T037)
@@ -192,6 +204,63 @@ executeAgentWithContext agent ctx input = do
             execLogEndTime = Nothing
           }
 
+  -- FR-005: Check if agent has a workflow defined
+  case agentWorkflow agent of
+    Just workflow -> do
+      -- Execute in workflow mode
+      executeWithWorkflow agent ctx'' input workflow execLog
+    Nothing -> do
+      -- Execute in traditional mode (ReAct-style)
+      executeTraditional agent ctx'' input execLog
+
+-- | Execute agent using workflow mode (FR-005)
+executeWithWorkflow :: Agent -> AgentContext -> Text -> Workflow Text -> ExecutionLog -> IO AgentResult
+executeWithWorkflow agent ctx input workflow execLog = do
+  -- Create workflow context from agent context
+  historyRef <- newIORef []
+  let workflowCtx = WF.AgentContext
+        { WF.ctxSystemPrompt = systemPrompt agent,
+          WF.ctxUserPrompt = input,
+          WF.ctxTools = availableTools agent,
+          WF.ctxCapabilities = agentCapabilities agent,
+          WF.ctxLLM = llmConfig agent,
+          WF.ctxHistory = historyRef
+        }
+
+  let initialState = WF.WorkflowState
+        { WF.stCurrentPhase = WF.Executing,
+          WF.stVariables = [],
+          WF.stStepCount = 0,
+          WF.stActiveCapabilities = []
+        }
+
+  -- Execute the workflow
+  result <- runWorkflow workflow workflowCtx initialState
+
+  -- Create assistant message with workflow result
+  assistantTimestamp <- getCurrentTime
+  let assistantMsg =
+        AssistantMessage
+          { messageContent = result,
+            messageTimestamp = assistantTimestamp
+          }
+
+  let ctxAfterResponse = addMessage assistantMsg ctx
+
+  -- Check if we need to summarize after workflow execution (FR-042)
+  finalCtx <-
+    if Sum.shouldTriggerSummarization Sum.defaultSummarizationConfig ctxAfterResponse
+      then Sum.summarizeContext (llmConfig agent) Sum.defaultSummarizationConfig ctxAfterResponse
+      else return ctxAfterResponse
+
+  endTime <- getCurrentTime
+  let finalLog = execLog {execLogEndTime = Just endTime}
+
+  return $ successResult result finalCtx finalLog
+
+-- | Execute agent using traditional ReAct mode (FR-005)
+executeTraditional :: Agent -> AgentContext -> Text -> ExecutionLog -> IO AgentResult
+executeTraditional agent ctx'' input execLog = do
   -- Check if this is a simple tool request that we can handle directly
   -- For now, implement basic pattern matching for calculator tool
   case tryDirectToolExecution agent input of

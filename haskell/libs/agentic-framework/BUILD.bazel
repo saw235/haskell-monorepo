@@ -94,3 +94,30 @@ haskell_test(
     ],
     tags = ["llm", "integration"],
 )
+
+# Workflow tests
+haskell_test(
+    name = "workflow_tests",
+    srcs = glob([
+        "test/Workflow/**/*.hs",
+    ]),
+    main_file = "test/Workflow/Main.hs",
+    data = glob(["examples/capabilities/*.json"]),
+    deps = [
+        ":agentic-framework",
+        "//:base",
+        "//:text",
+        "//:containers",
+        "//:time",
+        "//:bytestring",
+        "//:directory",
+        "//:filepath",
+        "@stackage//:hspec",
+        "@stackage//:hspec-discover",
+        "@stackage//:QuickCheck",
+        "@stackage//:aeson",
+        "@stackage//:mtl",
+        "@stackage//:transformers",
+    ],
+    tags = ["llm", "workflow"],
+)

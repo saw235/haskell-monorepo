@@ -1,0 +1,10 @@
+{
+  "name": "code-review",
+  "description": "Reviews code for issues, bugs, and improvements",
+  "modifierType": "prefix",
+  "modifierValue": "As a code reviewer, I will analyze this code for:\n- Bugs and potential issues\n- Code quality and readability\n- Performance considerations\n- Security vulnerabilities\n\n",
+  "parameters": {
+    "focus": ["bugs", "quality", "performance", "security"],
+    "severity_levels": ["critical", "major", "minor", "suggestion"]
+  }
+}

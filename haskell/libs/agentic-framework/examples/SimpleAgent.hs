@@ -1,112 +1,44 @@
 {-# LANGUAGE OverloadedStrings #-}
 
--- |
--- Module      : SimpleAgent
--- Description : Example demonstrating a simple agent with tools
--- Copyright   : (c) 2025
--- License     : MIT
---
--- This example demonstrates creating and executing a simple agent with
--- calculator and file reader tools.
---
--- = Usage
---
--- @
--- bazel run //haskell/libs/agentic-framework/examples:simple-agent
--- @
-module Main (main) where
+module Main where
 
-import AgenticFramework.Agent
-import AgenticFramework.Context (AgentContext (..))
-import AgenticFramework.Tool
-import AgenticFramework.Tool.File
-import AgenticFramework.Tool.LangChain
-import AgenticFramework.Types
-import Data.Text (Text)
+import AgenticFramework.Agent (executeAgent, resultOutput, agentCapabilities)
+import AgenticFramework.Types (LLMConfig (..), LLMProvider (..))
+import AgenticFramework.Workflow.Builder
+import AgenticFramework.Workflow.Types (Capability (..))
 import qualified Data.Text as T
-import qualified Data.Text.IO as TIO
-import System.Environment (lookupEnv)
+
+-- | Define a simple capability
+uppercaseCapability :: Capability
+uppercaseCapability = Capability
+  { capName = "uppercase",
+    capDescription = "Convert prompt to uppercase",
+    capModifier = T.toUpper,
+    capParameters = Nothing
+  }
 
 main :: IO ()
 main = do
-  putStrLn "=== Simple Agent Example ==="
-  putStrLn ""
+  putStrLn "Building agent..."
+  
+  -- Create agent using the new builder DSL
+  agent <- buildAgent $ do
+    withSystemPrompt "You are a helpful assistant."
+    withCapability uppercaseCapability
+    -- Mock LLM config for example
+    withLLM $ LLMConfig
+      { llmProvider = Custom "Mock",
+        llmModel = "mock-model",
+        llmApiKey = Nothing,
+        llmBaseUrl = Nothing,
+        llmMaxTokens = 1000,
+        llmTemperature = 0.7
+      }
 
-  -- Create agent with file and calculator tools
-  agent <- createSimpleAgent
-
-  putStrLn $ "Created agent: " ++ T.unpack (agentName agent)
-  putStrLn $ "Available tools: " ++ show (length (availableTools agent))
-  putStrLn ""
-
-  -- Example 1: Simple query
-  putStrLn "Example 1: Simple query"
-  result1 <- executeAgent agent "What is 2 + 2?"
-  displayResult result1
-  putStrLn ""
-
-  -- Example 2: File reading task (using stub)
-  putStrLn "Example 2: File reading task"
-  result2 <- executeAgent agent "Please read the file README.md"
-  displayResult result2
-  putStrLn ""
-
-  -- Example 3: Multi-turn conversation
-  putStrLn "Example 3: Multi-turn conversation"
-  result3 <- executeAgent agent "Hello, what can you help me with?"
-  displayResult result3
-
-  let ctx = resultContext result3
-  result4 <- executeAgentWithContext agent ctx "Can you calculate 10 * 5?"
-  displayResult result4
-  putStrLn ""
-
-  putStrLn "=== Example Complete ==="
-
--- | Create a simple agent with calculator and file tools using Kimi
-createSimpleAgent :: IO Agent
-createSimpleAgent = do
-  -- Get Kimi API key from environment
-  maybeApiKey <- lookupEnv "KIMI_API_KEY"
-  let apiKey = case maybeApiKey of
-        Just key -> Just (T.pack key)
-        Nothing -> Nothing
-
-  let llmCfg =
-        LLMConfig
-          { llmProvider = Kimi,
-            llmModel = "moonshot-v1-8k",
-            llmApiKey = apiKey,
-            llmBaseUrl = Just "https://api.moonshot.ai/v1",
-            llmMaxTokens = 4096,
-            llmTemperature = 0.7
-          }
-
-  let config =
-        AgentConfig
-          { configName = "simple-agent",
-            configSystemPrompt = "You are a helpful assistant with access to a calculator and file reader. Help users with calculations and reading files.",
-            configTools = [calculatorTool, readFileTool, listDirectoryTool],
-            configLLM = llmCfg,
-            configSkillsDir = Nothing,
-            configMaxTokens = Nothing,
-            configTemperature = Nothing
-          }
-
-  createAgent config
-
--- | Display agent execution result
-displayResult :: AgentResult -> IO ()
-displayResult result = do
-  putStrLn $ "Success: " ++ show (resultSuccess result)
-
-  case resultError result of
-    Just err -> putStrLn $ "Error: " ++ T.unpack err
-    Nothing -> return ()
-
-  putStrLn $ "Output: " ++ T.unpack (resultOutput result)
-  putStrLn $ "Tools used: " ++ show (length (resultToolsUsed result))
-
-  -- Show conversation length
-  let ctx = resultContext result
-  putStrLn $ "Conversation messages: " ++ show (length (contextConversation ctx))
+  putStrLn "Agent built successfully."
+  putStrLn $ "Agent has " ++ show (length (agentCapabilities agent)) ++ " capabilities."
+  
+  -- Execute agent (mock execution)
+  -- In a real scenario, this would call the LLM
+  -- For this example, we just verify the agent was built correctly
+  putStrLn "Done."

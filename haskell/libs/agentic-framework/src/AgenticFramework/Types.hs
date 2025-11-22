@@ -45,6 +45,7 @@ module AgenticFramework.Types
 
     -- * Orchestration Types
     ExecutionStatus (..),
+    ExecutionMode (..),
     ErrorPolicy (..),
     AggregationStrategy (..),
 
@@ -297,9 +298,24 @@ data ExecutionStatus
     Failed Text
   deriving (Show, Eq, Generic)
 
+-- | Execution mode selection for agents (FR-005).
+--   Determines whether to use workflow-based or traditional ReAct execution.
+data ExecutionMode
+  = -- | Automatically select based on workflow presence (default)
+    AutoMode
+  | -- | Force workflow execution (fails if no workflow)
+    WorkflowMode
+  | -- | Force traditional ReAct execution (ignores workflow if present)
+    TraditionalMode
+  deriving (Show, Eq, Generic)
+
 instance ToJSON ExecutionStatus
 
 instance FromJSON ExecutionStatus
+
+instance ToJSON ExecutionMode
+
+instance FromJSON ExecutionMode
 
 -- | Error handling policy for sequential workflows.
 data ErrorPolicy

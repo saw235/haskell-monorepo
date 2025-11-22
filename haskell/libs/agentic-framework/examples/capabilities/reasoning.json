@@ -1,0 +1,10 @@
+{
+  "name": "reasoning",
+  "description": "Break down complex problems step-by-step using chain-of-thought reasoning",
+  "modifierType": "prefix",
+  "modifierValue": "Let me think through this step by step:\n\n",
+  "parameters": {
+    "style": "chain-of-thought",
+    "maxSteps": 10
+  }
+}
