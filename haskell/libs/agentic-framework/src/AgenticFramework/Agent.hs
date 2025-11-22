@@ -56,15 +56,14 @@ import AgenticFramework.LLM.Kimi (KimiLLM, createKimiLLM, defaultKimiParams)
 import AgenticFramework.LLM.Ollama (OllamaLLM, createOllamaLLM, defaultOllamaParams)
 import AgenticFramework.Logging (ExecutionLog (..), logAgentReasoning)
 import AgenticFramework.Tool (executeTool)
-
 import AgenticFramework.Types
 import AgenticFramework.Workflow (runWorkflow)
-import qualified AgenticFramework.Workflow.Types as WF
 import AgenticFramework.Workflow.Types (Capability, Workflow)
-import Data.IORef (newIORef)
+import qualified AgenticFramework.Workflow.Types as WF
 import Data.Aeson (Value, object, (.=))
 import qualified Data.Aeson as Aeson
 import qualified Data.Aeson.KeyMap as KM
+import Data.IORef (newIORef)
 import qualified Data.List as List
 import qualified Data.Sequence as Seq
 import Data.Text (Text)
@@ -218,21 +217,23 @@ executeWithWorkflow :: Agent -> AgentContext -> Text -> Workflow Text -> Executi
 executeWithWorkflow agent ctx input workflow execLog = do
   -- Create workflow context from agent context
   historyRef <- newIORef []
-  let workflowCtx = WF.AgentContext
-        { WF.ctxSystemPrompt = systemPrompt agent,
-          WF.ctxUserPrompt = input,
-          WF.ctxTools = availableTools agent,
-          WF.ctxCapabilities = agentCapabilities agent,
-          WF.ctxLLM = llmConfig agent,
-          WF.ctxHistory = historyRef
-        }
+  let workflowCtx =
+        WF.AgentContext
+          { WF.ctxSystemPrompt = systemPrompt agent,
+            WF.ctxUserPrompt = input,
+            WF.ctxTools = availableTools agent,
+            WF.ctxCapabilities = agentCapabilities agent,
+            WF.ctxLLM = llmConfig agent,
+            WF.ctxHistory = historyRef
+          }
 
-  let initialState = WF.WorkflowState
-        { WF.stCurrentPhase = WF.Executing,
-          WF.stVariables = [],
-          WF.stStepCount = 0,
-          WF.stActiveCapabilities = []
-        }
+  let initialState =
+        WF.WorkflowState
+          { WF.stCurrentPhase = WF.Executing,
+            WF.stVariables = [],
+            WF.stStepCount = 0,
+            WF.stActiveCapabilities = []
+          }
 
   -- Execute the workflow
   result <- runWorkflow workflow workflowCtx initialState

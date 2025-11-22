@@ -16,15 +16,15 @@ import AgenticFramework.Context (AgentContext (..), createContext)
 import AgenticFramework.Tool.LangChain (calculatorTool)
 import AgenticFramework.Types
 import AgenticFramework.Workflow (runWorkflow)
-import AgenticFramework.Workflow.DSL (llmCall, useTool, getUserPrompt)
+import AgenticFramework.Workflow.DSL (getUserPrompt, llmCall, useTool)
 import AgenticFramework.Workflow.Execution (executeWorkflow)
 import AgenticFramework.Workflow.Types
   ( AgentContext (..),
     Capability (..),
     Workflow (..),
     WorkflowError (..),
-    WorkflowState (..),
     WorkflowPhase (..),
+    WorkflowState (..),
   )
 import Control.Monad.IO.Class (liftIO)
 import Data.Aeson (object, (.=))

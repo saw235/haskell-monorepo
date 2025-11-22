@@ -17,13 +17,13 @@ import AgenticFramework.Types (LLMConfig (..), LLMProvider (..), Tool (..))
 import AgenticFramework.Workflow (runWorkflow_)
 import AgenticFramework.Workflow.Builder
 import AgenticFramework.Workflow.Capabilities (applyCapabilities, findCapability)
-import AgenticFramework.Workflow.DSL (llmCall, useTool, branch, getUserPrompt)
+import AgenticFramework.Workflow.DSL (branch, getUserPrompt, llmCall, useTool)
 import AgenticFramework.Workflow.Execution (nestedWorkflow, withLocalCapabilities, withNestedContext)
 import AgenticFramework.Workflow.Loader
 import AgenticFramework.Workflow.Types
 import Control.Monad.IO.Class (liftIO)
 import Control.Monad.Reader (ask, asks)
-import Control.Monad.State (get, modify, gets)
+import Control.Monad.State (get, gets, modify)
 import Data.Aeson (Value (..))
 import qualified Data.Aeson as Aeson
 import Data.IORef (newIORef)
@@ -61,13 +61,14 @@ researchWorkflow = do
   let isTechnical = T.isInfixOf "code" userPrompt || T.isInfixOf "function" userPrompt
 
   -- Step C: Apply appropriate capability based on question type
-  result <- if isTechnical
-    then do
-      liftIO $ putStrLn "  [Step B] Technical question detected - applying 'technical' capability..."
-      return $ capModifier technicalCap reasonedPrompt
-    else do
-      liftIO $ putStrLn "  [Step B] General question - applying 'concise' capability..."
-      return $ capModifier conciseCap reasonedPrompt
+  result <-
+    if isTechnical
+      then do
+        liftIO $ putStrLn "  [Step B] Technical question detected - applying 'technical' capability..."
+        return $ capModifier technicalCap reasonedPrompt
+      else do
+        liftIO $ putStrLn "  [Step B] General question - applying 'concise' capability..."
+        return $ capModifier conciseCap reasonedPrompt
 
   liftIO $ putStrLn "  [Step C] Workflow complete!"
   return result
@@ -114,18 +115,18 @@ nestedResearchWorkflow = do
 
   -- Sub-workflow 3: Final formatting with modified context
   let isTechnical = T.isInfixOf "code" userPrompt || T.isInfixOf "function" userPrompt
-  finalResult <- withNestedContext (\c -> c { ctxSystemPrompt = "Format output professionally" }) $
+  finalResult <- withNestedContext (\c -> c {ctxSystemPrompt = "Format output professionally"}) $
     nestedWorkflow $ do
       liftIO $ putStrLn "    [Nested Sub-3] Running formatting sub-workflow..."
-      let formatted = if isTechnical
-            then capModifier technicalCap refinedResult
-            else refinedResult
+      let formatted =
+            if isTechnical
+              then capModifier technicalCap refinedResult
+              else refinedResult
       liftIO $ putStrLn "    [Nested Sub-3] Formatting complete"
       return formatted
 
   liftIO $ putStrLn "  [Nested Main] All sub-workflows complete!"
   return finalResult
-
 
 main :: IO ()
 main = do
@@ -149,21 +150,23 @@ main = do
 
   -- Create context for workflow execution
   historyRef <- newIORef []
-  let ctx = AgentContext
-        { ctxSystemPrompt = "You are a helpful AI assistant."
-        , ctxUserPrompt = "How do I implement a binary search function?"
-        , ctxTools = []
-        , ctxCapabilities = capabilities  -- Capabilities passed via context
-        , ctxLLM = LLMConfig
-            { llmProvider = Custom "Kimi"
-            , llmModel = "moonshot-v1-8k"
-            , llmApiKey = Nothing
-            , llmBaseUrl = Just "https://api.moonshot.cn/v1"
-            , llmMaxTokens = 2000
-            , llmTemperature = 0.7
-            }
-        , ctxHistory = historyRef
-        }
+  let ctx =
+        AgentContext
+          { ctxSystemPrompt = "You are a helpful AI assistant.",
+            ctxUserPrompt = "How do I implement a binary search function?",
+            ctxTools = [],
+            ctxCapabilities = capabilities, -- Capabilities passed via context
+            ctxLLM =
+              LLMConfig
+                { llmProvider = Custom "Kimi",
+                  llmModel = "moonshot-v1-8k",
+                  llmApiKey = Nothing,
+                  llmBaseUrl = Just "https://api.moonshot.cn/v1",
+                  llmMaxTokens = 2000,
+                  llmTemperature = 0.7
+                },
+            ctxHistory = historyRef
+          }
 
   -- Execute simple research workflow (defined at top level)
   -- Note: Using runWorkflow_ which uses defaultWorkflowState internally
@@ -183,7 +186,7 @@ main = do
   putStrLn ""
 
   -- Execute code review workflow with different prompt
-  let ctx3 = ctx { ctxUserPrompt = "Review this code: def add(a, b): return a + b" }
+  let ctx3 = ctx {ctxUserPrompt = "Review this code: def add(a, b): return a + b"}
   putStrLn "--- Code Review Workflow ---"
   result3 <- runWorkflow_ codeReviewWorkflow ctx3
   putStrLn ""
@@ -196,15 +199,16 @@ main = do
   agent <- buildAgent $ do
     withSystemPrompt "You are a helpful AI research assistant."
     mapM_ withCapability capabilities
-    withWorkflow researchWorkflow  -- Top-level workflow
-    withLLM $ LLMConfig
-      { llmProvider = Custom "Kimi"
-      , llmModel = "moonshot-v1-8k"
-      , llmApiKey = Nothing
-      , llmBaseUrl = Just "https://api.moonshot.cn/v1"
-      , llmMaxTokens = 2000
-      , llmTemperature = 0.7
-      }
+    withWorkflow researchWorkflow -- Top-level workflow
+    withLLM $
+      LLMConfig
+        { llmProvider = Custom "Kimi",
+          llmModel = "moonshot-v1-8k",
+          llmApiKey = Nothing,
+          llmBaseUrl = Just "https://api.moonshot.cn/v1",
+          llmMaxTokens = 2000,
+          llmTemperature = 0.7
+        }
 
   putStrLn $ "Agent built with " ++ show (length (agentCapabilities agent)) ++ " capabilities"
   putStrLn "Done!"

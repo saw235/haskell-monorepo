@@ -37,7 +37,7 @@ module AgenticFramework.Workflow.Tools
   )
 where
 
-import AgenticFramework.Types (Tool (..), ToolSchema(..))
+import AgenticFramework.Types (Tool (..), ToolSchema (..))
 import qualified AgenticFramework.Types as AgenticTypes
 import AgenticFramework.Workflow.Types (Workflow, WorkflowError (..))
 import Control.Exception (SomeException, catch, try)
@@ -145,8 +145,8 @@ makeTool name desc fn =
       toolDescription = desc,
       toolSchema = ToolSchema Aeson.Null Aeson.Null,
       toolExecute = \input -> do
-          result <- fn (AgenticTypes.unToolInput input)
-          return $ Right $ AgenticTypes.ToolOutput result,
+        result <- fn (AgenticTypes.unToolInput input)
+        return $ Right $ AgenticTypes.ToolOutput result,
       toolTimeout = Nothing,
       toolRetryable = True
     }

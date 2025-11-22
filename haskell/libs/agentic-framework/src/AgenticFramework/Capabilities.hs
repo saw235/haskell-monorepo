@@ -1,26 +1,24 @@
 {-# LANGUAGE DataKinds #-}
-{-# LANGUAGE GADTs #-}
-{-# LANGUAGE KindSignatures #-}
-{-# LANGUAGE TypeFamilies #-}
-{-# LANGUAGE TypeOperators #-}
-{-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE GADTs #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE KindSignatures #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE OverloadedStrings #-}
-
-{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE TypeOperators #-}
 
 module AgenticFramework.Capabilities where
 
+import Control.Monad.Reader
+import Control.Monad.State
 import Data.Kind (Type)
 import Data.Text (Text)
 import qualified Data.Text as T
-import Control.Monad.Reader
-import Control.Monad.State
 
 -- | Approach 1: Phantom Types for Capability Tracking
 -- Track what data the agent currently has access to
-
 data AgentState = Empty | Observed | Searched | Reasoned
 
 -- Phantom type parameter tracks the agent's current state
@@ -66,10 +64,8 @@ validFlow initial =
 --   respond . observe . search . reason $ initial
 --   -- Error: reason expects 'Searched but gets 'Reasoned
 
-
 -- | Approach 2: Type Classes for Capabilities
 -- More flexible: agents can have multiple capabilities
-
 class HasObservation m where
   observeEnv :: m Text
 
@@ -105,10 +101,8 @@ instance HasObservation SmartAgent where
 instance HasReasoning SmartAgent where
   reasonAbout data' = return $ "reasoned: " <> T.pack (show data')
 
-
 -- | Approach 3: Indexed Monads for Protocol Safety
 -- Ensures operations happen in valid sequences
-
 data Phase = Start | ObservedPhase | SearchedPhase | ReasonedPhase | Done
 
 -- IxMonad tracks phase transitions
@@ -117,8 +111,8 @@ class IxMonad (m :: Phase -> Phase -> Type -> Type) where
   (>>>=) :: m i j a -> (a -> m j k b) -> m i k b
 
 -- Agent operations that enforce phase transitions
-newtype IxAgent (i :: Phase) (j :: Phase) a =
-  IxAgent (ReaderT AgentEnv IO a)
+newtype IxAgent (i :: Phase) (j :: Phase) a
+  = IxAgent (ReaderT AgentEnv IO a)
 
 instance IxMonad IxAgent where
   ireturn x = IxAgent (return x)
@@ -152,9 +146,9 @@ irespond conclusion = IxAgent $ do
 validProtocol :: IxAgent 'Start 'Done Text
 validProtocol =
   iobserve >>>= \obs ->
-  isearch obs >>>= \results ->
-  ireason results >>>= \conclusion ->
-  irespond conclusion
+    isearch obs >>>= \results ->
+      ireason results >>>= \conclusion ->
+        irespond conclusion
 
 -- Invalid flow won't compile:
 -- invalidProtocol :: IxAgent 'Start 'Done Text
@@ -163,22 +157,17 @@ validProtocol =
 --   iobserve >>>= \obs ->
 --   irespond conclusion
 
-
 -- | Approach 4: GADTs with Capability Requirements
 -- Most explicit about what each operation needs
-
 data Capability = NeedsNothing | NeedsObservation | NeedsSearchResults | NeedsReasoning
 
 data AgentOp :: Capability -> Type -> Type where
   -- Observe requires nothing, produces observation
   Observe :: AgentOp 'NeedsNothing Text
-
   -- Search requires observation, produces results
   Search :: Text -> AgentOp 'NeedsObservation [Text]
-
   -- Reason requires search results, produces conclusion
   Reason :: [Text] -> AgentOp 'NeedsSearchResults Text
-
   -- Respond requires reasoning, produces response
   Respond :: Text -> AgentOp 'NeedsReasoning Text
 
@@ -196,7 +185,6 @@ runAgentOp (Reason results) = do
 runAgentOp (Respond conclusion) = do
   putStrLn $ "Responding with: " ++ show conclusion
   return conclusion
-
 
 -- | Approach 5: Capability as Monad Transformer Stacks
 -- Different stacks = different capabilities
@@ -221,37 +209,35 @@ observeWithReader = do
 
 reasonWithState :: ReasoningAgent Text
 reasonWithState = do
-  obs <- lift observeWithReader  -- Can still observe
+  obs <- lift observeWithReader -- Can still observe
   ctx <- get
-  modify $ \c -> c { previousObservations = obs : previousObservations c }
+  modify $ \c -> c {previousObservations = obs : previousObservations c}
   return "reasoned conclusion"
 
 searchWithIndex :: SearchingAgent [Text]
 searchWithIndex = do
-  index <- ask  -- Get search index
-  conclusion <- lift reasonWithState  -- Can reason
+  index <- ask -- Get search index
+  conclusion <- lift reasonWithState -- Can reason
   -- Search using both index and reasoning
   return ["search results"]
 
-
 -- | Helper Types
-
 data AgentEnv = AgentEnv
-  { agentTools :: [Text]
-  , agentConfig :: Text
+  { agentTools :: [Text],
+    agentConfig :: Text
   }
 
 data Environment = Environment
-  { envData :: Text }
-  deriving Show
+  {envData :: Text}
+  deriving (Show)
 
 data ReasoningContext = ReasoningContext
-  { previousObservations :: [Text]
-  , workingMemory :: [Text]
+  { previousObservations :: [Text],
+    workingMemory :: [Text]
   }
 
 data SearchIndex = SearchIndex
-  { indexedData :: [Text] }
+  {indexedData :: [Text]}
 
 data Context = Context
-  { ctxHistory :: [Text] }
+  {ctxHistory :: [Text]}

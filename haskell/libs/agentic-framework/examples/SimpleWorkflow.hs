@@ -5,11 +5,11 @@
 module Main where
 
 import AgenticFramework.Agent (Agent (..))
-import Configuration.Dotenv (defaultConfig, loadFile)
 import AgenticFramework.Types (LLMConfig (..), LLMProvider (..), Message (..), Tool (..), ToolError (..), ToolInput (..), ToolOutput (..), ToolSchema (..))
 import AgenticFramework.Workflow
 import AgenticFramework.Workflow.DSL
 import AgenticFramework.Workflow.Types
+import Configuration.Dotenv (defaultConfig, loadFile)
 import Data.Aeson (Value (..), object, (.=))
 import Data.IORef
 import Data.Text (Text)

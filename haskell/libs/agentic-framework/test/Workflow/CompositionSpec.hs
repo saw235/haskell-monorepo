@@ -2,10 +2,10 @@
 
 module Workflow.CompositionSpec (spec) where
 
+import AgenticFramework.Types (LLMConfig (..), LLMProvider (..), Tool (..), ToolInput (..), ToolOutput (..), ToolSchema (..))
 import AgenticFramework.Workflow
 import AgenticFramework.Workflow.DSL
 import AgenticFramework.Workflow.Types
-import AgenticFramework.Types (LLMConfig (..), LLMProvider (..), Tool (..), ToolSchema (..), ToolInput (..), ToolOutput (..))
 import Data.Aeson (Value (..), object)
 import Data.IORef
 import Data.Text (Text)

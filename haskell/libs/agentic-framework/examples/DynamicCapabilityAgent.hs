@@ -10,7 +10,7 @@
 -- agent capabilities dynamically from JSON configuration files.
 module Main where
 
-import AgenticFramework.Agent (executeAgent, resultOutput, agentCapabilities)
+import AgenticFramework.Agent (agentCapabilities, executeAgent, resultOutput)
 import AgenticFramework.Types (LLMConfig (..), LLMProvider (..))
 import AgenticFramework.Workflow.Builder
 import AgenticFramework.Workflow.Capabilities (applyCapabilities, composeCapabilities, mergeCapabilities)
@@ -30,7 +30,7 @@ main :: IO ()
 main = do
   args <- getArgs
   let capDir = case args of
-        (dir:_) -> dir
+        (dir : _) -> dir
         [] -> exampleCapabilitiesDir
 
   putStrLn "=== Dynamic Capability Loading Example ==="
@@ -65,7 +65,7 @@ main = do
   -- Demonstrate capability composition
   putStrLn "=== Capability Composition Demo ==="
   case capabilities of
-    (cap1:cap2:_) -> do
+    (cap1 : cap2 : _) -> do
       let composed = composeCapabilities cap1 cap2
       putStrLn $ "Composing: " ++ T.unpack (capName cap1) ++ " + " ++ T.unpack (capName cap2)
       putStrLn $ "Result: " ++ T.unpack (capModifier composed testPrompt)
@@ -86,14 +86,15 @@ main = do
   agent <- buildAgent $ do
     withSystemPrompt "You are a helpful AI assistant."
     mapM_ withCapability capabilities
-    withLLM $ LLMConfig
-      { llmProvider = Custom "Kimi"
-      , llmModel = "moonshot-v1-8k"
-      , llmApiKey = Nothing
-      , llmBaseUrl = Just "https://api.moonshot.cn/v1"
-      , llmMaxTokens = 2000
-      , llmTemperature = 0.7
-      }
+    withLLM $
+      LLMConfig
+        { llmProvider = Custom "Kimi",
+          llmModel = "moonshot-v1-8k",
+          llmApiKey = Nothing,
+          llmBaseUrl = Just "https://api.moonshot.cn/v1",
+          llmMaxTokens = 2000,
+          llmTemperature = 0.7
+        }
 
   putStrLn $ "Agent built with " ++ show (length (agentCapabilities agent)) ++ " capabilities"
   putStrLn "Done!"
@@ -109,8 +110,9 @@ demonstrateCapability prompt cap = do
   putStrLn $ "Applying '" ++ T.unpack (capName cap) ++ "':"
   let modified = capModifier cap prompt
   -- Show first 100 chars to keep output readable
-  let preview = if T.length modified > 100
-                then T.take 100 modified <> "..."
-                else modified
+  let preview =
+        if T.length modified > 100
+          then T.take 100 modified <> "..."
+          else modified
   TIO.putStrLn $ "  " <> preview
   putStrLn ""

@@ -28,7 +28,7 @@ module AgenticFramework.Workflow.Capabilities
 where
 
 import AgenticFramework.Workflow.Types (Capability (..), CapabilityDef (..))
-import Data.Aeson (FromJSON (..), ToJSON (..), (.:), (.:?), withObject)
+import Data.Aeson (FromJSON (..), ToJSON (..), withObject, (.:), (.:?))
 import qualified Data.Aeson as Aeson
 import Data.List (find)
 import Data.Text (Text)
@@ -88,12 +88,13 @@ lookupCapability = findCapabilityMaybe
 -- | Default capability used when a capability is not found
 --   Has identity modifier (does not modify the prompt)
 defaultCapability :: Text -> Capability
-defaultCapability name = Capability
-  { capName = name
-  , capDescription = "Default " <> name <> " capability (not found)"
-  , capModifier = id
-  , capParameters = Nothing
-  }
+defaultCapability name =
+  Capability
+    { capName = name,
+      capDescription = "Default " <> name <> " capability (not found)",
+      capModifier = id,
+      capParameters = Nothing
+    }
 
 -- | Convert a CapabilityDef (loaded from JSON) to a Capability (runtime)
 --   The modifier is constructed based on modifierType and modifierValue

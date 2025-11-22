@@ -288,7 +288,9 @@ formatMetrics wm =
   T.unlines
     [ "Workflow: " <> wmWorkflowId wm,
       "Duration: " <> maybe "N/A" showMs (wmTotalDurationMs wm),
-      "Steps: " <> T.pack (show (wmTotalSteps wm)) <> " ("
+      "Steps: "
+        <> T.pack (show (wmTotalSteps wm))
+        <> " ("
         <> T.pack (show (wmSuccessfulSteps wm))
         <> " successful, "
         <> T.pack (show (wmFailedSteps wm))
@@ -313,7 +315,7 @@ diffToMs :: NominalDiffTime -> Double
 diffToMs dt = realToFrac dt * 1000
 
 -- | Simple quicksort for percentile calculation
-quickSort :: Ord a => [a] -> [a]
+quickSort :: (Ord a) => [a] -> [a]
 quickSort [] = []
 quickSort (x : xs) = quickSort smaller ++ [x] ++ quickSort larger
   where

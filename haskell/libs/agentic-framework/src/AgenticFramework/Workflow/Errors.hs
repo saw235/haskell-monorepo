@@ -216,7 +216,10 @@ commonFixes =
 -- | Format an error for display (with colors for terminal)
 formatError :: DetailedError -> Text
 formatError err =
-  severityPrefix (deSeverity err) <> " " <> deMessage err <> "\n"
+  severityPrefix (deSeverity err)
+    <> " "
+    <> deMessage err
+    <> "\n"
     <> formatSuggestions (deSuggestions err)
     <> formatContext (deContext err)
   where
@@ -247,7 +250,8 @@ catMaybes = foldr (\mx acc -> maybe acc (: acc) mx) []
 -- | Format an error as plain text (no formatting)
 formatErrorPlain :: DetailedError -> Text
 formatErrorPlain err =
-  "Error: " <> deMessage err
+  "Error: "
+    <> deMessage err
     <> maybe "" ("\n\nTechnical details: " <>) (deTechnicalDetails err)
 
 -- | Format an error as JSON
@@ -258,7 +262,8 @@ formatErrorJson err =
 -- | Format an error for logging
 formatErrorForLog :: DetailedError -> Text
 formatErrorForLog err =
-  T.intercalate " | "
+  T.intercalate
+    " | "
     [ "[" <> T.pack (show (deSeverity err)) <> "]",
       "[" <> T.pack (show (deCategory err)) <> "]",
       T.pack (show (deOriginalError err)),

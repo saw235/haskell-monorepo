@@ -9,7 +9,7 @@ module AgenticFramework.Workflow.Builder
   ( -- * Agent Builder Monad
     AgentBuilder,
     buildAgent,
-    
+
     -- * Configuration Functions
     withSystemPrompt,
     withLLM,
@@ -25,8 +25,8 @@ where
 import AgenticFramework.Agent (Agent, AgentConfig (..), createAgent)
 import AgenticFramework.Types (LLMConfig, Tool)
 import AgenticFramework.Workflow.Types (Capability, Workflow)
-import Control.Monad.State (StateT, execStateT, modify)
 import Control.Monad.IO.Class (MonadIO, liftIO)
+import Control.Monad.State (StateT, execStateT, modify)
 import Data.Text (Text)
 
 -- | Agent Builder Monad
@@ -36,18 +36,19 @@ type AgentBuilder = StateT AgentConfig IO
 buildAgent :: AgentBuilder () -> IO Agent
 buildAgent builder = do
   -- Default configuration
-  let defaultConfig = AgentConfig
-        { configName = "agent",
-          configSystemPrompt = "You are a helpful assistant.",
-          configTools = [],
-          configLLM = undefined, -- Must be provided
-          configSkillsDir = Nothing,
-          configMaxTokens = Nothing,
-          configTemperature = Nothing,
-          configCapabilities = [],
-          configWorkflow = Nothing
-        }
-  
+  let defaultConfig =
+        AgentConfig
+          { configName = "agent",
+            configSystemPrompt = "You are a helpful assistant.",
+            configTools = [],
+            configLLM = undefined, -- Must be provided
+            configSkillsDir = Nothing,
+            configMaxTokens = Nothing,
+            configTemperature = Nothing,
+            configCapabilities = [],
+            configWorkflow = Nothing
+          }
+
   finalConfig <- execStateT builder defaultConfig
   createAgent finalConfig
 

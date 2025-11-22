@@ -22,22 +22,22 @@ module AgenticFramework.Workflow.DSL
   )
 where
 
-import AgenticFramework.Workflow (runWorkflow)
-import AgenticFramework.Workflow.Types
-import AgenticFramework.Workflow.Capabilities (applyCapabilities)
-import AgenticFramework.Types (Tool (..), ToolInput (..), ToolOutput (..), ToolError (..), LLMConfig (..), LLMProvider (..))
-import AgenticFramework.Tool (executeTool)
-import qualified AgenticFramework.LLM.Ollama as Ollama
 import qualified AgenticFramework.LLM.Kimi as Kimi
-import qualified Langchain.LLM.Core as LLM
+import qualified AgenticFramework.LLM.Ollama as Ollama
+import AgenticFramework.Tool (executeTool)
+import AgenticFramework.Types (LLMConfig (..), LLMProvider (..), Tool (..), ToolError (..), ToolInput (..), ToolOutput (..))
+import AgenticFramework.Workflow (runWorkflow)
+import AgenticFramework.Workflow.Capabilities (applyCapabilities)
+import AgenticFramework.Workflow.Types
 import Control.Concurrent.Async (mapConcurrently)
 import Control.Monad.IO.Class (liftIO)
 import Control.Monad.Reader (ask)
 import Control.Monad.State (get, modify)
 import Data.Aeson (Value)
+import qualified Data.List as List
 import Data.Text (Text)
 import qualified Data.Text as T
-import qualified Data.List as List
+import qualified Langchain.LLM.Core as LLM
 
 -- | Call the LLM with a prompt
 --   Uses the agent's configured LLM
@@ -57,9 +57,9 @@ llmCall prompt = do
       let llm = Ollama.createOllamaLLM config
       LLM.generate llm modifiedPrompt Nothing
     Kimi -> do
-       case Kimi.createKimiLLM config of
-         Nothing -> return $ Left "Kimi API key missing"
-         Just llm -> LLM.generate llm modifiedPrompt Nothing
+      case Kimi.createKimiLLM config of
+        Nothing -> return $ Left "Kimi API key missing"
+        Just llm -> LLM.generate llm modifiedPrompt Nothing
     Custom name
       | name == "Kimi" || name == "kimi" -> do
           -- Custom "Kimi" uses same backend as Kimi provider
@@ -124,12 +124,12 @@ withCapability capabilityName action = do
     Just cap -> do
       -- Push capability onto the active stack
       let oldCaps = stActiveCapabilities state
-      modify $ \s -> s { stActiveCapabilities = cap : oldCaps }
+      modify $ \s -> s {stActiveCapabilities = cap : oldCaps}
 
       -- Execute the action with the capability active
       result <- action
 
       -- Pop capability from the stack (restore previous state)
-      modify $ \s -> s { stActiveCapabilities = oldCaps }
+      modify $ \s -> s {stActiveCapabilities = oldCaps}
 
       return result

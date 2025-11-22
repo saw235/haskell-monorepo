@@ -5,11 +5,11 @@ module Workflow.CapabilitySpec (spec) where
 import AgenticFramework.Workflow.Capabilities
 import AgenticFramework.Workflow.Loader
 import AgenticFramework.Workflow.Types (Capability (..), CapabilityDef (..))
-import Data.Aeson (object, (.=), encode, decode)
+import Data.Aeson (decode, encode, object, (.=))
+import qualified Data.ByteString.Lazy as LBS
 import Data.Maybe (isJust, isNothing)
 import Data.Text (Text)
 import qualified Data.Text as T
-import qualified Data.ByteString.Lazy as LBS
 import Test.Hspec
 import Test.QuickCheck
 
@@ -17,19 +17,20 @@ spec :: Spec
 spec = describe "Capability System" $ do
   describe "applyCapability" $ do
     it "modifies the prompt using the capability's modifier" $ do
-      let cap = Capability
-            { capName = "uppercase",
-              capDescription = "Convert to uppercase",
-              capModifier = T.toUpper,
-              capParameters = Nothing
-            }
+      let cap =
+            Capability
+              { capName = "uppercase",
+                capDescription = "Convert to uppercase",
+                capModifier = T.toUpper,
+                capParameters = Nothing
+              }
       applyCapability cap "hello" `shouldBe` "HELLO"
 
   describe "applyCapabilities" $ do
     it "applies capabilities in order" $ do
       let cap1 = Capability "append-A" "Appends A" (<> "A") Nothing
           cap2 = Capability "append-B" "Appends B" (<> "B") Nothing
-      
+
       -- Should be (prompt <> "A") <> "B"
       applyCapabilities [cap1, cap2] "start" `shouldBe` "startAB"
 
@@ -62,11 +63,12 @@ spec = describe "Capability System" $ do
   -- User Story 5: Dynamic Capability Loading tests
   describe "[T049][US5] JSON capability loading" $ do
     it "parses valid capability definition from JSON" $ do
-      let validJson = object
-            [ "name" .= ("reasoning" :: Text)
-            , "description" .= ("Break down complex problems step-by-step" :: Text)
-            , "parameters" .= object ["style" .= ("chain-of-thought" :: Text)]
-            ]
+      let validJson =
+            object
+              [ "name" .= ("reasoning" :: Text),
+                "description" .= ("Break down complex problems step-by-step" :: Text),
+                "parameters" .= object ["style" .= ("chain-of-thought" :: Text)]
+              ]
       let parsed = decode (encode validJson) :: Maybe CapabilityDef
       parsed `shouldSatisfy` isJust
       case parsed of
@@ -76,36 +78,40 @@ spec = describe "Capability System" $ do
         Nothing -> expectationFailure "Should have parsed valid JSON"
 
     it "loads capability with all required fields" $ do
-      let json = object
-            [ "name" .= ("code-review" :: Text)
-            , "description" .= ("Reviews code for issues" :: Text)
-            ]
+      let json =
+            object
+              [ "name" .= ("code-review" :: Text),
+                "description" .= ("Reviews code for issues" :: Text)
+              ]
       let parsed = decode (encode json) :: Maybe CapabilityDef
       parsed `shouldSatisfy` isJust
 
     it "returns capability with correct modifier based on definition" $ do
-      let def = CapabilityDef
-            { capDefName = "prefix-test"
-            , capDefDescription = "Adds prefix to prompt"
-            , capDefParameters = Nothing
-            , capDefModifierType = Just "prefix"
-            , capDefModifierValue = Just "[PREFIX] "
-            }
+      let def =
+            CapabilityDef
+              { capDefName = "prefix-test",
+                capDefDescription = "Adds prefix to prompt",
+                capDefParameters = Nothing,
+                capDefModifierType = Just "prefix",
+                capDefModifierValue = Just "[PREFIX] "
+              }
       let cap = capabilityFromDef def
       applyCapability cap "hello" `shouldBe` "[PREFIX] hello"
 
   describe "[T050][US5] Invalid capability handling" $ do
     it "rejects JSON missing required 'name' field" $ do
-      let invalidJson = object
-            [ "description" .= ("A description" :: Text)
-            ]
+      let invalidJson =
+            object
+              [ "description" .= ("A description" :: Text)
+              ]
       let parsed = decode (encode invalidJson) :: Maybe CapabilityDef
       parsed `shouldSatisfy` isNothing
 
     it "rejects JSON missing required 'description' field" $ do
-      let invalidJson = object
-            [ "name" .= ("test-cap" :: Text)
-            ]
+      let invalidJson =
+            object
+              [ "name" .= ("test-cap" :: Text)
+              ]
       let parsed = decode (encode invalidJson) :: Maybe CapabilityDef
       parsed `shouldSatisfy` isNothing
 

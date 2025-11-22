@@ -23,8 +23,8 @@ module AgenticFramework.Workflow.Validation
   )
 where
 
-import AgenticFramework.Workflow.Types
 import AgenticFramework.Types (Tool (..))
+import AgenticFramework.Workflow.Types
 import Data.Text (Text)
 import qualified Data.Text as T
 
@@ -109,7 +109,7 @@ checkCapabilities caps =
    in map DuplicateCapabilityName duplicates
 
 -- | Find duplicate elements in a list
-findDuplicates :: Eq a => [a] -> [a]
+findDuplicates :: (Eq a) => [a] -> [a]
 findDuplicates [] = []
 findDuplicates (x : xs)
   | x `elem` xs = x : findDuplicates (filter (/= x) xs)

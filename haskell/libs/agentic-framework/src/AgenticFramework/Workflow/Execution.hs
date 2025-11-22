@@ -162,7 +162,7 @@ getVariable name = do
 --   Overwrites existing value if present
 setVariable :: Text -> Value -> Workflow ()
 setVariable name value = modify $ \s ->
-  s { stVariables = (name, value) : filter ((/= name) . fst) (stVariables s) }
+  s {stVariables = (name, value) : filter ((/= name) . fst) (stVariables s)}
 
 -- | Modify a variable in the workflow state
 --   Does nothing if variable doesn't exist
@@ -176,7 +176,7 @@ modifyVariable name f = do
 -- | Remove a variable from the workflow state
 clearVariable :: Text -> Workflow ()
 clearVariable name = modify $ \s ->
-  s { stVariables = filter ((/= name) . fst) (stVariables s) }
+  s {stVariables = filter ((/= name) . fst) (stVariables s)}
 
 -- | Get all variables from the workflow state
 getAllVariables :: Workflow [(Text, Value)]
@@ -204,11 +204,11 @@ nestedWorkflow subWorkflow = do
   ctx <- ask
   parentState <- get
   -- Create isolated state for nested workflow
-  let nestedState = parentState { stStepCount = 0 }
+  let nestedState = parentState {stStepCount = 0}
   -- Execute nested workflow in isolated state
   result <- liftIO $ runWorkflow subWorkflow ctx nestedState
   -- Increment parent's step count to track that a nested workflow was executed
-  modify $ \s -> s { stStepCount = stStepCount s + 1 }
+  modify $ \s -> s {stStepCount = stStepCount s + 1}
   return result
 
 -- | Execute a workflow with a modified context (for nesting)
@@ -222,8 +222,8 @@ withNestedContext modifyCtx subWorkflow = do
 withLocalCapabilities :: [Capability] -> Workflow a -> Workflow a
 withLocalCapabilities localCaps subWorkflow = do
   -- Update workflow state with local capabilities
-  modify $ \s -> s { stActiveCapabilities = localCaps ++ stActiveCapabilities s }
+  modify $ \s -> s {stActiveCapabilities = localCaps ++ stActiveCapabilities s}
   result <- subWorkflow
   -- Restore original active capabilities
-  modify $ \s -> s { stActiveCapabilities = drop (length localCaps) (stActiveCapabilities s) }
+  modify $ \s -> s {stActiveCapabilities = drop (length localCaps) (stActiveCapabilities s)}
   return result

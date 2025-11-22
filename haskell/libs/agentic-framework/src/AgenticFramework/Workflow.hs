@@ -34,9 +34,10 @@ runWorkflow_ workflow ctx = runWorkflow workflow ctx defaultWorkflowState
 -- | Default initial state for workflow execution
 --   Use this when you don't need custom state initialization
 defaultWorkflowState :: WorkflowState
-defaultWorkflowState = WorkflowState
-  { stCurrentPhase = Executing
-  , stVariables = []
-  , stStepCount = 0
-  , stActiveCapabilities = []
-  }
+defaultWorkflowState =
+  WorkflowState
+    { stCurrentPhase = Executing,
+      stVariables = [],
+      stStepCount = 0,
+      stActiveCapabilities = []
+    }

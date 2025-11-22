@@ -35,7 +35,7 @@ import AgenticFramework.Workflow.Schema
     validateCapabilitySchema,
   )
 import AgenticFramework.Workflow.Types (Capability, CapabilityDef)
-import Control.Exception (catch, IOException)
+import Control.Exception (IOException, catch)
 import Control.Monad (filterM, forM)
 import Data.Aeson (eitherDecodeFileStrict)
 import qualified Data.ByteString.Lazy as LBS
@@ -49,7 +49,7 @@ import System.Directory
     getHomeDirectory,
     listDirectory,
   )
-import System.FilePath ((</>), takeExtension)
+import System.FilePath (takeExtension, (</>))
 
 -- | Errors that can occur during capability loading
 data LoadError

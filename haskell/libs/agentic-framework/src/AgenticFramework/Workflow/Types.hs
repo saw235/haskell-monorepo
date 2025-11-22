@@ -60,7 +60,6 @@ newtype Workflow a = Workflow
       Generic
     )
 
-
 -- | Runtime context available to workflows
 data AgentContext = AgentContext
   { ctxSystemPrompt :: Text,
@@ -73,20 +72,26 @@ data AgentContext = AgentContext
   deriving (Generic)
 
 instance Show AgentContext where
-  show ctx = "AgentContext { "
-    ++ "ctxSystemPrompt = " ++ show (ctxSystemPrompt ctx)
-    ++ ", ctxUserPrompt = " ++ show (ctxUserPrompt ctx)
-    ++ ", ctxTools = " ++ show (map toolName (ctxTools ctx))
-    ++ ", ctxCapabilities = " ++ show (map capName (ctxCapabilities ctx))
-    ++ ", ctxLLM = " ++ show (ctxLLM ctx)
-    ++ ", ctxHistory = <IORef> }"
+  show ctx =
+    "AgentContext { "
+      ++ "ctxSystemPrompt = "
+      ++ show (ctxSystemPrompt ctx)
+      ++ ", ctxUserPrompt = "
+      ++ show (ctxUserPrompt ctx)
+      ++ ", ctxTools = "
+      ++ show (map toolName (ctxTools ctx))
+      ++ ", ctxCapabilities = "
+      ++ show (map capName (ctxCapabilities ctx))
+      ++ ", ctxLLM = "
+      ++ show (ctxLLM ctx)
+      ++ ", ctxHistory = <IORef> }"
 
 -- | Mutable state during workflow execution
 data WorkflowState = WorkflowState
   { stCurrentPhase :: WorkflowPhase,
     stVariables :: [(Text, Value)],
     stStepCount :: Int,
-    stActiveCapabilities :: [Capability]  -- Stack of active capabilities for current step
+    stActiveCapabilities :: [Capability] -- Stack of active capabilities for current step
   }
   deriving (Generic)
 

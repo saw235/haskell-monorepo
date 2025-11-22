@@ -14,10 +14,10 @@
 module Main where
 
 import AgenticFramework.Types (LLMConfig (..), LLMProvider (..))
-import Configuration.Dotenv (defaultConfig, loadFile)
 import AgenticFramework.Workflow (runWorkflow_)
 import AgenticFramework.Workflow.Reasoning
 import AgenticFramework.Workflow.Types (AgentContext (..))
+import Configuration.Dotenv (defaultConfig, loadFile)
 import Data.IORef (newIORef)
 import Data.Text (Text)
 import qualified Data.Text as T
@@ -42,14 +42,15 @@ main = do
 
   -- Create LLM config (using Kimi provider)
   historyRef <- newIORef []
-  let llmConfig = LLMConfig
-        { llmProvider = Kimi
-        , llmModel = "moonshot-v1-8k"
-        , llmApiKey = Just apiKey
-        , llmBaseUrl = Just "https://api.moonshot.ai/v1"
-        , llmMaxTokens = 2000
-        , llmTemperature = 0.3  -- Lower temperature for more deterministic reasoning
-        }
+  let llmConfig =
+        LLMConfig
+          { llmProvider = Kimi,
+            llmModel = "moonshot-v1-8k",
+            llmApiKey = Just apiKey,
+            llmBaseUrl = Just "https://api.moonshot.ai/v1",
+            llmMaxTokens = 2000,
+            llmTemperature = 0.3 -- Lower temperature for more deterministic reasoning
+          }
 
   -- Example 1: Modus Ponens
   putStrLn "══════════════════════════════════════════════════════════════"
@@ -57,23 +58,25 @@ main = do
   putStrLn "══════════════════════════════════════════════════════════════"
   putStrLn ""
 
-  let modusPonensObservation = T.unlines
-        [ "Observation 1: If it is raining, then the ground is wet."
-        , "Observation 2: It is raining."
-        ]
+  let modusPonensObservation =
+        T.unlines
+          [ "Observation 1: If it is raining, then the ground is wet.",
+            "Observation 2: It is raining."
+          ]
 
   TIO.putStrLn $ "Input observations:\n" <> modusPonensObservation
   putStrLn "Applying modus ponens..."
   putStrLn ""
 
-  let ctx1 = AgentContext
-        { ctxSystemPrompt = "You are a formal logic reasoner."
-        , ctxUserPrompt = modusPonensObservation
-        , ctxTools = []
-        , ctxCapabilities = []
-        , ctxLLM = llmConfig
-        , ctxHistory = historyRef
-        }
+  let ctx1 =
+        AgentContext
+          { ctxSystemPrompt = "You are a formal logic reasoner.",
+            ctxUserPrompt = modusPonensObservation,
+            ctxTools = [],
+            ctxCapabilities = [],
+            ctxLLM = llmConfig,
+            ctxHistory = historyRef
+          }
 
   result1 <- runWorkflow_ modusPonensWorkflow ctx1
   putStrLn "LLM Response:"
@@ -87,16 +90,17 @@ main = do
   putStrLn "══════════════════════════════════════════════════════════════"
   putStrLn ""
 
-  let modusTollensObservation = T.unlines
-        [ "Observation 1: If the car has fuel, then the car can start."
-        , "Observation 2: The car cannot start."
-        ]
+  let modusTollensObservation =
+        T.unlines
+          [ "Observation 1: If the car has fuel, then the car can start.",
+            "Observation 2: The car cannot start."
+          ]
 
   TIO.putStrLn $ "Input observations:\n" <> modusTollensObservation
   putStrLn "Applying modus tollens..."
   putStrLn ""
 
-  let ctx2 = ctx1 { ctxUserPrompt = modusTollensObservation }
+  let ctx2 = ctx1 {ctxUserPrompt = modusTollensObservation}
 
   result2 <- runWorkflow_ modusTollensWorkflow ctx2
   putStrLn "LLM Response:"
@@ -110,19 +114,20 @@ main = do
   putStrLn "══════════════════════════════════════════════════════════════"
   putStrLn ""
 
-  let generalObservation = T.unlines
-        [ "Facts:"
-        , "- All mammals are warm-blooded."
-        , "- Whales are mammals."
-        , ""
-        , "Question: What can we conclude about whales?"
-        ]
+  let generalObservation =
+        T.unlines
+          [ "Facts:",
+            "- All mammals are warm-blooded.",
+            "- Whales are mammals.",
+            "",
+            "Question: What can we conclude about whales?"
+          ]
 
   TIO.putStrLn $ "Input observations:\n" <> generalObservation
   putStrLn "Applying formal reasoning..."
   putStrLn ""
 
-  let ctx3 = ctx1 { ctxUserPrompt = generalObservation }
+  let ctx3 = ctx1 {ctxUserPrompt = generalObservation}
 
   result3 <- runWorkflow_ reasoningWorkflow ctx3
   putStrLn "LLM Response:"
@@ -136,19 +141,20 @@ main = do
   putStrLn "══════════════════════════════════════════════════════════════"
   putStrLn ""
 
-  let invalidObservation = T.unlines
-        [ "Observation 1: If it is raining, then the ground is wet."
-        , "Observation 2: The ground is wet."
-        , ""
-        , "Question: Can we conclude that it is raining?"
-        ]
+  let invalidObservation =
+        T.unlines
+          [ "Observation 1: If it is raining, then the ground is wet.",
+            "Observation 2: The ground is wet.",
+            "",
+            "Question: Can we conclude that it is raining?"
+          ]
 
   TIO.putStrLn $ "Input observations:\n" <> invalidObservation
   putStrLn "Checking if valid inference is possible..."
   putStrLn "(Note: Affirming the consequent is a FALLACY)"
   putStrLn ""
 
-  let ctx4 = ctx1 { ctxUserPrompt = invalidObservation }
+  let ctx4 = ctx1 {ctxUserPrompt = invalidObservation}
 
   result4 <- runWorkflow_ reasoningWorkflow ctx4
   putStrLn "LLM Response:"

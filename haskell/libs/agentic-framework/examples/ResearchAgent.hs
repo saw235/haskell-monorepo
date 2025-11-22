@@ -7,11 +7,11 @@
 module Main where
 
 import AgenticFramework.Agent (Agent (..))
-import Configuration.Dotenv (defaultConfig, loadFile)
 import AgenticFramework.Types (LLMConfig (..), LLMProvider (..), Message (..), Tool (..), ToolError (..), ToolInput (..), ToolOutput (..), ToolSchema (..))
 import AgenticFramework.Workflow
 import AgenticFramework.Workflow.DSL
 import AgenticFramework.Workflow.Types
+import Configuration.Dotenv (defaultConfig, loadFile)
 import Data.Aeson (Value (..), object, (.=))
 import Data.IORef
 import Data.Text (Text)
@@ -28,11 +28,16 @@ searchTool =
       toolSchema = ToolSchema (object []) (object []),
       toolExecute = \(ToolInput (String query)) -> do
         -- Simulate a web search result
-        return $ Right $ ToolOutput $ String $
-          "Search results for '" <> query <> "':\n" <>
-          "1. Haskell is a purely functional programming language\n" <>
-          "2. Haskell features strong static typing and lazy evaluation\n" <>
-          "3. Monads are a core abstraction in Haskell",
+        return $
+          Right $
+            ToolOutput $
+              String $
+                "Search results for '"
+                  <> query
+                  <> "':\n"
+                  <> "1. Haskell is a purely functional programming language\n"
+                  <> "2. Haskell features strong static typing and lazy evaluation\n"
+                  <> "3. Monads are a core abstraction in Haskell",
       toolTimeout = Nothing,
       toolRetryable = True
     }
@@ -46,11 +51,16 @@ docSearchTool =
       toolSchema = ToolSchema (object []) (object []),
       toolExecute = \(ToolInput (String query)) -> do
         -- Simulate documentation search
-        return $ Right $ ToolOutput $ String $
-          "Documentation for '" <> query <> "':\n" <>
-          "- Type: Type class for monadic operations\n" <>
-          "- Methods: >>= (bind), >> (then), return\n" <>
-          "- Laws: Left identity, right identity, associativity",
+        return $
+          Right $
+            ToolOutput $
+              String $
+                "Documentation for '"
+                  <> query
+                  <> "':\n"
+                  <> "- Type: Type class for monadic operations\n"
+                  <> "- Methods: >>= (bind), >> (then), return\n"
+                  <> "- Laws: Left identity, right identity, associativity",
       toolTimeout = Nothing,
       toolRetryable = True
     }
@@ -86,10 +96,18 @@ researchWorkflow = do
   -- Step 4: Final synthesis with creativity capability
   -- Uses LLM to combine all findings into a creative response
   synthesis <- withCapability "creativity" $ do
-    llmCall $ "Create a comprehensive and engaging answer about '" <> query <> "' by synthesizing these findings:\n\n" <>
-              "Analysis:\n" <> analysis <> "\n\n" <>
-              "Web Results:\n" <> webResults <> "\n\n" <>
-              "Documentation:\n" <> docResults
+    llmCall $
+      "Create a comprehensive and engaging answer about '"
+        <> query
+        <> "' by synthesizing these findings:\n\n"
+        <> "Analysis:\n"
+        <> analysis
+        <> "\n\n"
+        <> "Web Results:\n"
+        <> webResults
+        <> "\n\n"
+        <> "Documentation:\n"
+        <> docResults
 
   return synthesis
 

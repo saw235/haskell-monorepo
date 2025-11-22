@@ -39,10 +39,10 @@ import Data.Aeson
   ( FromJSON (..),
     ToJSON (..),
     Value,
-    (.:),
-    (.:?),
     withObject,
     withText,
+    (.:),
+    (.:?),
   )
 import qualified Data.Aeson as Aeson
 import Data.Text (Text)
