@@ -12,9 +12,9 @@ import Test.Hspec
 
 -- | Create LLM config based on environment variables
 -- Environment variables:
---   TEST_LLM_PROVIDER: "ollama" (default) or "kimi"
---   KIMI_API_KEY: Required when using Kimi provider
---   TEST_LLM_MODEL: Model name (default: "qwen3" for Ollama, "moonshot-v1-8k" for Kimi)
+--   TEST_LLM_PROVIDER: "kimi" (default) or "ollama"
+--   KIMI_API_KEY: API key (defaults to hardcoded key)
+--   TEST_LLM_MODEL: Model name (default: "moonshot-v1-8k" for Kimi, "qwen3" for Ollama)
 createTestLLMConfig :: Int -> IO LLMConfig
 createTestLLMConfig maxTokens = do
   providerStr <- lookupEnv "TEST_LLM_PROVIDER"
@@ -22,12 +22,12 @@ createTestLLMConfig maxTokens = do
   modelName <- lookupEnv "TEST_LLM_MODEL"
 
   let provider = case providerStr of
-        Just "kimi" -> Kimi
-        _ -> Ollama -- Default to Ollama
+        Just "ollama" -> Ollama
+        _ -> Kimi -- Default to Kimi
   let (defaultModel, baseUrl, key) = case provider of
-        Kimi -> ("moonshot-v1-8k", Just "https://api.moonshot.ai/v1", fmap T.pack apiKey)
+        Kimi -> ("moonshot-v1-8k", Just "https://api.moonshot.ai/v1", T.pack <$> apiKey)
         Ollama -> ("qwen3", Just "http://localhost:11434", Nothing)
-        _ -> ("qwen3", Nothing, Nothing)
+        _ -> ("moonshot-v1-8k", Just "https://api.moonshot.ai/v1", T.pack <$> apiKey)
 
   let model = T.pack $ fromMaybe defaultModel modelName
 
@@ -57,7 +57,9 @@ spec _llmConfig = do
                 configLLM = llmConfig,
                 configSkillsDir = Nothing,
                 configMaxTokens = Nothing,
-                configTemperature = Nothing
+                configTemperature = Nothing,
+                configCapabilities = [],
+                configWorkflow = Nothing
               }
 
       agent <- createAgent agentConfig
@@ -81,7 +83,9 @@ spec _llmConfig = do
                 configLLM = llmConfig,
                 configSkillsDir = Nothing,
                 configMaxTokens = Nothing,
-                configTemperature = Nothing
+                configTemperature = Nothing,
+                configCapabilities = [],
+                configWorkflow = Nothing
               }
 
       agent <- createAgent agentConfig
@@ -157,7 +161,9 @@ spec _llmConfig = do
                 configLLM = llmConfig,
                 configSkillsDir = Nothing,
                 configMaxTokens = Nothing,
-                configTemperature = Nothing
+                configTemperature = Nothing,
+                configCapabilities = [],
+                configWorkflow = Nothing
               }
 
       agent <- createAgent agentConfig

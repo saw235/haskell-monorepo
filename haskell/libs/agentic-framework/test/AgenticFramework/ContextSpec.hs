@@ -17,10 +17,10 @@ spec = do
     it "creates context with empty conversation" $ do
       let llmConfig =
             LLMConfig
-              { llmProvider = Ollama,
-                llmModel = "qwen3",
+              { llmProvider = Kimi,
+                llmModel = "moonshot-v1-8k",
                 llmApiKey = Nothing,
-                llmBaseUrl = Just "http://localhost:11434",
+                llmBaseUrl = Just "https://api.moonshot.ai/v1",
                 llmMaxTokens = 4096,
                 llmTemperature = 0.7
               }
@@ -36,10 +36,10 @@ spec = do
     it "initializes token metrics correctly" $ do
       let llmConfig =
             LLMConfig
-              { llmProvider = Ollama,
-                llmModel = "qwen3",
+              { llmProvider = Kimi,
+                llmModel = "moonshot-v1-8k",
                 llmApiKey = Nothing,
-                llmBaseUrl = Just "http://localhost:11434",
+                llmBaseUrl = Just "https://api.moonshot.ai/v1",
                 llmMaxTokens = 8192,
                 llmTemperature = 0.7
               }
@@ -131,10 +131,10 @@ testUUID = read "00000000-0000-0000-0000-000000000000"
 testLLMConfig :: LLMConfig
 testLLMConfig =
   LLMConfig
-    { llmProvider = Ollama,
-      llmModel = "qwen3",
+    { llmProvider = Kimi,
+      llmModel = "moonshot-v1-8k",
       llmApiKey = Nothing,
-      llmBaseUrl = Just "http://localhost:11434",
+      llmBaseUrl = Just "https://api.moonshot.ai/v1",
       llmMaxTokens = 4096,
       llmTemperature = 0.7
     }

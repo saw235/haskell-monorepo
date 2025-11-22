@@ -179,6 +179,8 @@ _ALT_SIMPLE_PACKAGES = [
     "bytestring",
     "http-conduit",
     "vector",
+    "data-default-class-0.1.2.1",  # Required by dotenv-0.12.0.0
+    "dotenv-0.12.0.0",  # Load environment variables from .env files
 ]
 
 [stack_alt.package(name = pkg) for pkg in _ALT_SIMPLE_PACKAGES]

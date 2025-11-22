@@ -1,0 +1,10 @@
+{
+  "name": "friendly",
+  "description": "Uses warm, approachable language suitable for non-technical users",
+  "modifierType": "wrap",
+  "modifierValue": "In a friendly and helpful tone: ",
+  "parameters": {
+    "audience": "general",
+    "avoid_jargon": true
+  }
+}

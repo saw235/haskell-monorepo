@@ -30,7 +30,9 @@ spec llmConfig = do
                 configLLM = llmConfig,
                 configSkillsDir = Nothing,
                 configMaxTokens = Nothing,
-                configTemperature = Nothing
+                configTemperature = Nothing,
+                configCapabilities = [],
+                configWorkflow = Nothing
               }
 
       agent <- createAgent agentConfig
@@ -73,7 +75,9 @@ spec llmConfig = do
                   configLLM = llmConfig,
                   configSkillsDir = Nothing,
                   configMaxTokens = Nothing,
-                  configTemperature = Nothing
+                  configTemperature = Nothing,
+                  configCapabilities = [],
+                  configWorkflow = Nothing
                 }
 
         agent <- createAgent agentConfig
@@ -105,7 +109,9 @@ spec llmConfig = do
                   configLLM = llmConfig,
                   configSkillsDir = Nothing,
                   configMaxTokens = Nothing,
-                  configTemperature = Nothing
+                  configTemperature = Nothing,
+                  configCapabilities = [],
+                  configWorkflow = Nothing
                 }
 
         agent <- createAgent agentConfig
@@ -136,7 +142,9 @@ spec llmConfig = do
                 configLLM = llmConfig,
                 configSkillsDir = Nothing,
                 configMaxTokens = Nothing,
-                configTemperature = Nothing
+                configTemperature = Nothing,
+                configCapabilities = [],
+                configWorkflow = Nothing
               }
 
       agent <- createAgent agentConfig
@@ -163,7 +171,9 @@ spec llmConfig = do
                   configLLM = llmConfig,
                   configSkillsDir = Nothing,
                   configMaxTokens = Nothing,
-                  configTemperature = Nothing
+                  configTemperature = Nothing,
+                  configCapabilities = [],
+                  configWorkflow = Nothing
                 }
 
         agent <- createAgent agentConfig

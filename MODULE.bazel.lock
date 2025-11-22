@@ -1303,7 +1303,7 @@
     "@@rules_haskell~//extensions:stack_snapshot.bzl%stack_snapshot%<root>~stack_alt": {
       "general": {
         "bzlTransitiveDigest": "y4BGoCRypgR5pPUjRTExOCNOVpjzkWAQpDUg+NVjvBM=",
-        "usagesDigest": "oL4p8wW9k1O8bCLCqqbTnub+1qKCX/GzO0bpmsRCy8U=",
+        "usagesDigest": "dCO/t1zkk8+i8TlPsX3+300pQjYzK8EvdTGSAFhwNuE=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},
         "envVariables": {},
@@ -1336,6 +1336,8 @@
                 "bytestring",
                 "http-conduit",
                 "vector",
+                "data-default-class-0.1.2.1",
+                "dotenv-0.12.0.0",
                 "ollama-haskell-0.1.3.0",
                 "attoparsec",
                 "langchain-hs-0.0.2.0"
@@ -1363,6 +1365,8 @@
                 "bytestring",
                 "http-conduit",
                 "vector",
+                "data-default-class-0.1.2.1",
+                "dotenv-0.12.0.0",
                 "ollama-haskell-0.1.3.0",
                 "attoparsec",
                 "langchain-hs-0.0.2.0"
@@ -3249,7 +3253,7 @@
         "recordedFileInputs": {
           "@@//haskell/libs/agentic-framework/rust-ffi/Cargo.toml": "86fe58049c8450f95085b1201af30fd0978e2ce707d12a94d98e47ca84a3db26",
           "@@//haskell/libs/agentic-framework/rust-ffi/Cargo.lock": "14b36171311c4301d398d0c835b70a06d2b53cdc03055e3c5d8c16496497f4de",
-          "@@//MODULE.bazel": "f49981d81627e84109bbff906816870d10fa2ba2a548e3cc724eb1cf7e98ff0b",
+          "@@//MODULE.bazel": "1972520538fff8e3604af93126d5e7e7c6425ce2eca2984844a0f24b42913058",
           "@@rules_rust~~rust_host_tools~rust_host_tools//rust_host_tools": "ENOENT"
         },
         "recordedDirentsInputs": {},
