@@ -3,47 +3,49 @@
 
 module CLI.Output
   ( -- * Query Results
-    outputQueryResultsText
-  , outputQueryResultsJson
-  , outputQueryResultsMarkdown
-    -- * Validation Results
-  , outputValidationResultsText
-  , outputValidationResultsJson
-    -- * List Output
-  , outputSystemsList
-  , outputCategoriesList
-  , outputRulesList
-    -- * Rule Info
-  , outputRuleInfo
-  ) where
+    outputQueryResultsText,
+    outputQueryResultsJson,
+    outputQueryResultsMarkdown,
 
+    -- * Validation Results
+    outputValidationResultsText,
+    outputValidationResultsJson,
+
+    -- * List Output
+    outputSystemsList,
+    outputCategoriesList,
+    outputRulesList,
+
+    -- * Rule Info
+    outputRuleInfo,
+  )
+where
+
+import CLI.Options (OutputFormat (..))
 import Control.Monad (when)
-import Data.Aeson (encode, Value)
-import Data.Aeson.Types (ToJSON(..), object, (.=))
+import Data.Aeson (Value, encode)
+import Data.Aeson.Types (ToJSON (..), object, (.=))
 import qualified Data.ByteString.Lazy.Char8 as BL
 import Data.Set (Set)
 import qualified Data.Set as Set
 import Data.Text (Text)
 import qualified Data.Text as T
 import qualified Data.Text.IO as TIO
-import System.Exit (exitFailure, exitSuccess)
-
-import RpgRuleset.Core.Types
 import RpgRuleset.Core.Rule
 import RpgRuleset.Core.System
+import RpgRuleset.Core.Types
 import RpgRuleset.Query.Engine
 import RpgRuleset.Validation.RuleId
-
-import CLI.Options (OutputFormat(..))
+import System.Exit (exitFailure, exitSuccess)
 
 -- | Output query results as text
 outputQueryResultsText :: QueryResult -> Bool -> IO ()
-outputQueryResultsText QueryResult{..} showRelated = do
+outputQueryResultsText QueryResult {..} showRelated = do
   TIO.putStrLn $ "Found " <> T.pack (show qrTotalCount) <> " results\n"
   mapM_ (outputScoredRuleText showRelated) qrResults
   where
-    outputScoredRuleText showRel ScoredRule{..} = do
-      let Rule{..} = srRule
+    outputScoredRuleText showRel ScoredRule {..} = do
+      let Rule {..} = srRule
       TIO.putStrLn $ unRuleId ruleId <> " | " <> maybe "(no title)" id ruleTitle
       TIO.putStrLn $ "  Category: " <> unCategory ruleCategory
       TIO.putStrLn $ "  Tags: " <> T.intercalate ", " (map unTag $ Set.toList ruleTags)
@@ -59,12 +61,12 @@ outputQueryResultsJson result = do
 
 -- | Output query results as Markdown
 outputQueryResultsMarkdown :: QueryResult -> IO ()
-outputQueryResultsMarkdown QueryResult{..} = do
+outputQueryResultsMarkdown QueryResult {..} = do
   TIO.putStrLn $ "# Query Results (" <> T.pack (show qrTotalCount) <> " found)\n"
   mapM_ outputScoredRuleMd qrResults
   where
-    outputScoredRuleMd ScoredRule{..} = do
-      let Rule{..} = srRule
+    outputScoredRuleMd ScoredRule {..} = do
+      let Rule {..} = srRule
       TIO.putStrLn $ "## " <> unRuleId ruleId <> " - " <> maybe "(no title)" id ruleTitle
       TIO.putStrLn ""
       TIO.putStrLn $ "- **Category**: " <> unCategory ruleCategory
@@ -98,22 +100,24 @@ outputValidationResultsText formatResult warnings strict = do
 -- | Output validation results as JSON
 outputValidationResultsJson :: Either RuleIdError () -> [RuleIdWarning] -> IO ()
 outputValidationResultsJson formatResult warnings = do
-  let result = object
-        [ "valid" .= case formatResult of { Right () -> True; Left _ -> False }
-        , "errors" .= case formatResult of
-            Left (InvalidFormat rid reason) -> [object ["type" .= ("invalid_format" :: Text), "rule_id" .= rid, "reason" .= reason]]
-            Left (DuplicateId rid) -> [object ["type" .= ("duplicate" :: Text), "rule_id" .= rid]]
-            Right () -> [] :: [Value]
-        , "warnings" .= map warningToJson warnings
-        ]
+  let result =
+        object
+          [ "valid" .= case formatResult of Right () -> True; Left _ -> False,
+            "errors" .= case formatResult of
+              Left (InvalidFormat rid reason) -> [object ["type" .= ("invalid_format" :: Text), "rule_id" .= rid, "reason" .= reason]]
+              Left (DuplicateId rid) -> [object ["type" .= ("duplicate" :: Text), "rule_id" .= rid]]
+              Right () -> [] :: [Value],
+            "warnings" .= map warningToJson warnings
+          ]
   BL.putStrLn $ encode result
   where
-    warningToJson (NonStandardPrefix rid used suggested) = object
-      [ "type" .= ("non_standard_prefix" :: Text)
-      , "rule_id" .= rid
-      , "used" .= used
-      , "suggested" .= suggested
-      ]
+    warningToJson (NonStandardPrefix rid used suggested) =
+      object
+        [ "type" .= ("non_standard_prefix" :: Text),
+          "rule_id" .= rid,
+          "used" .= used,
+          "suggested" .= suggested
+        ]
 
 -- | Output systems list
 outputSystemsList :: [System] -> OutputFormat -> IO ()
@@ -124,15 +128,15 @@ outputSystemsList systems fmt = case fmt of
     TIO.putStrLn "# Available Systems\n"
     mapM_ outputSystemMd systems
   where
-    outputSystemText System{..} = do
+    outputSystemText System {..} = do
       TIO.putStrLn $ unSystemId systemId <> " - " <> systemName
       maybe (return ()) (\d -> TIO.putStrLn $ "  " <> d) systemDescription
-    outputSystemMd System{..} = do
+    outputSystemMd System {..} = do
       TIO.putStrLn $ "- **" <> unSystemId systemId <> "**: " <> systemName
 
 -- | Output categories list
 outputCategoriesList :: System -> OutputFormat -> IO ()
-outputCategoriesList System{..} fmt = case fmt of
+outputCategoriesList System {..} fmt = case fmt of
   TextFormat -> mapM_ (TIO.putStrLn . unCategory) systemCategories
   JsonFormat -> BL.putStrLn $ encode systemCategories
   MarkdownFormat -> do
@@ -148,9 +152,9 @@ outputRulesList rules fmt = case fmt of
     TIO.putStrLn "# Rules\n"
     mapM_ outputRuleMd rules
   where
-    outputRuleText Rule{..} =
+    outputRuleText Rule {..} =
       TIO.putStrLn $ unRuleId ruleId <> " | " <> maybe "(no title)" id ruleTitle
-    outputRuleMd Rule{..} =
+    outputRuleMd Rule {..} =
       TIO.putStrLn $ "- **" <> unRuleId ruleId <> "**: " <> maybe "(no title)" id ruleTitle
 
 -- | Output detailed rule info
@@ -161,7 +165,7 @@ outputRuleInfo rule showChangelog fmt = case fmt of
   MarkdownFormat -> outputRuleInfoMarkdown rule showChangelog
 
 outputRuleInfoText :: Rule -> Bool -> IO ()
-outputRuleInfoText Rule{..} showChangelog = do
+outputRuleInfoText Rule {..} showChangelog = do
   TIO.putStrLn $ "Rule ID: " <> unRuleId ruleId
   maybe (return ()) (\t -> TIO.putStrLn $ "Title: " <> t) ruleTitle
   TIO.putStrLn $ "Category: " <> unCategory ruleCategory
@@ -176,11 +180,11 @@ outputRuleInfoText Rule{..} showChangelog = do
     TIO.putStrLn "\n--- Changelog ---\n"
     mapM_ outputChangelogEntry ruleChangelog
   where
-    outputChangelogEntry ChangelogEntry{..} = do
+    outputChangelogEntry ChangelogEntry {..} = do
       TIO.putStrLn $ showVersion ceVersion <> ": " <> ceDescription
 
 outputRuleInfoMarkdown :: Rule -> Bool -> IO ()
-outputRuleInfoMarkdown Rule{..} showChangelog = do
+outputRuleInfoMarkdown Rule {..} showChangelog = do
   TIO.putStrLn $ "# " <> unRuleId ruleId <> maybe "" (" - " <>) ruleTitle
   TIO.putStrLn ""
   TIO.putStrLn $ "- **Category**: " <> unCategory ruleCategory
@@ -196,8 +200,8 @@ outputRuleInfoMarkdown Rule{..} showChangelog = do
     TIO.putStrLn "\n## Changelog\n"
     mapM_ outputChangelogEntry ruleChangelog
   where
-    outputChangelogEntry ChangelogEntry{..} =
+    outputChangelogEntry ChangelogEntry {..} =
       TIO.putStrLn $ "- **" <> showVersion ceVersion <> "**: " <> ceDescription
 
 showVersion :: Version -> Text
-showVersion Version{..} = T.pack $ show vMajor <> "." <> show vMinor <> "." <> show vPatch
+showVersion Version {..} = T.pack $ show vMajor <> "." <> show vMinor <> "." <> show vPatch

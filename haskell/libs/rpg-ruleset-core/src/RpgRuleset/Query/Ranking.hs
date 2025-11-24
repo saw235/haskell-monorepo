@@ -3,88 +3,95 @@
 {-# LANGUAGE RecordWildCards #-}
 
 module RpgRuleset.Query.Ranking
-  ( scoreRule
-  , ScoredRule(..)
-  , rankingWeights
-  ) where
+  ( scoreRule,
+    ScoredRule (..),
+    rankingWeights,
+  )
+where
 
-import Data.Aeson (ToJSON, FromJSON)
+import Data.Aeson (FromJSON, ToJSON)
 import Data.Set (Set)
 import qualified Data.Set as Set
 import Data.Text (Text)
 import qualified Data.Text as T
 import GHC.Generics (Generic)
-
-import RpgRuleset.Core.Types
 import RpgRuleset.Core.Rule
+import RpgRuleset.Core.Types
 
 -- | A rule with its relevance score
 data ScoredRule = ScoredRule
-  { srRule :: !Rule
-  , srScore :: !Double
-  } deriving (Show, Eq, Generic)
+  { srRule :: !Rule,
+    srScore :: !Double
+  }
+  deriving (Show, Eq, Generic)
 
 instance ToJSON ScoredRule
+
 instance FromJSON ScoredRule
 
 -- | Ranking weights for different match types
 data RankingWeights = RankingWeights
-  { wTitle :: !Double      -- ^ Weight for title matches
-  , wContent :: !Double    -- ^ Weight for content matches
-  , wTag :: !Double        -- ^ Weight for tag matches
-  , wCategory :: !Double   -- ^ Weight for category matches
-  } deriving (Show, Eq)
+  { -- | Weight for title matches
+    wTitle :: !Double,
+    -- | Weight for content matches
+    wContent :: !Double,
+    -- | Weight for tag matches
+    wTag :: !Double,
+    -- | Weight for category matches
+    wCategory :: !Double
+  }
+  deriving (Show, Eq)
 
 -- | Default ranking weights per spec
 rankingWeights :: RankingWeights
-rankingWeights = RankingWeights
-  { wTitle = 5.0
-  , wContent = 1.0
-  , wTag = 2.0
-  , wCategory = 10.0
-  }
+rankingWeights =
+  RankingWeights
+    { wTitle = 5.0,
+      wContent = 1.0,
+      wTag = 2.0,
+      wCategory = 10.0
+    }
 
 -- | Score a rule based on keyword matches
 scoreRule :: [Text] -> Rule -> ScoredRule
 scoreRule keywords rule =
   let score = sum $ map (scoreKeyword rule) keywords
-  in ScoredRule
-    { srRule = rule
-    , srScore = score
-    }
+   in ScoredRule
+        { srRule = rule,
+          srScore = score
+        }
 
 -- | Score a single keyword against a rule
 scoreKeyword :: Rule -> Text -> Double
-scoreKeyword Rule{..} keyword =
+scoreKeyword Rule {..} keyword =
   let kw = T.toLower keyword
-      RankingWeights{..} = rankingWeights
+      RankingWeights {..} = rankingWeights
 
       -- Title score
       titleScore = case ruleTitle of
         Nothing -> 0.0
         Just title ->
           if kw `T.isInfixOf` T.toLower title
-          then wTitle
-          else 0.0
+            then wTitle
+            else 0.0
 
       -- Content score
       contentScore =
         let contentLower = T.toLower ruleContent
             occurrences = countOccurrences kw contentLower
-        in wContent * fromIntegral occurrences
+         in wContent * fromIntegral occurrences
 
       -- Tag score
       tagScore =
         let matchingTags = filter (keywordMatchesTag kw) (Set.toList ruleTags)
-        in wTag * fromIntegral (length matchingTags)
+         in wTag * fromIntegral (length matchingTags)
 
       -- Category score
       categoryScore =
         if kw `T.isInfixOf` T.toLower (unCategory ruleCategory)
-        then wCategory
-        else 0.0
-
-  in titleScore + contentScore + tagScore + categoryScore
+          then wCategory
+          else 0.0
+   in titleScore + contentScore + tagScore + categoryScore
 
 -- | Check if keyword matches a tag
 keywordMatchesTag :: Text -> Tag -> Bool
@@ -106,4 +113,4 @@ textSimilarity :: Text -> Text -> Double
 textSimilarity t1 t2 =
   let common = T.length $ T.filter (`T.elem` t2) t1
       total = max (T.length t1) (T.length t2)
-  in if total == 0 then 0.0 else fromIntegral common / fromIntegral total
+   in if total == 0 then 0.0 else fromIntegral common / fromIntegral total
