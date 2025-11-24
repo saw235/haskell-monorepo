@@ -1,0 +1,33 @@
+load("@rules_haskell//haskell:defs.bzl", "haskell_library", "haskell_test")
+
+haskell_library(
+    name = "rpg-ruleset-core",
+    srcs = glob(["src/**/*.hs"]),
+    src_strip_prefix = "src",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//:base",
+        "//:bytestring",
+        "//:containers",
+        "//:directory",
+        "//:filepath",
+        "//:text",
+        "//:time",
+        "@stackage//:aeson",
+        "@stackage//:cmark",
+        "@stackage//:yaml",
+    ],
+)
+
+haskell_test(
+    name = "unit-tests",
+    srcs = glob(["test/**/*.hs"]),
+    src_strip_prefix = "test",
+    deps = [
+        ":rpg-ruleset-core",
+        "@stackage//:QuickCheck",
+        "@stackage//:base",
+        "@stackage//:hspec",
+        "@stackage//:text",
+    ],
+)

@@ -1,0 +1,218 @@
+# JSON Schema for Rule File YAML Frontmatter
+# Used for validation and documentation of rule file structure
+
+$schema: http://json-schema.org/draft-07/schema#
+$id: https://github.com/your-org/rpg-ruleset-query/schemas/rule-file.json
+title: RPG Rule File Schema
+description: Schema for YAML frontmatter in rule markdown files
+
+type: object
+required:
+  - category
+  - system
+  - rules
+properties:
+  category:
+    type: string
+    description: "Category path for this rule file (e.g., 'character-creation/combat')"
+    pattern: "^(character-creation|world-building|interactions)(/[a-z0-9-]+)*$"
+    examples:
+      - "character-creation"
+      - "character-creation/combat"
+      - "world-building/geography"
+      - "interactions/social"
+
+  system:
+    type: string
+    description: "System ID this rule belongs to"
+    pattern: "^[a-z0-9-]+$"
+    examples:
+      - "my-fantasy-rpg"
+      - "my-fantasy-rpg-variant"
+
+  rules:
+    type: array
+    description: "Array of rules in this file"
+    minItems: 1
+    items:
+      $ref: "#/definitions/Rule"
+
+definitions:
+  Rule:
+    type: object
+    required:
+      - id
+      - version
+      - changelog
+      - tags
+      - visibility
+    properties:
+      id:
+        type: string
+        description: "Unique rule identifier within the system (e.g., 'COMBAT-1.2')"
+        pattern: "^[A-Z0-9-]+$"
+        examples:
+          - "COMBAT-1.2"
+          - "CHARACTER-0.1"
+          - "WORLD-3.4"
+
+      version:
+        $ref: "#/definitions/Version"
+
+      changelog:
+        type: array
+        description: "Version history for this rule"
+        minItems: 1
+        items:
+          $ref: "#/definitions/ChangelogEntry"
+
+      title:
+        type: string
+        description: "Optional human-readable title for the rule"
+        examples:
+          - "Critical Hits"
+          - "Armor Class Calculation"
+
+      tags:
+        type: array
+        description: "Free-form tags for categorization and search"
+        items:
+          type: string
+          pattern: "^[a-z0-9-]+$"
+        examples:
+          - ["mechanics", "combat", "critical-hits"]
+          - ["worldbuilding", "geography", "mountains"]
+
+      visibility:
+        type: string
+        enum: ["public", "gm-only"]
+        description: "Visibility level (public = all players, gm-only = Game Master only)"
+        default: "public"
+
+      related:
+        type: array
+        description: "IDs of related rules in the same system"
+        items:
+          type: string
+          pattern: "^[A-Z0-9-]+$"
+        examples:
+          - ["COMBAT-1.3", "CHARACTER-0.2"]
+
+      crossSystemRefs:
+        type: array
+        description: "References to rules in other systems (for variants)"
+        items:
+          $ref: "#/definitions/CrossSystemRef"
+
+      conditions:
+        type: array
+        description: "Conditions under which this rule applies (structured text)"
+        items:
+          type: string
+        examples:
+          - ["character.weapon_equipped == true"]
+          - ["character.level >= 5", "character.class == 'Fighter'"]
+
+      formulas:
+        type: object
+        description: "Named formulas for calculations (map of name -> formula text)"
+        additionalProperties:
+          type: string
+        examples:
+          - attack_roll: "1d20 + STR_modifier + proficiency_bonus"
+            damage: "weapon_damage + STR_modifier"
+            critical_damage: "weapon_damage * 2 + STR_modifier"
+
+  Version:
+    type: string
+    description: "Semantic version (major.minor.patch)"
+    pattern: "^\\d+\\.\\d+\\.\\d+$"
+    examples:
+      - "1.0.0"
+      - "2.1.3"
+
+  ChangelogEntry:
+    type: object
+    required:
+      - version
+      - date
+      - changes
+    properties:
+      version:
+        $ref: "#/definitions/Version"
+
+      date:
+        type: string
+        format: date-time
+        description: "ISO 8601 timestamp of the change"
+        examples:
+          - "2025-11-15T10:30:00Z"
+
+      changes:
+        type: string
+        description: "Summary of changes in this version"
+        examples:
+          - "Reduced critical multiplier from 3x to 2x for balance"
+          - "Initial rule definition"
+
+  CrossSystemRef:
+    type: object
+    required:
+      - targetSystem
+      - targetRule
+      - refType
+    properties:
+      targetSystem:
+        type: string
+        description: "System ID of the referenced rule"
+        pattern: "^[a-z0-9-]+$"
+        examples:
+          - "base-fantasy-rpg"
+
+      targetRule:
+        type: string
+        description: "Rule ID in the target system"
+        pattern: "^[A-Z0-9-]+$"
+        examples:
+          - "COMBAT-1.0"
+
+      refType:
+        type: string
+        enum: ["extends", "replaces", "references"]
+        description: |
+          Type of cross-system reference:
+          - extends: This rule extends the base rule with additional mechanics
+          - replaces: This rule completely replaces the base rule
+          - references: Informational reference to related rule in another system
+
+# Example valid rule file:
+# ---
+# category: character-creation/combat
+# system: my-fantasy-rpg
+# rules:
+#   - id: COMBAT-1.2
+#     version: 2.1.0
+#     title: "Critical Hits"
+#     changelog:
+#       - version: 2.1.0
+#         date: 2025-11-15T10:30:00Z
+#         changes: "Reduced critical multiplier from 3x to 2x for balance"
+#       - version: 2.0.0
+#         date: 2025-10-01T14:00:00Z
+#         changes: "Initial combat rule definition"
+#     tags: [mechanics, combat, attack, critical-hits]
+#     visibility: public
+#     related: [COMBAT-1.3, CHARACTER-0.2]
+#     conditions:
+#       - "character.weapon_equipped == true"
+#       - "character.level >= 1"
+#     formulas:
+#       attack_roll: "1d20 + STR_modifier + proficiency_bonus"
+#       critical_damage: "weapon_damage * 2 + STR_modifier"
+# ---
+#
+# ## Combat Rules
+#
+# ### [COMBAT-1.2] Critical Hits
+#
+# When you roll a natural 20...

@@ -1,0 +1,18 @@
+load("@rules_haskell//haskell:defs.bzl", "haskell_binary")
+
+haskell_binary(
+    name = "rpg-ruleset-query",
+    srcs = glob(["src/**/*.hs"]) + ["Main.hs"],
+    deps = [
+        "//haskell/libs/rpg-ruleset-core",
+        "//:base",
+        "//:bytestring",
+        "//:containers",
+        "//:directory",
+        "//:filepath",
+        "//:text",
+        "@stackage//:aeson",
+        "@stackage//:optparse-applicative",
+    ],
+    visibility = ["//visibility:public"],
+)

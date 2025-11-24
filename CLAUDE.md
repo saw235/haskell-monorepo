@@ -207,6 +207,11 @@ bazel run @selenium//file:selenium-server-standalone-3.141.59.jar
 - File-based JSON cache in ~/.cache/hackage-cli/ with TTL-based invalidation (24h metadata, 7d versions, 30d immutable) (001-hackage-doc-cli)
 - Haskell GHC 9.10.1 (Stackage LTS-24.19) + langchain-hs (LLM integration, ReAct agents), monad-logger (logging), ansi-terminal (colorized output), aeson (JSON), http-conduit (web search), Rust FFI (tiktoken-rs or HuggingFace tokenizers) (002-agentic-framework)
 - File-based (skill markdown files, logs to file system), no database required (002-agentic-framework)
+- Haskell GHC 9.10.1 (Stackage LTS-24.19) + yaml (YAML frontmatter parsing), cmark (Markdown parsing, may migrate to commonmark-hs for extensions), aeson (JSON/YAML integration), containers (Map/Set for indexing), text, directory, filepath, optparse-applicative (already in project) (001-dnd-ruleset-query)
+- File-based Markdown + YAML frontmatter storage, directory hierarchy for categories, git for version control (001-dnd-ruleset-query)
+- Library-centric: rpg-ruleset-core (core types, parsers, query engine, validation) + rpg-ruleset-query CLI app (001-dnd-ruleset-query)
+- Future Phase 2c: megaparsec for formula/condition DSL parsing with AST validation (001-dnd-ruleset-query)
 
 ## Recent Changes
 - 001-hackage-doc-cli: Added Haskell with GHC 9.10.1 (project uses Stackage LTS-24.19) + http-conduit (2.3.9.1), aeson (2.2.3.0), optparse-applicative (already in project), containers (core), directory (core)
+- 001-dnd-ruleset-query: Completed planning phase (research.md, data-model.md, contracts/, quickstart.md). Technology stack: yaml (frontmatter), cmark (Markdown), containers (indexing), optparse-applicative (CLI). Library-centric architecture with rpg-ruleset-core library + thin CLI wrapper. MVP focuses on single-system support, basic query/validation. Phase 2b adds multi-world/inheritance, Phase 2c adds formula/condition parsing with megaparsec.

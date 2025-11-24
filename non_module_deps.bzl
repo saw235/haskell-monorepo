@@ -55,6 +55,84 @@ haskell_cabal_library(
         urls = ["https://github.com/tweag/cabal/archive/refs/heads/ghc-9.4-paths-module-relocatable.zip"],
     )
 
+    http_archive(
+        name = "yaml",
+        urls = ["https://hackage.haskell.org/package/yaml-0.11.11.2/yaml-0.11.11.2.tar.gz"],
+        build_file_content = """
+load("@rules_haskell//haskell:cabal.bzl", "haskell_cabal_binary", "haskell_cabal_library")
+load("@rules_haskell//haskell:defs.bzl", "haskell_library", "haskell_toolchain_library")
+haskell_toolchain_library(name = "Cabal", visibility = ["//visibility:private"])
+haskell_cabal_library(
+    name = "yaml",
+    version = "0.11.11.2",
+    haddock = False,
+    flags = [],
+    srcs = glob(["yaml-0.11.11.2/**/*"]),
+    deps = ["@stackage//:base", 
+        "@stackage//:bytestring", 
+        "@stackage//:conduit", 
+        "@stackage//:resourcet", 
+        "@stackage//:aeson", 
+        "@stackage//:attoparsec", 
+        "@stackage//:scientific", 
+        "@libyaml//:libyaml"
+    ],
+    setup_deps = [],
+    tools = [],
+    visibility = ["//visibility:public"],
+    cabalopts = ["--ghc-option=-w", "--ghc-option=-optF=-w"],
+    verbose = False,
+    unique_name = True,
+)
+        """
+    )
+
+    http_archive(
+        name = "libyaml",
+        urls = ["https://hackage.haskell.org/package/libyaml-0.1.4/libyaml-0.1.4.tar.gz"],
+        integrity = "sha256-1il+ybHrtOS1gKQ1fYQNCKb1PhOhDAxT7nS5c7um+hM=",
+        build_file_content = """
+load("@rules_haskell//haskell:cabal.bzl", "haskell_cabal_binary", "haskell_cabal_library")
+load("@rules_haskell//haskell:defs.bzl", "haskell_library", "haskell_toolchain_library")
+haskell_toolchain_library(name = "Cabal", visibility = ["//visibility:private"])
+haskell_cabal_library(
+    name = "libyaml",
+    version = "0.1.4",
+    haddock = False,
+    flags = ["-system-libyaml"],
+    srcs = glob(["libyaml-0.1.4/**/*"]),
+    deps = ["@stackage//:base", "@stackage//:conduit", "@stackage//:resourcet", "@libyaml-clib//:libyaml-clib"],
+    tools = [],
+    visibility = ["//visibility:public"],
+    cabalopts = ["--ghc-option=-w", "--ghc-option=-optF=-w"],
+    verbose = False,
+    unique_name = True,
+)
+        """
+    )
+
+    http_archive(
+        name = "libyaml-clib",
+        urls = ["https://hackage.haskell.org/package/libyaml-clib-0.2.5/libyaml-clib-0.2.5.tar.gz"],
+        integrity = "sha256-BFJrxU5fz0ccK9IoVOa1GeFipuPWVOhmzYhiEDxyUUk=",
+        build_file_content = """
+load("@rules_haskell//haskell:cabal.bzl", "haskell_cabal_binary", "haskell_cabal_library")
+load("@rules_haskell//haskell:defs.bzl", "haskell_library", "haskell_toolchain_library")
+haskell_toolchain_library(name = "Cabal", visibility = ["//visibility:private"])
+haskell_cabal_library(
+    name = "libyaml-clib",
+    version = "0.2.5",
+    haddock = False,
+    flags = [],
+    srcs = glob(["libyaml-clib-0.2.5/**/*"]),
+    tools = [],
+    visibility = ["//visibility:public"],
+    cabalopts = ["--ghc-option=-w", "--ghc-option=-optF=-w"],
+    verbose = False,
+    unique_name = True,
+)
+    """
+    )
 def _non_module_deps_impl(_ctx):
     repositories(bzlmod = True)
 
