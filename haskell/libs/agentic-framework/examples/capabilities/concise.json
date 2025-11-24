@@ -1,0 +1,6 @@
+{
+  "name": "concise",
+  "description": "Produces brief, to-the-point responses without unnecessary elaboration",
+  "modifierType": "suffix",
+  "modifierValue": "\n\nBe concise and direct in your response. Avoid unnecessary elaboration."
+}

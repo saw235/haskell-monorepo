@@ -1,4 +1,4 @@
-FROM node:22-slim
+FROM ubuntu:24.04
 
 # Set non-interactive for package installations to avoid prompts
 ENV DEBIAN_FRONTEND=noninteractive
@@ -21,6 +21,16 @@ RUN apt-get update && apt-get install -y \
     happy \
     && rm -rf /var/lib/apt/lists/*
 
+# Install Volta
+RUN curl https://get.volta.sh | bash
+
+# Set up Volta environment for root user
+ENV VOLTA_HOME=/root/.volta
+ENV PATH=$VOLTA_HOME/bin:$PATH
+
+# Install Node.js via Volta
+RUN volta install node@24
+
 # Install Bazelisk globally using npm
 RUN npm install -g @bazel/bazelisk
 
@@ -42,16 +52,6 @@ RUN wget http://security.ubuntu.com/ubuntu/pool/universe/n/ncurses/libtinfo5_6.3
     && apt install -y ./libtinfo5_6.3-2ubuntu0.1_amd64.deb \
     && rm libtinfo5_6.3-2ubuntu0.1_amd64.deb
 
-# Download Selenium Server
-RUN wget https://github.com/SeleniumHQ/selenium/releases/download/selenium-3.9.1/selenium-server-standalone-3.9.1.jar -O /opt/selenium-server-standalone.jar
-
-RUN curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg \
-    && apt update \
-    && apt install -y gh
-
 # Expose ports for Selenium and a potential web application
 EXPOSE 4444
 EXPOSE 3000
-
-# A simple default command to show the environment is ready
-CMD ["echo", "Environment ready. Run selenium with 'java -jar /opt/selenium-server-standalone.jar'"]

@@ -1,9 +1,6 @@
 name: Bazel CI
 
 on:
-  push:
-    branches:
-      - '**'
   pull_request:
     types: [opened, synchronize, reopened]
     branches:
@@ -26,7 +23,10 @@ jobs:
           commit_message: automated ormolu commit
 
   build-and-test:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted]
+    container:
+      image: saw235/haskell-monorepo-ci:latest
+      options: --user 1000:1000
     needs: ormolu
     steps:
       - name: Checkout
@@ -35,22 +35,13 @@ jobs:
       - name: Setup Bazel
         uses: bazel-contrib/setup-bazel@0.15.0
         with:
-          # Avoid downloading Bazel every time.
           bazelisk-cache: true
-          # Store build cache per workflow.
-          disk-cache: ${{ github.workflow }}
-          # Share repository cache between workflows.
+          disk-cache: true
           repository-cache: true
-
-      - name: Install dependencies
-        run: |
-          sudo apt-get update
-          wget http://security.ubuntu.com/ubuntu/pool/universe/n/ncurses/libtinfo5_6.3-2ubuntu0.1_amd64.deb
-          sudo apt install -y ./libtinfo5_6.3-2ubuntu0.1_amd64.deb
-          sudo apt install -y alex happy
-
+          external-cache: true
+          
       - name: Build all targets
-        run: bazel build //...
+        run: ./bazelisk build //...
 
       - name: Test all targets
-        run: bazel test //... 
+        run: ./bazelisk test //... --test_tag_filters=-llm

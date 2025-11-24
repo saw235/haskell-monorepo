@@ -84,6 +84,21 @@ _SIMPLE_PACKAGES = [
     "filepath",
     "cmark",
     "resourcet",
+    # Agentic Framework dependencies
+    "monad-logger",
+    "uuid",
+    "async",
+    "hashable",
+    "unordered-containers",
+    "bytestring",
+    "time",
+    "hspec",
+    "hspec-discover",
+    # Note: langchain-hs not yet available in Stackage
+    # Note: tiktoken FFI will be configured via non_module_deps.bzl
+    "terminal-size",  # Terminal width/height detection
+    "wcwidth",        # Unicode display width calculation
+    "ansi-terminal",  # Terminal capability detection
 ]
 
 [stack.package(name = pkg) for pkg in _SIMPLE_PACKAGES]
@@ -128,12 +143,19 @@ stack.package(
 
 stack.package(
     name = "yaml",
-    vendored = "@yaml",
+    extra_deps = ["@libyaml-clib", "@libyaml"],
 )
 
 stack.package(
     name = "libyaml",
-    vendored = "@libyaml",
+    extra_deps = ["@libyaml", "@libyaml-clib"],
+    vendored = "@libyaml"
+)
+
+stack.package(
+    name = "libyaml-clib",
+    extra_deps = ["@libyaml-clib"],
+    vendored = "@libyaml-clib"
 )
 
 # Versioned packages from LTS
@@ -184,6 +206,8 @@ _ALT_SIMPLE_PACKAGES = [
     "bytestring",
     "http-conduit",
     "vector",
+    "data-default-class-0.1.2.1",  # Required by dotenv-0.12.0.0
+    "dotenv-0.12.0.0",  # Load environment variables from .env files
 ]
 
 [stack_alt.package(name = pkg) for pkg in _ALT_SIMPLE_PACKAGES]
@@ -308,3 +332,18 @@ npm_sprite.npm_translate_lock(
 )
 use_repo(npm_sprite, "npm_electron_sprite_animation")
 
+bazel_dep(name = "rules_rust", version = "0.67.0")
+rust = use_extension("@rules_rust//rust:extensions.bzl", "rust")
+rust.toolchain(
+    edition = "2024",
+    versions = [ "1.85.0" ],
+)
+
+# Cargo dependencies for Rust crates
+crate = use_extension("@rules_rust//crate_universe:extensions.bzl", "crate")
+crate.from_cargo(
+    name = "crates",
+    cargo_lockfile = "//haskell/libs/agentic-framework/rust-ffi:Cargo.lock",
+    manifests = ["//haskell/libs/agentic-framework/rust-ffi:Cargo.toml"],
+)
+use_repo(crate, "crates")

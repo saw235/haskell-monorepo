@@ -1,0 +1,19 @@
+load("@rules_rust//rust:defs.bzl", "rust_static_library", "rust_test")
+
+# Rust static library for FFI with Haskell
+rust_static_library(
+    name = "agentic_tokenizer_ffi",
+    srcs = ["src/lib.rs"],
+    edition = "2021",
+    deps = [
+        "@crates//:tiktoken-rs",
+    ],
+    visibility = ["//haskell/libs/agentic-framework:__pkg__"],
+)
+
+# Rust tests
+rust_test(
+    name = "agentic_tokenizer_ffi_test",
+    crate = ":agentic_tokenizer_ffi",
+    edition = "2021",
+)

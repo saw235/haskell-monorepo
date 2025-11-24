@@ -1,0 +1,100 @@
+load("@rules_haskell//haskell:defs.bzl", "haskell_binary")
+
+haskell_binary(
+    name = "simple-agent",
+    srcs = ["SimpleAgent.hs"],
+    deps = [
+        "//haskell/libs/agentic-framework:agentic-framework",
+        "//:base",
+        "//:text",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+# Research Agent with step-level capabilities
+haskell_binary(
+    name = "research-agent",
+    srcs = ["ResearchAgent.hs"],
+    deps = [
+        "//haskell/libs/agentic-framework:agentic-framework",
+        "//:base",
+        "//:text",
+        "@stackage//:aeson",
+        "@stackage//:mtl",
+        "@stackage//:transformers",
+        "@stackage_alt//:dotenv",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+# Simple Workflow example
+haskell_binary(
+    name = "simple-workflow",
+    srcs = ["SimpleWorkflow.hs"],
+    deps = [
+        "//haskell/libs/agentic-framework:agentic-framework",
+        "//:base",
+        "//:text",
+        "@stackage//:aeson",
+        "@stackage//:mtl",
+        "@stackage//:transformers",
+        "@stackage_alt//:dotenv",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+# Debug Agent - demonstrates both workflow and traditional execution modes (FR-005)
+haskell_binary(
+    name = "debug-agent",
+    srcs = ["DebugAgent.hs"],
+    deps = [
+        "//haskell/libs/agentic-framework:agentic-framework",
+        "//:base",
+        "//:text",
+        "@stackage//:aeson",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+# Dynamic Capability Agent - loads capabilities from JSON files (FR-015)
+haskell_binary(
+    name = "dynamic-capability-agent",
+    srcs = ["DynamicCapabilityAgent.hs"],
+    data = glob(["capabilities/*.json"]),
+    deps = [
+        "//haskell/libs/agentic-framework:agentic-framework",
+        "//:base",
+        "//:text",
+        "//:filepath",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+# Dynamic Workflow Agent - combines dynamic capabilities with workflows (US2 + US3 + US5)
+haskell_binary(
+    name = "dynamic-workflow-agent",
+    srcs = ["DynamicWorkflowAgent.hs"],
+    data = glob(["capabilities/*.json"]),
+    deps = [
+        "//haskell/libs/agentic-framework:agentic-framework",
+        "//:base",
+        "//:text",
+        "@stackage//:aeson",
+        "@stackage//:mtl",
+        "@stackage//:transformers",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+# Reasoning Agent - formal logical reasoning with modus ponens/tollens
+haskell_binary(
+    name = "reasoning-agent",
+    srcs = ["ReasoningAgent.hs"],
+    deps = [
+        "//haskell/libs/agentic-framework:agentic-framework",
+        "//:base",
+        "//:text",
+        "@stackage_alt//:dotenv",
+    ],
+    visibility = ["//visibility:public"],
+)

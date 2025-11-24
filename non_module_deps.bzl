@@ -91,6 +91,7 @@ haskell_cabal_library(
         name = "libyaml",
         urls = ["https://hackage.haskell.org/package/libyaml-0.1.4/libyaml-0.1.4.tar.gz"],
         integrity = "sha256-1il+ybHrtOS1gKQ1fYQNCKb1PhOhDAxT7nS5c7um+hM=",
+        strip_prefix = "libyaml-0.1.4",
         build_file_content = """
 load("@rules_haskell//haskell:cabal.bzl", "haskell_cabal_binary", "haskell_cabal_library")
 load("@rules_haskell//haskell:defs.bzl", "haskell_library", "haskell_toolchain_library")
@@ -101,7 +102,7 @@ haskell_cabal_library(
     haddock = False,
     flags = ["-system-libyaml"],
     srcs = glob(["libyaml-0.1.4/**/*"]),
-    deps = ["@stackage//:base", "@stackage//:conduit", "@stackage//:resourcet", "@libyaml-clib//:libyaml-clib"],
+    deps = ["@stackage//:base", "@stackage//:conduit", "@stackage//:resourcet", "@stackage//:libyaml-clib"],
     tools = [],
     visibility = ["//visibility:public"],
     cabalopts = ["--ghc-option=-w", "--ghc-option=-optF=-w"],

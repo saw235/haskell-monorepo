@@ -211,7 +211,3 @@ bazel run @selenium//file:selenium-server-standalone-3.141.59.jar
 - File-based Markdown + YAML frontmatter storage, directory hierarchy for categories, git for version control (001-dnd-ruleset-query)
 - Library-centric: rpg-ruleset-core (core types, parsers, query engine, validation) + rpg-ruleset-query CLI app (001-dnd-ruleset-query)
 - Future Phase 2c: megaparsec for formula/condition DSL parsing with AST validation (001-dnd-ruleset-query)
-
-## Recent Changes
-- 001-hackage-doc-cli: Added Haskell with GHC 9.10.1 (project uses Stackage LTS-24.19) + http-conduit (2.3.9.1), aeson (2.2.3.0), optparse-applicative (already in project), containers (core), directory (core)
-- 001-dnd-ruleset-query: Completed planning phase (research.md, data-model.md, contracts/, quickstart.md). Technology stack: yaml (frontmatter), cmark (Markdown), containers (indexing), optparse-applicative (CLI). Library-centric architecture with rpg-ruleset-core library + thin CLI wrapper. MVP focuses on single-system support, basic query/validation. Phase 2b adds multi-world/inheritance, Phase 2c adds formula/condition parsing with megaparsec.

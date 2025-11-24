@@ -1,0 +1,10 @@
+{
+  "name": "technical",
+  "description": "Uses technical language appropriate for software developers",
+  "modifierType": "prefix",
+  "modifierValue": "As a technical expert communicating with software developers, I will use precise technical terminology and include relevant implementation details.\n\n",
+  "parameters": {
+    "audience": "developers",
+    "include_examples": true
+  }
+}
