@@ -5,7 +5,7 @@
 
 **Tests**: Not explicitly requested in spec - focusing on implementation tasks with QuickCheck properties as specified in plan.md
 
-**Organization**: Tasks are grouped by user story to enable independent implementation and testing of each story. MVP focuses on User Story 1 (Query Character Creation Rules) and User Story 5 (Validate New Rules) as both are marked P1.
+**Organization**: Tasks are grouped by user story to enable independent implementation and testing of each story. MVP focuses on User Story 1 (Query Character Creation Rules), User Story 5 (Validate New Rules), and User Story 6 (Create and Add New Rules via CLI) as all three are marked P1.
 
 ## Format: `[ID] [P?] [Story] Description`
 
@@ -178,26 +178,26 @@ Per plan.md:
 
 ---
 
-## Phase 7: User Story 7 - GM-Only Content Access Control (Priority: P2)
+## Phase 8: User Story 8 - GM-Only Content Access Control (Priority: P2)
 
 **Goal**: Enable GMs to hide spoilers from players using visibility metadata
 
 **Independent Test**: Create rule marked `visibility: gm-only`, query as player (hidden) vs GM (visible)
 
-### Implementation for User Story 7
+### Implementation for User Story 8
 
-- [ ] T059 [P] [US7] Verify --role flag parsing in CLI/Options.hs defaults to Player
-- [ ] T060 [US7] Test visibility filtering in Query/Filter.hs with Player role (only public rules)
-- [ ] T061 [US7] Test visibility filtering with GM role (all rules including gm-only)
-- [ ] T062 [US7] Create fixture markdown files with gm-only visibility rules in test/fixtures/
-- [ ] T063 [US7] Add visibility filter examples to CLI help text and quickstart.md
-- [ ] T064 [US7] Implement hidden reference indicator in CLI/Output.hs when player views rule referencing GM-only rule
+- [ ] T074 [P] [US8] Verify --role flag parsing in CLI/Options.hs defaults to Player
+- [ ] T075 [US8] Test visibility filtering in Query/Filter.hs with Player role (only public rules)
+- [ ] T076 [US8] Test visibility filtering with GM role (all rules including gm-only)
+- [ ] T077 [US8] Create fixture markdown files with gm-only visibility rules in test/fixtures/
+- [ ] T078 [US8] Add visibility filter examples to CLI help text and quickstart.md
+- [ ] T079 [US8] Implement hidden reference indicator in CLI/Output.hs when player views rule referencing GM-only rule
 
-**Checkpoint**: User Story 7 complete - GM-only content properly hidden from players via --role flag
+**Checkpoint**: User Story 8 complete - GM-only content properly hidden from players via --role flag
 
 ---
 
-## Phase 8: User Story 4 - Cross-Reference Related Rules (Priority: P3)
+## Phase 9: User Story 4 - Cross-Reference Related Rules (Priority: P3)
 
 **Goal**: Enable users to find related rules and understand rule interactions
 
@@ -205,18 +205,18 @@ Per plan.md:
 
 ### Implementation for User Story 4
 
-- [ ] T065 [P] [US4] Implement --show-related flag in CLI/Options.hs to display related rules
-- [ ] T066 [US4] Enhance query result formatting in CLI/Output.hs to show related rule IDs
-- [ ] T067 [US4] Implement lookupRule helper in Query/Index.hs to fetch related rules by ID
-- [ ] T068 [US4] Add recursive related rules traversal option (depth-limited to avoid cycles)
-- [ ] T069 [US4] Create fixture markdown files with complex rule relationships in test/fixtures/
-- [ ] T070 [US4] Add related rules query examples to quickstart.md
+- [ ] T080 [P] [US4] Implement --show-related flag in CLI/Options.hs to display related rules
+- [ ] T081 [US4] Enhance query result formatting in CLI/Output.hs to show related rule IDs
+- [ ] T082 [US4] Implement lookupRule helper in Query/Index.hs to fetch related rules by ID
+- [ ] T083 [US4] Add recursive related rules traversal option (depth-limited to avoid cycles)
+- [ ] T084 [US4] Create fixture markdown files with complex rule relationships in test/fixtures/
+- [ ] T085 [US4] Add related rules query examples to quickstart.md
 
 **Checkpoint**: User Story 4 complete - can discover and navigate related rules
 
 ---
 
-## Phase 9: User Story 6 - Manage Multi-World System Variants (Priority: P2)
+## Phase 10: User Story 7 - Manage Multi-World System Variants (Priority: P2)
 
 **Goal**: Enable system inheritance where variants extend base systems
 
@@ -224,26 +224,26 @@ Per plan.md:
 
 **Note**: This implements Phase 2b from plan.md (Multi-World architecture)
 
-### Implementation for User Story 6
+### Implementation for User Story 7
 
-- [ ] T071 [P] [US6] Implement system inheritance resolver in haskell/libs/rpg-ruleset-core/src/RpgRuleset/Inheritance/Resolver.hs
-- [ ] T072 [US6] Implement rule override logic in Inheritance/Resolver.hs (variant rules override base with same ID)
-- [ ] T073 [US6] Implement cross-system reference validation in haskell/libs/rpg-ruleset-core/src/RpgRuleset/Inheritance/CrossRef.hs
-- [ ] T074 [US6] Update file system loader in FileSystem/Loader.hs to detect system.yaml and resolve inheritance
-- [ ] T075 [US6] Implement circular inheritance detection in Inheritance/Resolver.hs
-- [ ] T076 [P] [US6] Create ContentPackage type in haskell/libs/rpg-ruleset-core/src/RpgRuleset/Export/Import.hs (packageId, rules, dependencies, validationWarnings)
-- [ ] T077 [P] [US6] Implement export command in CLI/Commands.hs to create ContentPackage JSON
-- [ ] T078 [US6] Implement import command in CLI/Commands.hs with compatibility validation
-- [ ] T079 [US6] Implement --resolve-conflicts option in CLI/Options.hs (fail/skip/rename)
-- [ ] T080 [US6] Create fixture directories for base-system and variant-system in test/fixtures/
-- [ ] T081 [US6] Create QuickCheck properties in haskell/libs/rpg-ruleset-core/test/RpgRuleset/Inheritance/ResolverSpec.hs for inheritance correctness
-- [ ] T082 [US6] Add export/import examples to quickstart.md
+- [ ] T086 [P] [US7] Implement system inheritance resolver in haskell/libs/rpg-ruleset-core/src/RpgRuleset/Inheritance/Resolver.hs
+- [ ] T087 [US7] Implement rule override logic in Inheritance/Resolver.hs (variant rules override base with same ID)
+- [ ] T088 [US7] Implement cross-system reference validation in haskell/libs/rpg-ruleset-core/src/RpgRuleset/Inheritance/CrossRef.hs
+- [ ] T089 [US7] Update file system loader in FileSystem/Loader.hs to detect system.yaml and resolve inheritance
+- [ ] T090 [US7] Implement circular inheritance detection in Inheritance/Resolver.hs
+- [ ] T091 [P] [US7] Create ContentPackage type in haskell/libs/rpg-ruleset-core/src/RpgRuleset/Export/Import.hs (packageId, rules, dependencies, validationWarnings)
+- [ ] T092 [P] [US7] Implement export command in CLI/Commands.hs to create ContentPackage JSON
+- [ ] T093 [US7] Implement import command in CLI/Commands.hs with compatibility validation
+- [ ] T094 [US7] Implement --resolve-conflicts option in CLI/Options.hs (fail/skip/rename)
+- [ ] T095 [US7] Create fixture directories for base-system and variant-system in test/fixtures/
+- [ ] T096 [US7] Create QuickCheck properties in haskell/libs/rpg-ruleset-core/test/RpgRuleset/Inheritance/ResolverSpec.hs for inheritance correctness
+- [ ] T097 [US7] Add export/import examples to quickstart.md
 
-**Checkpoint**: User Story 6 complete - multi-world variants with inheritance and content portability work
+**Checkpoint**: User Story 7 complete - multi-world variants with inheritance and content portability work
 
 ---
 
-## Phase 10: Advanced Rules - Conditional & Formula Support (Phase 2c)
+## Phase 11: Advanced Rules - Conditional & Formula Support (Phase 2c)
 
 **Goal**: Add conditional rules and formula parsing for advanced rule mechanics
 
@@ -251,62 +251,62 @@ Per plan.md:
 
 ### Implementation
 
-- [ ] T083 [P] Create Formula parser in haskell/libs/rpg-ruleset-core/src/RpgRuleset/Parser/Formula.hs using megaparsec (FormulaAST: DiceRoll, Variable, BinOp)
-- [ ] T084 [P] Create Condition parser in haskell/libs/rpg-ruleset-core/src/RpgRuleset/Parser/Condition.hs using megaparsec (ConditionAST: CompareOp, LogicalOp)
-- [ ] T085 Add megaparsec dependency to MODULE.bazel and re-pin
-- [ ] T086 Implement formula validation in haskell/libs/rpg-ruleset-core/src/RpgRuleset/Validation/Formulas.hs (syntax check, variable reference check)
-- [ ] T087 [P] Implement condition validation in haskell/libs/rpg-ruleset-core/src/RpgRuleset/Validation/Conditions.hs
-- [ ] T088 Integrate formula/condition validation into validation workflow in Validation/Checklist.hs
-- [ ] T089 Add --show-formulas flag in CLI/Options.hs to display formula metadata
-- [ ] T090 Update CLI/Output.hs to render formulas from metadata
-- [ ] T091 Create fixtures with formulas and conditions in test/fixtures/
-- [ ] T092 Create QuickCheck properties for formula parsing in test/RpgRuleset/Parser/FormulaSpec.hs
+- [ ] T098 [P] Create Formula parser in haskell/libs/rpg-ruleset-core/src/RpgRuleset/Parser/Formula.hs using megaparsec (FormulaAST: DiceRoll, Variable, BinOp)
+- [ ] T099 [P] Create Condition parser in haskell/libs/rpg-ruleset-core/src/RpgRuleset/Parser/Condition.hs using megaparsec (ConditionAST: CompareOp, LogicalOp)
+- [ ] T100 Add megaparsec dependency to MODULE.bazel and re-pin
+- [ ] T101 Implement formula validation in haskell/libs/rpg-ruleset-core/src/RpgRuleset/Validation/Formulas.hs (syntax check, variable reference check)
+- [ ] T102 [P] Implement condition validation in haskell/libs/rpg-ruleset-core/src/RpgRuleset/Validation/Conditions.hs
+- [ ] T103 Integrate formula/condition validation into validation workflow in Validation/Checklist.hs
+- [ ] T104 Add --show-formulas flag in CLI/Options.hs to display formula metadata
+- [ ] T105 Update CLI/Output.hs to render formulas from metadata
+- [ ] T106 Create fixtures with formulas and conditions in test/fixtures/
+- [ ] T107 Create QuickCheck properties for formula parsing in test/RpgRuleset/Parser/FormulaSpec.hs
 
 **Checkpoint**: Advanced rules complete - formulas and conditions parsed and validated
 
 ---
 
-## Phase 11: Additional CLI Commands
+## Phase 12: Additional CLI Commands
 
 **Goal**: Implement remaining CLI commands from contracts/cli-interface.md
 
 ### Implementation
 
-- [ ] T093 [P] Implement list command handler in CLI/Commands.hs (list systems, categories, rules)
-- [ ] T094 [P] Implement info command handler in CLI/Commands.hs to show detailed rule information
-- [ ] T095 [P] Implement init command handler in CLI/Commands.hs to create new system structure
-- [ ] T096 Implement list systems output formatting in CLI/Output.hs
-- [ ] T097 [P] Implement list categories output with tree format in CLI/Output.hs
-- [ ] T098 [P] Implement list rules output in CLI/Output.hs
-- [ ] T099 Implement info command output with full rule details, changelog, related rules in CLI/Output.hs
-- [ ] T100 Implement init command to create system.yaml, category directories, README.md
-- [ ] T101 Add all new commands to Main.hs routing
-- [ ] T102 Update CLI help text with all available commands
+- [ ] T108 [P] Implement list command handler in CLI/Commands.hs (list systems, categories, rules)
+- [ ] T109 [P] Implement info command handler in CLI/Commands.hs to show detailed rule information
+- [ ] T110 [P] Implement init command handler in CLI/Commands.hs to create new system structure
+- [ ] T111 Implement list systems output formatting in CLI/Output.hs
+- [ ] T112 [P] Implement list categories output with tree format in CLI/Output.hs
+- [ ] T113 [P] Implement list rules output in CLI/Output.hs
+- [ ] T114 Implement info command output with full rule details, changelog, related rules in CLI/Output.hs
+- [ ] T115 Implement init command to create system.yaml, category directories, README.md
+- [ ] T116 Add all new commands to Main.hs routing
+- [ ] T117 Update CLI help text with all available commands
 
 **Checkpoint**: All CLI commands implemented per contracts/cli-interface.md
 
 ---
 
-## Phase 12: Polish & Performance
+## Phase 13: Polish & Performance
 
 **Goal**: Optimize, test scalability, and prepare for production use
 
 ### Implementation
 
-- [ ] T103 [P] Create scalability test suite in tests/rpg-ruleset-query/integration/ testing 1000 rules per system
-- [ ] T104 [P] Test query performance with 10 systems (10,000 total rules) to verify < 2 second target
-- [ ] T105 [P] Test validation performance to verify < 2 minute target per rule
-- [ ] T106 [P] Test concurrent user scenario (5 users querying simultaneously)
-- [ ] T107 Optimize query index building if performance tests fail
-- [ ] T108 [P] Add comprehensive error messages for all validation failures
-- [ ] T109 [P] Add logging throughout application for debugging
-- [ ] T110 Format all Haskell code with Ormolu
-- [ ] T111 [P] Format all BUILD.bazel files with Buildifier
-- [ ] T112 Run bazel build //... to verify all targets compile
-- [ ] T113 Run bazel test //... to verify all tests pass (including QuickCheck properties)
-- [ ] T114 Update quickstart.md with complete examples using final CLI
-- [ ] T115 [P] Create example ruleset in rulesets/systems/tutorial-rpg/ per quickstart.md
-- [ ] T116 [P] Update CLAUDE.md with final implementation notes
+- [ ] T118 [P] Create scalability test suite in tests/rpg-ruleset-query/integration/ testing 1000 rules per system
+- [ ] T119 [P] Test query performance with 10 systems (10,000 total rules) to verify < 2 second target
+- [ ] T120 [P] Test validation performance to verify < 2 minute target per rule
+- [ ] T121 [P] Test concurrent user scenario (5 users querying simultaneously)
+- [ ] T122 Optimize query index building if performance tests fail
+- [ ] T123 [P] Add comprehensive error messages for all validation failures
+- [ ] T124 [P] Add logging throughout application for debugging
+- [ ] T125 Format all Haskell code with Ormolu
+- [ ] T126 [P] Format all BUILD.bazel files with Buildifier
+- [ ] T127 Run bazel build //... to verify all targets compile
+- [ ] T128 Run bazel test //... to verify all tests pass (including QuickCheck properties)
+- [ ] T129 Update quickstart.md with complete examples using final CLI
+- [ ] T130 [P] Create example ruleset in rulesets/systems/tutorial-rpg/ per quickstart.md
+- [ ] T131 [P] Update CLAUDE.md with final implementation notes
 
 **Checkpoint**: System polished, tested, and ready for use
 
@@ -316,21 +316,22 @@ Per plan.md:
 
 ### MVP (Minimum Viable Product)
 
-**Scope**: Phase 1-4 only
-- User Story 1 (Query Character Creation Rules)
-- User Story 5 (Validate New Rules)
+**Scope**: Phase 1-5 (includes new User Story 6 - Add Rules via CLI)
+- User Story 1 (Query Character Creation Rules) - P1
+- User Story 5 (Validate New Rules) - P1
+- User Story 6 (Create and Add New Rules via CLI) - P1 **NEW**
 
-**Deliverable**: Working query and validation system for single system with rule ID format enforcement
+**Deliverable**: Working query, validation, and rule addition system for single system with rule ID format enforcement
 
-**Timeline**: Shortest path to value - users can query and validate character creation rules
+**Timeline**: Shortest path to value - users can query, validate, AND add character creation rules
 
 ### Incremental Delivery
 
-**Phase 2 MVP**: Add Phase 5-6 (World Building + Interaction queries)
-**Phase 3 MVP**: Add Phase 7 (GM-only access control)
-**Phase 4 MVP**: Add Phase 8-9 (Related rules + Multi-world variants)
-**Phase 5 MVP**: Add Phase 10 (Formulas and conditions)
-**Final Release**: Phase 11-12 (All CLI commands + polish)
+**Phase 2 MVP**: Add Phase 6-7 (World Building + Interaction queries)
+**Phase 3 MVP**: Add Phase 8 (GM-only access control)
+**Phase 4 MVP**: Add Phase 9-10 (Related rules + Multi-world variants)
+**Phase 5 MVP**: Add Phase 11 (Formulas and conditions)
+**Final Release**: Phase 12-13 (All CLI commands + polish)
 
 ---
 
@@ -341,22 +342,23 @@ Per plan.md:
 ```
 Phase 1-2 (Setup + Foundation) → MUST complete first
     ↓
-Phase 3 (US1: Query) ──┐
-Phase 4 (US5: Validate) ┘ ← MVP milestone (both P1)
+Phase 3 (US1: Query) ──────────┐
+Phase 4 (US5: Validate) ───────┼── MVP milestone (all P1)
+Phase 5 (US6: Add Rules CLI) ──┘   **NEW**
     ↓
-Phase 5 (US2: World Building) ──┐
-Phase 6 (US3: Interactions)     ├── Can run in parallel
-Phase 7 (US7: GM-only)          ┘
+Phase 6 (US2: World Building) ──┐
+Phase 7 (US3: Interactions)     ├── Can run in parallel
+Phase 8 (US8: GM-only)          ┘
     ↓
-Phase 8 (US4: Related rules) ← Independent
+Phase 9 (US4: Related rules) ← Independent
     ↓
-Phase 9 (US6: Multi-world) ← Requires US1+US5 foundation
+Phase 10 (US7: Multi-world) ← Requires US1+US5+US6 foundation
     ↓
-Phase 10 (Formulas/Conditions) ← Independent enhancement
+Phase 11 (Formulas/Conditions) ← Independent enhancement
     ↓
-Phase 11 (CLI commands) ← Can start after US1
+Phase 12 (CLI commands) ← Can start after US1
     ↓
-Phase 12 (Polish) ← Final phase
+Phase 13 (Polish) ← Final phase
 ```
 
 ### Parallel Execution Opportunities
@@ -376,30 +378,35 @@ Phase 12 (Polish) ← Final phase
 - T043-T045 (category checks) in parallel
 - T051-T052 (fixtures + tests) in parallel
 
+**Within User Story 6 (Phase 5)** - NEW:
+- T053, T055 (option types) in parallel
+- T062, T066 (batch + fixtures) in parallel
+
 **Across User Stories**:
-- Phase 5-7 (US2, US3, US7) are independent - can implement in any order or in parallel
-- Phase 10 (formulas) is independent from Phase 8-9
+- Phase 6-8 (US2, US3, US8) are independent - can implement in any order or in parallel
+- Phase 11 (formulas) is independent from Phase 9-10
 
 ---
 
 ## Task Summary
 
-**Total Tasks**: 116
+**Total Tasks**: 131
 **Setup**: 8 tasks (T001-T008)
 **Foundation**: 16 tasks (T009-T024)
 **User Story 1 (P1)**: 13 tasks (T025-T037)
 **User Story 5 (P1)**: 15 tasks (T038-T052)
-**User Story 2 (P2)**: 3 tasks (T053-T055)
-**User Story 3 (P2)**: 3 tasks (T056-T058)
-**User Story 7 (P2)**: 6 tasks (T059-T064)
-**User Story 4 (P3)**: 6 tasks (T065-T070)
-**User Story 6 (P2)**: 12 tasks (T071-T082)
-**Advanced Rules**: 10 tasks (T083-T092)
-**CLI Commands**: 10 tasks (T093-T102)
-**Polish**: 14 tasks (T103-T116)
+**User Story 6 (P1)**: 15 tasks (T053-T067) **NEW - Add Rules via CLI**
+**User Story 2 (P2)**: 3 tasks (T068-T070)
+**User Story 3 (P2)**: 3 tasks (T071-T073)
+**User Story 8 (P2)**: 6 tasks (T074-T079)
+**User Story 4 (P3)**: 6 tasks (T080-T085)
+**User Story 7 (P2)**: 12 tasks (T086-T097)
+**Advanced Rules**: 10 tasks (T098-T107)
+**CLI Commands**: 10 tasks (T108-T117)
+**Polish**: 14 tasks (T118-T131)
 
-**MVP (Phase 1-4)**: 52 tasks
-**Parallel Opportunities**: 47 tasks marked [P]
+**MVP (Phase 1-5)**: 67 tasks (includes new User Story 6)
+**Parallel Opportunities**: 52 tasks marked [P]
 
 **Format Validation**: ✅ All tasks follow checklist format: `- [ ] [ID] [P?] [Story?] Description with file path`
 
