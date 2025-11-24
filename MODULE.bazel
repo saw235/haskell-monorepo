@@ -1,7 +1,10 @@
 module(name = "haskell-monorepo", version = "0.1")
 
 # Haskell
-bazel_dep(name = "rules_haskell", version = "1.0")
+bazel_dep(
+    name = "rules_haskell", 
+    version = "1.0")
+
 bazel_dep(name = "rules_cc", version = "0.0.17")
 
 # BNFC binary download
@@ -24,6 +27,9 @@ use_repo(
     non_module_deps,
     "zlib.hs",
     "Cabal",
+    "yaml",
+    "libyaml",
+    "libyaml-clib",
 )
 
 ################################################################################
@@ -76,6 +82,8 @@ _SIMPLE_PACKAGES = [
     "tagsoup",
     "directory",
     "filepath",
+    "cmark",
+    "resourcet",
     # Agentic Framework dependencies
     "monad-logger",
     "uuid",
@@ -133,6 +141,23 @@ stack.package(
     },
 )
 
+stack.package(
+    name = "yaml",
+    extra_deps = ["@libyaml-clib", "@libyaml"],
+)
+
+stack.package(
+    name = "libyaml",
+    extra_deps = ["@libyaml", "@libyaml-clib"],
+    vendored = "@libyaml"
+)
+
+stack.package(
+    name = "libyaml-clib",
+    extra_deps = ["@libyaml-clib"],
+    vendored = "@libyaml-clib"
+)
+
 # Versioned packages from LTS
 _VERSIONED_LTS_PACKAGES = [
     "data-default-0.8.0.0",
@@ -168,7 +193,9 @@ use_repo(
     stackage_alt_unpinned = "stackage-unpinned",
 )
 
-stack_alt.snapshot(name = "lts-24.12")
+stack_alt.snapshot(
+	name = "lts-24.12"
+)
 
 # Minimal package set for alternative snapshot
 # Add only packages needed by targets using this alternative snapshot

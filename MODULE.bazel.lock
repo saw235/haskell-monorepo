@@ -143,7 +143,7 @@
   "moduleExtensions": {
     "//:non_module_deps.bzl%non_module_deps": {
       "general": {
-        "bzlTransitiveDigest": "0N0rzQ1rNaEnlArWzPeaUDJJvTh/z5gUrMvzsJRgm/E=",
+        "bzlTransitiveDigest": "12DOjnQxLbo4dQE/jnUeqTi9swMvdAcfaZO7y+BoMcw=",
         "usagesDigest": "O3QGaye4lozculcA8brwOKNC9M0ERtB/RkZM0kgMlIY=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},
@@ -176,6 +176,39 @@
               "urls": [
                 "https://github.com/tweag/cabal/archive/refs/heads/ghc-9.4-paths-module-relocatable.zip"
               ]
+            }
+          },
+          "yaml": {
+            "bzlFile": "@@bazel_tools//tools/build_defs/repo:http.bzl",
+            "ruleClassName": "http_archive",
+            "attributes": {
+              "urls": [
+                "https://hackage.haskell.org/package/yaml-0.11.11.2/yaml-0.11.11.2.tar.gz"
+              ],
+              "build_file_content": "\nload(\"@rules_haskell//haskell:cabal.bzl\", \"haskell_cabal_binary\", \"haskell_cabal_library\")\nload(\"@rules_haskell//haskell:defs.bzl\", \"haskell_library\", \"haskell_toolchain_library\")\nhaskell_toolchain_library(name = \"Cabal\", visibility = [\"//visibility:private\"])\nhaskell_cabal_library(\n    name = \"yaml\",\n    version = \"0.11.11.2\",\n    haddock = False,\n    flags = [],\n    srcs = glob([\"yaml-0.11.11.2/**/*\"]),\n    deps = [\"@stackage//:base\", \n        \"@stackage//:bytestring\", \n        \"@stackage//:conduit\", \n        \"@stackage//:resourcet\", \n        \"@stackage//:aeson\", \n        \"@stackage//:attoparsec\", \n        \"@stackage//:scientific\", \n        \"@libyaml//:libyaml\"\n    ],\n    setup_deps = [],\n    tools = [],\n    visibility = [\"//visibility:public\"],\n    cabalopts = [\"--ghc-option=-w\", \"--ghc-option=-optF=-w\"],\n    verbose = False,\n    unique_name = True,\n)\n        "
+            }
+          },
+          "libyaml": {
+            "bzlFile": "@@bazel_tools//tools/build_defs/repo:http.bzl",
+            "ruleClassName": "http_archive",
+            "attributes": {
+              "urls": [
+                "https://hackage.haskell.org/package/libyaml-0.1.4/libyaml-0.1.4.tar.gz"
+              ],
+              "integrity": "sha256-1il+ybHrtOS1gKQ1fYQNCKb1PhOhDAxT7nS5c7um+hM=",
+              "strip_prefix": "libyaml-0.1.4",
+              "build_file_content": "\nload(\"@rules_haskell//haskell:cabal.bzl\", \"haskell_cabal_binary\", \"haskell_cabal_library\")\nload(\"@rules_haskell//haskell:defs.bzl\", \"haskell_library\", \"haskell_toolchain_library\")\nhaskell_toolchain_library(name = \"Cabal\", visibility = [\"//visibility:private\"])\nhaskell_cabal_library(\n    name = \"libyaml\",\n    version = \"0.1.4\",\n    haddock = False,\n    flags = [\"-system-libyaml\"],\n    srcs = glob([\"libyaml-0.1.4/**/*\"]),\n    deps = [\"@stackage//:base\", \"@stackage//:conduit\", \"@stackage//:resourcet\", \"@stackage//:libyaml-clib\"],\n    tools = [],\n    visibility = [\"//visibility:public\"],\n    cabalopts = [\"--ghc-option=-w\", \"--ghc-option=-optF=-w\"],\n    verbose = False,\n    unique_name = True,\n)\n        "
+            }
+          },
+          "libyaml-clib": {
+            "bzlFile": "@@bazel_tools//tools/build_defs/repo:http.bzl",
+            "ruleClassName": "http_archive",
+            "attributes": {
+              "urls": [
+                "https://hackage.haskell.org/package/libyaml-clib-0.2.5/libyaml-clib-0.2.5.tar.gz"
+              ],
+              "integrity": "sha256-BFJrxU5fz0ccK9IoVOa1GeFipuPWVOhmzYhiEDxyUUk=",
+              "build_file_content": "\nload(\"@rules_haskell//haskell:cabal.bzl\", \"haskell_cabal_binary\", \"haskell_cabal_library\")\nload(\"@rules_haskell//haskell:defs.bzl\", \"haskell_library\", \"haskell_toolchain_library\")\nhaskell_toolchain_library(name = \"Cabal\", visibility = [\"//visibility:private\"])\nhaskell_cabal_library(\n    name = \"libyaml-clib\",\n    version = \"0.2.5\",\n    haddock = False,\n    flags = [],\n    srcs = glob([\"libyaml-clib-0.2.5/**/*\"]),\n    tools = [],\n    visibility = [\"//visibility:public\"],\n    cabalopts = [\"--ghc-option=-w\", \"--ghc-option=-optF=-w\"],\n    verbose = False,\n    unique_name = True,\n)\n    "
             }
           }
         },
@@ -1055,7 +1088,7 @@
     "@@rules_haskell~//extensions:stack_snapshot.bzl%stack_snapshot": {
       "general": {
         "bzlTransitiveDigest": "y4BGoCRypgR5pPUjRTExOCNOVpjzkWAQpDUg+NVjvBM=",
-        "usagesDigest": "MmFRtH8Z1vNOAUH1EP9662iPaJ/T6kIPfxzVCM4rGiM=",
+        "usagesDigest": "WpI3slwrhVvn3WqfZXfO8QPl2/YpC1q2fIjMvhV657w=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},
         "envVariables": {},
@@ -1079,7 +1112,10 @@
               "unmangled_repo_name": "stackage",
               "stack": "@@rules_haskell~~rules_haskell_dependencies~rules_haskell_stack//:stack",
               "stack_update": "@@rules_haskell~~stack_snapshot~rules_haskell_stack_update//:stack_update",
-              "vendored_packages": {},
+              "vendored_packages": {
+                "@@_main~non_module_deps~libyaml//:libyaml": "libyaml",
+                "@@_main~non_module_deps~libyaml-clib//:libyaml-clib": "libyaml-clib"
+              },
               "snapshot": "lts-24.19",
               "stack_snapshot_json": "@@//:stackage_snapshot.json",
               "packages": [
@@ -1111,6 +1147,8 @@
                 "tagsoup",
                 "directory",
                 "filepath",
+                "cmark",
+                "resourcet",
                 "monad-logger",
                 "uuid",
                 "async",
@@ -1129,6 +1167,7 @@
                 "streaming-commons",
                 "digest",
                 "attoparsec",
+                "yaml",
                 "data-default-0.8.0.0",
                 "tls-2.1.2"
               ],
@@ -1154,9 +1193,14 @@
               "stack": "@@rules_haskell~~rules_haskell_dependencies~rules_haskell_stack//:stack",
               "stack_update": "'@@rules_haskell~~rules_haskell_dependencies~rules_haskell_stack_update//:stack_update'",
               "extra_deps": {
-                "@@_main~non_module_deps~zlib.hs//:zlib.hs": "zlib streaming-commons digest"
+                "@@_main~non_module_deps~zlib.hs//:zlib.hs": "zlib streaming-commons digest",
+                "@@_main~non_module_deps~libyaml-clib//:libyaml-clib": "yaml libyaml libyaml-clib",
+                "@@_main~non_module_deps~libyaml//:libyaml": "yaml libyaml"
               },
-              "vendored_packages": {},
+              "vendored_packages": {
+                "@@_main~non_module_deps~libyaml//:libyaml": "libyaml",
+                "@@_main~non_module_deps~libyaml-clib//:libyaml-clib": "libyaml-clib"
+              },
               "snapshot": "lts-24.19",
               "stack_snapshot_json": "@@//:stackage_snapshot.json",
               "packages": [
@@ -1188,6 +1232,8 @@
                 "tagsoup",
                 "directory",
                 "filepath",
+                "cmark",
+                "resourcet",
                 "monad-logger",
                 "uuid",
                 "async",
@@ -1206,6 +1252,7 @@
                 "streaming-commons",
                 "digest",
                 "attoparsec",
+                "yaml",
                 "data-default-0.8.0.0",
                 "tls-2.1.2"
               ],
