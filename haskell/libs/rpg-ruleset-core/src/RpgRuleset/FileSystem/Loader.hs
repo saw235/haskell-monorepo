@@ -2,13 +2,14 @@
 {-# LANGUAGE RecordWildCards #-}
 
 module RpgRuleset.FileSystem.Loader
-  ( loadRuleFromFile
-  , loadSystemFromDirectory
-  , loadAllRulesFromDirectory
-  , LoadError(..)
-  ) where
+  ( loadRuleFromFile,
+    loadSystemFromDirectory,
+    loadAllRulesFromDirectory,
+    LoadError (..),
+  )
+where
 
-import Control.Monad (forM, filterM)
+import Control.Monad (filterM, forM)
 import qualified Data.ByteString as BS
 import Data.Map.Strict (Map)
 import qualified Data.Map.Strict as Map
@@ -19,14 +20,13 @@ import qualified Data.Text as T
 import qualified Data.Text.Encoding as TE
 import Data.Time (getCurrentTime)
 import Data.Yaml (decodeEither')
-import System.Directory
-import System.FilePath
-
-import RpgRuleset.Core.Types
 import RpgRuleset.Core.Rule
 import RpgRuleset.Core.System
-import RpgRuleset.Parser.Yaml
+import RpgRuleset.Core.Types
 import RpgRuleset.Parser.Markdown
+import RpgRuleset.Parser.Yaml
+import System.Directory
+import System.FilePath
 
 -- | Errors that can occur during loading
 data LoadError
@@ -50,23 +50,24 @@ loadRuleFromFile sysId path = do
         Left err -> return $ Left $ ParseError path (T.pack $ show err)
         Right fm -> do
           let markdownContent = extractContentAfterFrontmatter textContent
-              rule = Rule
-                { ruleId = fmRuleId fm
-                , ruleCategory = fmCategory fm
-                , ruleSystemId = maybe sysId id (fmSystemId fm)
-                , ruleTitle = fmTitle fm
-                , ruleContent = markdownContent
-                , ruleTags = fmTags fm
-                , ruleVisibility = fmVisibility fm
-                , ruleVersion = fmVersion fm
-                , ruleChangelog = []
-                , ruleRelatedRules = fmRelatedRules fm
-                , ruleCrossSystemRefs = []
-                , ruleConditions = Nothing
-                , ruleFormulas = Nothing
-                , ruleSourceFile = path
-                , ruleLoadedAt = Just now
-                }
+              rule =
+                Rule
+                  { ruleId = fmRuleId fm,
+                    ruleCategory = fmCategory fm,
+                    ruleSystemId = maybe sysId id (fmSystemId fm),
+                    ruleTitle = fmTitle fm,
+                    ruleContent = markdownContent,
+                    ruleTags = fmTags fm,
+                    ruleVisibility = fmVisibility fm,
+                    ruleVersion = fmVersion fm,
+                    ruleChangelog = [],
+                    ruleRelatedRules = fmRelatedRules fm,
+                    ruleCrossSystemRefs = [],
+                    ruleConditions = Nothing,
+                    ruleFormulas = Nothing,
+                    ruleSourceFile = path,
+                    ruleLoadedAt = Just now
+                  }
           return $ Right rule
 
 -- | Load all rules from a directory (recursively)
@@ -87,12 +88,12 @@ checkDuplicates :: [Rule] -> Either LoadError [Rule]
 checkDuplicates rules = go rules Map.empty
   where
     go [] _ = Right rules
-    go (r:rs) seen =
+    go (r : rs) seen =
       let rid = ruleId r
           path = ruleSourceFile r
-      in case Map.lookup rid seen of
-        Just existingPath -> Left $ DuplicateRuleId rid existingPath path
-        Nothing -> go rs (Map.insert rid path seen)
+       in case Map.lookup rid seen of
+            Just existingPath -> Left $ DuplicateRuleId rid existingPath path
+            Nothing -> go rs (Map.insert rid path seen)
 
 -- | Load a system from a directory
 loadSystemFromDirectory :: FilePath -> IO (Either LoadError System)
@@ -120,10 +121,12 @@ loadSystemWithYaml dir yamlPath = do
         Left err -> return $ Left err
         Right rules ->
           let rulesMap = Map.fromList [(ruleId r, r) | r <- rules]
-          in return $ Right sys
-              { systemRules = rulesMap
-              , systemRootPath = dir
-              }
+           in return $
+                Right
+                  sys
+                    { systemRules = rulesMap,
+                      systemRootPath = dir
+                    }
 
 -- | Infer system from directory structure when no system.yaml
 inferSystemFromDirectory :: FilePath -> IO (Either LoadError System)
@@ -136,11 +139,13 @@ inferSystemFromDirectory dir = do
     Right rules ->
       let rulesMap = Map.fromList [(ruleId r, r) | r <- rules]
           categories = Set.toList $ Set.fromList [ruleCategory r | r <- rules]
-      in return $ Right $ (mkBaseSystem sysId (T.pack dirName))
-          { systemRules = rulesMap
-          , systemCategories = categories
-          , systemRootPath = dir
-          }
+       in return $
+            Right $
+              (mkBaseSystem sysId (T.pack dirName))
+                { systemRules = rulesMap,
+                  systemCategories = categories,
+                  systemRootPath = dir
+                }
 
 -- | Find all markdown files in a directory recursively
 findMarkdownFiles :: FilePath -> IO [FilePath]

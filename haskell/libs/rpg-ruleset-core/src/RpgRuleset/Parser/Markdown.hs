@@ -1,11 +1,12 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 module RpgRuleset.Parser.Markdown
-  ( parseMarkdownContent
-  , extractContentAfterFrontmatter
-  , MarkdownDocument(..)
-  , HeadingInfo(..)
-  ) where
+  ( parseMarkdownContent,
+    extractContentAfterFrontmatter,
+    MarkdownDocument (..),
+    HeadingInfo (..),
+  )
+where
 
 import CMark
 import Data.Text (Text)
@@ -13,17 +14,25 @@ import qualified Data.Text as T
 
 -- | A parsed markdown document
 data MarkdownDocument = MarkdownDocument
-  { mdContent :: !Text          -- ^ Raw markdown content (after frontmatter)
-  , mdHtml :: !Text             -- ^ Rendered HTML
-  , mdPlainText :: !Text        -- ^ Plain text for indexing/search
-  , mdHeadings :: ![HeadingInfo] -- ^ Extracted headings
-  } deriving (Show, Eq)
+  { -- | Raw markdown content (after frontmatter)
+    mdContent :: !Text,
+    -- | Rendered HTML
+    mdHtml :: !Text,
+    -- | Plain text for indexing/search
+    mdPlainText :: !Text,
+    -- | Extracted headings
+    mdHeadings :: ![HeadingInfo]
+  }
+  deriving (Show, Eq)
 
 -- | Information about a heading in the document
 data HeadingInfo = HeadingInfo
-  { hiLevel :: !Int    -- ^ Heading level (1-6)
-  , hiText :: !Text    -- ^ Heading text
-  } deriving (Show, Eq)
+  { -- | Heading level (1-6)
+    hiLevel :: !Int,
+    -- | Heading text
+    hiText :: !Text
+  }
+  deriving (Show, Eq)
 
 -- | Parse markdown content and extract useful information
 parseMarkdownContent :: Text -> MarkdownDocument
@@ -32,23 +41,23 @@ parseMarkdownContent content =
       html = nodeToHtml [] node
       plainText = extractPlainText node
       headings = extractHeadings node
-  in MarkdownDocument
-    { mdContent = content
-    , mdHtml = html
-    , mdPlainText = plainText
-    , mdHeadings = headings
-    }
+   in MarkdownDocument
+        { mdContent = content,
+          mdHtml = html,
+          mdPlainText = plainText,
+          mdHeadings = headings
+        }
 
 -- | Extract content after YAML frontmatter (between --- markers)
 extractContentAfterFrontmatter :: Text -> Text
 extractContentAfterFrontmatter input =
   let ls = T.lines input
-  in case ls of
-    ("---" : rest) ->
-      case break (== "---") rest of
-        (_, "---" : remaining) -> T.unlines remaining
+   in case ls of
+        ("---" : rest) ->
+          case break (== "---") rest of
+            (_, "---" : remaining) -> T.unlines remaining
+            _ -> input
         _ -> input
-    _ -> input
 
 -- | Extract plain text from a cmark node (for search indexing)
 extractPlainText :: Node -> Text
@@ -71,7 +80,7 @@ extractHeadings = collectHeadings
       case nodeType of
         HEADING level ->
           let text = T.concat (map extractHeadingText children)
-          in [HeadingInfo level text] ++ concatMap collectHeadings children
+           in [HeadingInfo level text] ++ concatMap collectHeadings children
         _ -> concatMap collectHeadings children
 
     extractHeadingText (Node _ nodeType children) =
@@ -84,7 +93,7 @@ extractHeadings = collectHeadings
 getDocumentTitle :: MarkdownDocument -> Maybe Text
 getDocumentTitle doc =
   case filter ((== 1) . hiLevel) (mdHeadings doc) of
-    (h:_) -> Just (hiText h)
+    (h : _) -> Just (hiText h)
     [] -> Nothing
 
 -- | Check if content contains a specific text (case-insensitive)
@@ -94,4 +103,4 @@ contentContains needle doc =
 
 -- | Get all text from a specific heading section
 getSectionContent :: Text -> MarkdownDocument -> Maybe Text
-getSectionContent _ _ = Nothing  -- Placeholder for future implementation
+getSectionContent _ _ = Nothing -- Placeholder for future implementation

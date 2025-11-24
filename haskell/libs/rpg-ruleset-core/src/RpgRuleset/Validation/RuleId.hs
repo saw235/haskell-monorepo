@@ -2,33 +2,38 @@
 
 module RpgRuleset.Validation.RuleId
   ( -- * Format Validation
-    validateRuleIdFormat
-  , checkRuleIdFormat
-  , RuleIdError(..)
-  , RuleIdWarning(..)
+    validateRuleIdFormat,
+    checkRuleIdFormat,
+    RuleIdError (..),
+    RuleIdWarning (..),
+
     -- * Duplicate Checking
-  , checkDuplicateIds
+    checkDuplicateIds,
+
     -- * Prefix Conventions
-  , checkPrefixConventions
-  , suggestedPrefixFor
-  ) where
+    checkPrefixConventions,
+    suggestedPrefixFor,
+  )
+where
 
 import Data.Set (Set)
 import qualified Data.Set as Set
 import Data.Text (Text)
 import qualified Data.Text as T
-
-import RpgRuleset.Core.Types (RuleId(..), Category(..))
+import RpgRuleset.Core.Types (Category (..), RuleId (..))
 
 -- | Errors from rule ID validation (blocking)
 data RuleIdError
-  = InvalidFormat !RuleId !Text  -- ^ Rule ID doesn't match ^[A-Z]{2,6}-\d{3}$
-  | DuplicateId !RuleId          -- ^ Rule ID already exists in system
+  = -- | Rule ID doesn't match ^[A-Z]{2,6}-\d{3}$
+    InvalidFormat !RuleId !Text
+  | -- | Rule ID already exists in system
+    DuplicateId !RuleId
   deriving (Show, Eq)
 
 -- | Warnings from rule ID validation (non-blocking)
 data RuleIdWarning
-  = NonStandardPrefix !RuleId !Text !Text  -- ^ (id, used prefix, suggested prefix)
+  = -- | (id, used prefix, suggested prefix)
+    NonStandardPrefix !RuleId !Text !Text
   deriving (Show, Eq)
 
 -- | Validate rule ID format: ^[A-Z]{2,6}-\d{3}$
@@ -38,20 +43,20 @@ checkRuleIdFormat rid@(RuleId ruleText) =
   case T.splitOn "-" ruleText of
     [prefix, num] ->
       let prefixLen = T.length prefix
-          isUpperAlpha = T.all (`elem` ['A'..'Z']) prefix
-          isThreeDigits = T.length num == 3 && T.all (`elem` ['0'..'9']) num
+          isUpperAlpha = T.all (`elem` ['A' .. 'Z']) prefix
+          isThreeDigits = T.length num == 3 && T.all (`elem` ['0' .. '9']) num
           validPrefix = prefixLen >= 2 && prefixLen <= 6 && isUpperAlpha
-      in if validPrefix && isThreeDigits
-         then Right ()
-         else Left $ InvalidFormat rid (describeError prefix num)
+       in if validPrefix && isThreeDigits
+            then Right ()
+            else Left $ InvalidFormat rid (describeError prefix num)
     _ -> Left $ InvalidFormat rid "Rule ID must be in format PREFIX-NNN (e.g., CHAR-001)"
   where
     describeError prefix num
       | T.length prefix < 2 = "Prefix too short (minimum 2 characters)"
       | T.length prefix > 6 = "Prefix too long (maximum 6 characters)"
-      | not (T.all (`elem` ['A'..'Z']) prefix) = "Prefix must be uppercase letters only"
+      | not (T.all (`elem` ['A' .. 'Z']) prefix) = "Prefix must be uppercase letters only"
       | T.length num /= 3 = "Number must be exactly 3 digits"
-      | not (T.all (`elem` ['0'..'9']) num) = "Number must contain only digits"
+      | not (T.all (`elem` ['0' .. '9']) num) = "Number must contain only digits"
       | otherwise = "Invalid format"
 
 -- | Simple validation returning Bool (for backwards compatibility)
@@ -74,20 +79,20 @@ checkPrefixConventions rid@(RuleId ruleText) cat =
   case T.splitOn "-" ruleText of
     (prefix : _) ->
       let suggested = suggestedPrefixFor cat
-      in if prefix `elem` suggested
-         then []
-         else case suggested of
-           (s:_) -> [NonStandardPrefix rid prefix s]
-           [] -> []
+       in if prefix `elem` suggested
+            then []
+            else case suggested of
+              (s : _) -> [NonStandardPrefix rid prefix s]
+              [] -> []
     _ -> []
 
 -- | Get suggested prefixes for a category
 suggestedPrefixFor :: Category -> [Text]
 suggestedPrefixFor (Category cat) = case cat of
   "character-creation" -> ["CHAR", "CLASS", "RACE", "CHRGEN"]
-  "world-building"     -> ["WRLD", "GEOG", "SETTL", "REGION"]
-  "interactions"       -> ["INTR", "SOCL", "CMBT", "SKILL"]
-  _                    -> ["MISC", "RULE"]
+  "world-building" -> ["WRLD", "GEOG", "SETTL", "REGION"]
+  "interactions" -> ["INTR", "SOCL", "CMBT", "SKILL"]
+  _ -> ["MISC", "RULE"]
 
 -- | Extract prefix from a rule ID
 extractPrefix :: RuleId -> Maybe Text
@@ -104,7 +109,7 @@ suggestNextId prefix existingIds =
       maxNum = if Set.null numbers then 0 else Set.findMax numbers
       nextNum = maxNum + 1
       paddedNum = T.justifyRight 3 '0' (T.pack $ show nextNum)
-  in RuleId $ prefix <> "-" <> paddedNum
+   in RuleId $ prefix <> "-" <> paddedNum
   where
     hasPrefix pfx (RuleId rt) = pfx `T.isPrefixOf` rt
     extractNumber (RuleId rt) =

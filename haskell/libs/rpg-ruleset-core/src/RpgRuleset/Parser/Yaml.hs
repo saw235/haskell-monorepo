@@ -2,11 +2,12 @@
 {-# LANGUAGE RecordWildCards #-}
 
 module RpgRuleset.Parser.Yaml
-  ( parseRuleFrontmatter
-  , parseFrontmatterFromFile
-  , RuleFrontmatter(..)
-  , ParseError(..)
-  ) where
+  ( parseRuleFrontmatter,
+    parseFrontmatterFromFile,
+    RuleFrontmatter (..),
+    ParseError (..),
+  )
+where
 
 import Data.Aeson
 import qualified Data.ByteString as BS
@@ -15,9 +16,8 @@ import qualified Data.Set as Set
 import Data.Text (Text)
 import qualified Data.Text as T
 import qualified Data.Text.Encoding as TE
-import Data.Yaml (decodeEither', ParseException)
+import Data.Yaml (ParseException, decodeEither')
 import GHC.Generics (Generic)
-
 import RpgRuleset.Core.Types
 
 -- | Parse errors that can occur during frontmatter parsing
@@ -30,27 +30,29 @@ data ParseError
 
 -- | Frontmatter extracted from a rule markdown file
 data RuleFrontmatter = RuleFrontmatter
-  { fmRuleId :: !RuleId
-  , fmCategory :: !Category
-  , fmTitle :: !(Maybe Text)
-  , fmTags :: !(Set Tag)
-  , fmVisibility :: !Visibility
-  , fmVersion :: !Version
-  , fmRelatedRules :: ![RuleId]
-  , fmSystemId :: !(Maybe SystemId)
-  } deriving (Show, Eq)
+  { fmRuleId :: !RuleId,
+    fmCategory :: !Category,
+    fmTitle :: !(Maybe Text),
+    fmTags :: !(Set Tag),
+    fmVisibility :: !Visibility,
+    fmVersion :: !Version,
+    fmRelatedRules :: ![RuleId],
+    fmSystemId :: !(Maybe SystemId)
+  }
+  deriving (Show, Eq)
 
 -- | Intermediate type for JSON/YAML parsing
 data RawFrontmatter = RawFrontmatter
-  { rawRuleId :: !Text
-  , rawCategory :: !Text
-  , rawTitle :: !(Maybe Text)
-  , rawTags :: !(Maybe [Text])
-  , rawVisibility :: !(Maybe Text)
-  , rawVersion :: !(Maybe Text)
-  , rawRelatedRules :: !(Maybe [Text])
-  , rawSystemId :: !(Maybe Text)
-  } deriving (Show, Generic)
+  { rawRuleId :: !Text,
+    rawCategory :: !Text,
+    rawTitle :: !(Maybe Text),
+    rawTags :: !(Maybe [Text]),
+    rawVisibility :: !(Maybe Text),
+    rawVersion :: !(Maybe Text),
+    rawRelatedRules :: !(Maybe [Text]),
+    rawSystemId :: !(Maybe Text)
+  }
+  deriving (Show, Generic)
 
 instance FromJSON RawFrontmatter where
   parseJSON = withObject "RawFrontmatter" $ \o -> do
@@ -62,7 +64,7 @@ instance FromJSON RawFrontmatter where
     rawVersion <- o .:? "version"
     rawRelatedRules <- o .:? "related_rules"
     rawSystemId <- o .:? "system_id"
-    return RawFrontmatter{..}
+    return RawFrontmatter {..}
 
 -- | Parse YAML frontmatter from text
 parseRuleFrontmatter :: Text -> Either ParseError RuleFrontmatter
@@ -75,12 +77,12 @@ parseRuleFrontmatter input = do
 extractFrontmatter :: Text -> Either ParseError Text
 extractFrontmatter input =
   let ls = T.lines input
-  in case ls of
-    ("---" : rest) ->
-      case break (== "---") rest of
-        (yamlLines, "---" : _) -> Right (T.unlines yamlLines)
-        _ -> Left InvalidFrontmatterDelimiter
-    _ -> Left MissingFrontmatter
+   in case ls of
+        ("---" : rest) ->
+          case break (== "---") rest of
+            (yamlLines, "---" : _) -> Right (T.unlines yamlLines)
+            _ -> Left InvalidFrontmatterDelimiter
+        _ -> Left MissingFrontmatter
 
 -- | Parse YAML text into RawFrontmatter
 parseYaml :: Text -> Either ParseError RawFrontmatter
@@ -91,16 +93,18 @@ parseYaml yamlText =
 
 -- | Convert raw frontmatter to typed frontmatter
 convertRawFrontmatter :: RawFrontmatter -> Either ParseError RuleFrontmatter
-convertRawFrontmatter RawFrontmatter{..} = Right RuleFrontmatter
-  { fmRuleId = RuleId rawRuleId
-  , fmCategory = Category rawCategory
-  , fmTitle = rawTitle
-  , fmTags = Set.fromList $ map Tag (maybe [] id rawTags)
-  , fmVisibility = parseVisibility rawVisibility
-  , fmVersion = parseVersion rawVersion
-  , fmRelatedRules = map RuleId (maybe [] id rawRelatedRules)
-  , fmSystemId = SystemId <$> rawSystemId
-  }
+convertRawFrontmatter RawFrontmatter {..} =
+  Right
+    RuleFrontmatter
+      { fmRuleId = RuleId rawRuleId,
+        fmCategory = Category rawCategory,
+        fmTitle = rawTitle,
+        fmTags = Set.fromList $ map Tag (maybe [] id rawTags),
+        fmVisibility = parseVisibility rawVisibility,
+        fmVersion = parseVersion rawVersion,
+        fmRelatedRules = map RuleId (maybe [] id rawRelatedRules),
+        fmSystemId = SystemId <$> rawSystemId
+      }
 
 -- | Parse visibility from text
 parseVisibility :: Maybe Text -> Visibility

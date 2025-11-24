@@ -1,7 +1,7 @@
 module Main where
 
-import CLI.Options (parseOptions)
 import CLI.Commands (runCommand)
+import CLI.Options (parseOptions)
 
 main :: IO ()
 main = do

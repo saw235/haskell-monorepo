@@ -2,31 +2,30 @@
 {-# LANGUAGE RecordWildCards #-}
 
 module CLI.Commands
-  ( runCommand
-  , runQuery
-  , runValidate
-  , runList
-  , runInfo
-  , runInit
-  ) where
+  ( runCommand,
+    runQuery,
+    runValidate,
+    runList,
+    runInfo,
+    runInit,
+  )
+where
 
+import CLI.Options
+import CLI.Output
 import Control.Monad (when)
 import Data.Text (Text)
 import qualified Data.Text as T
 import qualified Data.Text.IO as TIO
-import System.Exit (exitFailure, exitSuccess)
-
-import RpgRuleset.Core.Types
 import RpgRuleset.Core.Rule
 import RpgRuleset.Core.System hiding (getAllRules)
-import RpgRuleset.Query.Index
-import RpgRuleset.Query.Engine
+import RpgRuleset.Core.Types
 import RpgRuleset.FileSystem.Loader
 import RpgRuleset.FileSystem.Structure
+import RpgRuleset.Query.Engine
+import RpgRuleset.Query.Index
 import RpgRuleset.Validation.RuleId
-
-import CLI.Options
-import CLI.Output
+import System.Exit (exitFailure, exitSuccess)
 
 -- | Run the appropriate command based on options
 runCommand :: Options -> IO ()
@@ -40,7 +39,7 @@ runCommand opts = do
 
 -- | Execute query command
 runQuery :: Options -> QueryOptions -> IO ()
-runQuery opts QueryOptions{..} = do
+runQuery opts QueryOptions {..} = do
   -- Load system(s)
   loadResult <- loadSystemFromDirectory (optDataDir opts)
   case loadResult of
@@ -52,15 +51,16 @@ runQuery opts QueryOptions{..} = do
       let idx = buildIndex [sys]
 
       -- Build query
-      let query = Query
-            { qKeywords = qoKeywords
-            , qFilterCategory = qoCategory
-            , qFilterSystem = qoSystem
-            , qFilterTags = qoTags
-            , qFilterVisibility = Just (roleToVisibility $ optRole opts)
-            , qLimit = qoLimit
-            , qOffset = 0
-            }
+      let query =
+            Query
+              { qKeywords = qoKeywords,
+                qFilterCategory = qoCategory,
+                qFilterSystem = qoSystem,
+                qFilterTags = qoTags,
+                qFilterVisibility = Just (roleToVisibility $ optRole opts),
+                qLimit = qoLimit,
+                qOffset = 0
+              }
 
       -- Execute query
       let results = executeQuery query idx
@@ -73,7 +73,7 @@ runQuery opts QueryOptions{..} = do
 
 -- | Execute validate command
 runValidate :: Options -> ValidateOptions -> IO ()
-runValidate opts ValidateOptions{..} = do
+runValidate opts ValidateOptions {..} = do
   -- Load the rule file
   loadResult <- loadRuleFromFile (SystemId "validation") voFilePath
   case loadResult of
@@ -99,7 +99,7 @@ runValidate opts ValidateOptions{..} = do
 
 -- | Execute list command
 runList :: Options -> ListOptions -> IO ()
-runList opts ListOptions{..} = do
+runList opts ListOptions {..} = do
   loadResult <- loadSystemFromDirectory (optDataDir opts)
   case loadResult of
     Left err -> do
@@ -119,7 +119,7 @@ runList opts ListOptions{..} = do
 
 -- | Execute info command
 runInfo :: Options -> InfoOptions -> IO ()
-runInfo opts InfoOptions{..} = do
+runInfo opts InfoOptions {..} = do
   loadResult <- loadSystemFromDirectory (optDataDir opts)
   case loadResult of
     Left err -> do
@@ -140,7 +140,7 @@ runInfo opts InfoOptions{..} = do
 
 -- | Execute init command
 runInit :: Options -> InitOptions -> IO ()
-runInit _ InitOptions{..} = do
+runInit _ InitOptions {..} = do
   createSystemStructure initPath (SystemId initSystemId) initSystemName
   TIO.putStrLn $ "Initialized new ruleset at: " <> T.pack initPath
   TIO.putStrLn "Created:"
@@ -153,4 +153,4 @@ runInit _ InitOptions{..} = do
 -- | Convert user role to visibility filter
 roleToVisibility :: UserRole -> Visibility
 roleToVisibility Player = Public
-roleToVisibility GameMaster = GMOnly  -- GM can see all, but we filter to GMOnly to include both
+roleToVisibility GameMaster = GMOnly -- GM can see all, but we filter to GMOnly to include both
